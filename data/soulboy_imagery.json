@@ -1,6 +1,6 @@
 {
   "collectionId": 201549018,
-  "method": "Counts: greedy longest-first match of a hand-built lexicon over LRCLIB plainLyrics (repeated choruses count each time). nature = nature_plants + sky_weather + water; city = city_street. 紅 includes 紅與不紅 in 南音, where it also means fame. Palette, mood and hoverQuote are hand-curated interpretation, not measured.",
+  "method": "Counts: greedy longest-first match of a hand-built lexicon over LRCLIB plainLyrics (repeated choruses count each time). nature = nature_plants + sky_weather + water; city = city_street. Palette, mood and hoverQuote are hand-curated interpretation, not measured.",
   "categories": [
     "nature_plants",
     "sky_weather",
@@ -265,8 +265,7 @@
         }
       },
       "colourWords": {
-        "blue": 4,
-        "white": 2
+        "blue": 4
       },
       "natureVsCity": {
         "nature": 4,
@@ -390,9 +389,7 @@
           "神": 3
         }
       },
-      "colourWords": {
-        "white": 2
-      },
+      "colourWords": {},
       "natureVsCity": {
         "nature": 0,
         "city": 6,
@@ -537,7 +534,7 @@
         }
       },
       "colourWords": {
-        "red": 7,
+        "red": 1,
         "black": 3,
         "rainbow": 2
       },
@@ -989,9 +986,7 @@
           "家": 1
         }
       },
-      "colourWords": {
-        "white": 1
-      },
+      "colourWords": {},
       "natureVsCity": {
         "nature": 0,
         "city": 5,

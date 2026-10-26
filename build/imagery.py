@@ -28,7 +28,7 @@ STOP = "光榮"
 
 COLOURS = {"紅": "red", "綠": "green", "藍": "blue", "黑": "black", "白": "white",
            "金": "gold", "彩虹": "rainbow"}
-COLOUR_STOP = "青蛙 晴"  # 青 in 青蛙 is not a colour
+COLOUR_STOP = "青蛙 晴 明白 坦白 紅與不紅"  # not colours: 青蛙 (frog), 明白/坦白 (understand/frank), 紅與不紅 (famous or not)
 
 
 def tokenize(text, lexicon):
@@ -161,7 +161,7 @@ def main():
         "collectionId": album["collectionId"],
         "method": ("Counts: greedy longest-first match of a hand-built lexicon over LRCLIB plainLyrics "
                    "(repeated choruses count each time). nature = nature_plants + sky_weather + water; "
-                   "city = city_street. 紅 includes 紅與不紅 in 南音, where it also means fame. "
+                   "city = city_street. "
                    "Palette, mood and hoverQuote are hand-curated interpretation, not measured."),
         "categories": list(LEXICON),
         "tracks": tracks,
