@@ -27,6 +27,20 @@
       "water": 0,
       "solitude": 0
     },
+    "imagery": {
+      "nature_plants": 0,
+      "sky_weather": 0,
+      "water": 0,
+      "light_fire": 0,
+      "night_moon": 0,
+      "city_street": 0,
+      "body_gesture": 0,
+      "time_memory": 0,
+      "people_relationships": 0,
+      "cosmos": 0
+    },
+    "love": 0,
+    "love_en": 1,
     "palette": [
       "#F2E6D0",
       "#D9A441",
@@ -65,6 +79,20 @@
       "water": 1,
       "solitude": 2
     },
+    "imagery": {
+      "nature_plants": 0,
+      "sky_weather": 3,
+      "water": 0,
+      "light_fire": 0,
+      "night_moon": 0,
+      "city_street": 0,
+      "body_gesture": 7,
+      "time_memory": 11,
+      "people_relationships": 7,
+      "cosmos": 0
+    },
+    "love": 1,
+    "love_en": 0,
     "palette": [
       "#7A8691",
       "#8EC5E8",
@@ -104,6 +132,20 @@
       "water": 4,
       "solitude": 6
     },
+    "imagery": {
+      "nature_plants": 12,
+      "sky_weather": 13,
+      "water": 1,
+      "light_fire": 0,
+      "night_moon": 3,
+      "city_street": 2,
+      "body_gesture": 3,
+      "time_memory": 16,
+      "people_relationships": 0,
+      "cosmos": 1
+    },
+    "love": 0,
+    "love_en": 0,
     "palette": [
       "#F4A6A0",
       "#8DB86B",
@@ -144,6 +186,20 @@
       "water": 4,
       "solitude": 9
     },
+    "imagery": {
+      "nature_plants": 0,
+      "sky_weather": 0,
+      "water": 4,
+      "light_fire": 0,
+      "night_moon": 0,
+      "city_street": 6,
+      "body_gesture": 7,
+      "time_memory": 14,
+      "people_relationships": 5,
+      "cosmos": 0
+    },
+    "love": 0,
+    "love_en": 1,
     "palette": [
       "#1F6FB2",
       "#9A9A9A",
@@ -182,6 +238,20 @@
       "water": 0,
       "solitude": 3
     },
+    "imagery": {
+      "nature_plants": 0,
+      "sky_weather": 0,
+      "water": 0,
+      "light_fire": 0,
+      "night_moon": 0,
+      "city_street": 0,
+      "body_gesture": 6,
+      "time_memory": 3,
+      "people_relationships": 8,
+      "cosmos": 1
+    },
+    "love": 9,
+    "love_en": 0,
     "palette": [
       "#E7A1B0",
       "#B49A7A",
@@ -220,6 +290,20 @@
       "water": 0,
       "solitude": 2
     },
+    "imagery": {
+      "nature_plants": 0,
+      "sky_weather": 0,
+      "water": 0,
+      "light_fire": 0,
+      "night_moon": 0,
+      "city_street": 6,
+      "body_gesture": 2,
+      "time_memory": 5,
+      "people_relationships": 3,
+      "cosmos": 3
+    },
+    "love": 12,
+    "love_en": 0,
     "palette": [
       "#F7C6C7",
       "#C2A27C",
@@ -258,6 +342,20 @@
       "water": 0,
       "solitude": 9
     },
+    "imagery": {
+      "nature_plants": 0,
+      "sky_weather": 0,
+      "water": 0,
+      "light_fire": 0,
+      "night_moon": 0,
+      "city_street": 0,
+      "body_gesture": 19,
+      "time_memory": 0,
+      "people_relationships": 0,
+      "cosmos": 0
+    },
+    "love": 0,
+    "love_en": 0,
     "palette": [
       "#4B3B6B",
       "#E0B84C",
@@ -296,6 +394,20 @@
       "water": 5,
       "solitude": 6
     },
+    "imagery": {
+      "nature_plants": 0,
+      "sky_weather": 4,
+      "water": 4,
+      "light_fire": 11,
+      "night_moon": 7,
+      "city_street": 10,
+      "body_gesture": 8,
+      "time_memory": 4,
+      "people_relationships": 6,
+      "cosmos": 0
+    },
+    "love": 1,
+    "love_en": 0,
     "palette": [
       "#14141A",
       "#9E1B1B",
@@ -336,6 +448,20 @@
       "water": 0,
       "solitude": 1
     },
+    "imagery": {
+      "nature_plants": 0,
+      "sky_weather": 0,
+      "water": 0,
+      "light_fire": 0,
+      "night_moon": 0,
+      "city_street": 1,
+      "body_gesture": 12,
+      "time_memory": 5,
+      "people_relationships": 7,
+      "cosmos": 17
+    },
+    "love": 0,
+    "love_en": 0,
     "palette": [
       "#0B1D3A",
       "#2E6DA4",
@@ -375,6 +501,20 @@
       "water": 0,
       "solitude": 4
     },
+    "imagery": {
+      "nature_plants": 0,
+      "sky_weather": 0,
+      "water": 0,
+      "light_fire": 8,
+      "night_moon": 2,
+      "city_street": 4,
+      "body_gesture": 29,
+      "time_memory": 3,
+      "people_relationships": 2,
+      "cosmos": 20
+    },
+    "love": 0,
+    "love_en": 0,
     "palette": [
       "#BDBAB2",
       "#F26B1D",
@@ -414,6 +554,20 @@
       "water": 1,
       "solitude": 9
     },
+    "imagery": {
+      "nature_plants": 6,
+      "sky_weather": 4,
+      "water": 0,
+      "light_fire": 0,
+      "night_moon": 1,
+      "city_street": 0,
+      "body_gesture": 9,
+      "time_memory": 7,
+      "people_relationships": 2,
+      "cosmos": 3
+    },
+    "love": 3,
+    "love_en": 0,
     "palette": [
       "#A47C48",
       "#DDE7F5",
@@ -454,6 +608,20 @@
       "water": 0,
       "solitude": 0
     },
+    "imagery": {
+      "nature_plants": 0,
+      "sky_weather": 1,
+      "water": 0,
+      "light_fire": 1,
+      "night_moon": 3,
+      "city_street": 14,
+      "body_gesture": 0,
+      "time_memory": 11,
+      "people_relationships": 10,
+      "cosmos": 0
+    },
+    "love": 0,
+    "love_en": 0,
     "palette": [
       "#707780",
       "#7FA36B",
@@ -492,6 +660,20 @@
       "water": 2,
       "solitude": 8
     },
+    "imagery": {
+      "nature_plants": 2,
+      "sky_weather": 2,
+      "water": 0,
+      "light_fire": 0,
+      "night_moon": 0,
+      "city_street": 0,
+      "body_gesture": 2,
+      "time_memory": 4,
+      "people_relationships": 0,
+      "cosmos": 0
+    },
+    "love": 0,
+    "love_en": 1,
     "palette": [
       "#F3B5C4",
       "#23304A",
@@ -531,6 +713,20 @@
       "water": 0,
       "solitude": 1
     },
+    "imagery": {
+      "nature_plants": 0,
+      "sky_weather": 0,
+      "water": 0,
+      "light_fire": 0,
+      "night_moon": 1,
+      "city_street": 5,
+      "body_gesture": 1,
+      "time_memory": 7,
+      "people_relationships": 3,
+      "cosmos": 0
+    },
+    "love": 0,
+    "love_en": 0,
     "palette": [
       "#E8D6BF",
       "#6F4E37",

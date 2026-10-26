@@ -1,13 +1,15 @@
 """Step f: data/songs.json, one compact object per track for the visual.
 
 Seven imagery weights from build/imagery_lexicon.json (normalised to sum 1),
+raw counts for the 10 imagery groups from imagery.py (same as soulboy_imagery.json),
 audio features from data/soulboy_features.json, palette and quote from the
 hand-curated EDITORIAL table in imagery.py.
 """
 import os
+import re
 
 from common import DATA, RAW, read_json, write_json
-from imagery import EDITORIAL, tokenize
+from imagery import EDITORIAL, LEXICON, STOP, tokenize
 
 SPARSE_BELOW = 4  # fewer total hits than this: too little evidence, use equal weights
 CATS = ["love", "light", "sun", "night", "nature", "water", "solitude"]
@@ -19,6 +21,10 @@ def main():
     for c in CATS:
         for w in spec[c]:
             lex[w] = c
+    groups = {STOP: None}
+    for g, words in LEXICON.items():
+        for w in words.split():
+            groups[w] = g
     album = read_json(os.path.join(DATA, "soulboy_tracks.json"))
     feats = {f["trackNumber"]: f["reccobeats"] for f in read_json(os.path.join(DATA, "soulboy_features.json"))["tracks"]}
     energies = [feats[t["trackNumber"]]["energy"] for t in album["tracks"]]
@@ -30,6 +36,8 @@ def main():
         hits = tokenize(text, lex)
         counts = {c: sum(hits.get(c, {}).values()) for c in CATS}
         total = sum(counts.values())
+        ghits = tokenize(text, groups)
+        imagery = {g: sum(ghits.get(g, {}).values()) for g in LEXICON}
         sparse = total < SPARSE_BELOW
         weights = {c: round(1 / 7, 3) if sparse else round(counts[c] / total, 3) for c in CATS}
         f = feats[n]
@@ -37,7 +45,9 @@ def main():
             "album": "Soulboy", "year": 2005, "track": n, "name": t["trackName"],
             "tempo": round(f["tempo"], 2), "energy": round(f["energy"], 2), "valence": round(f["valence"], 2),
             "intensity": round((f["energy"] - lo) / (hi - lo), 3),
-            "weights": weights, "sparse": sparse, "hits": counts,
+            "weights": weights, "sparse": sparse, "hits": counts, "imagery": imagery,
+            "love": text.count("愛") + text.count("爱"),
+            "love_en": len(re.findall(r"\blove\b", text, re.IGNORECASE)),
             "palette": [h for h, _ in EDITORIAL[n]["palette"]],
             "quote": EDITORIAL[n]["quote"],
             "preview_url": t["previewUrl"], "apple_url": t["trackViewUrl"], "artwork": t["artworkUrl600"],
