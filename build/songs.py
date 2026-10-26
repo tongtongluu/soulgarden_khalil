@@ -38,6 +38,8 @@ def main():
         total = sum(counts.values())
         ghits = tokenize(text, groups)
         imagery = {g: sum(ghits.get(g, {}).values()) for g in LEXICON}
+        love_zh = text.count("愛") + text.count("爱")
+        love_en = len(re.findall(r"\blove\b", text, re.IGNORECASE))
         sparse = total < SPARSE_BELOW
         weights = {c: round(1 / 7, 3) if sparse else round(counts[c] / total, 3) for c in CATS}
         f = feats[n]
@@ -46,8 +48,8 @@ def main():
             "tempo": round(f["tempo"], 2), "energy": round(f["energy"], 2), "valence": round(f["valence"], 2),
             "intensity": round((f["energy"] - lo) / (hi - lo), 3),
             "weights": weights, "sparse": sparse, "hits": counts, "imagery": imagery,
-            "love": text.count("愛") + text.count("爱"),
-            "love_en": len(re.findall(r"\blove\b", text, re.IGNORECASE)),
+            "love": love_zh + love_en,  # 愛 + 爱 + English "love"
+            "love_en": love_en,
             "palette": [h for h, _ in EDITORIAL[n]["palette"]],
             "quote": EDITORIAL[n]["quote"],
             "preview_url": t["previewUrl"], "apple_url": t["trackViewUrl"], "artwork": t["artworkUrl600"],

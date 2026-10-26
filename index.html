@@ -72,8 +72,8 @@ h1 { font-family: var(--display); font-weight: 400; font-size: 20px; line-height
 .chips[data-off="true"] { display: none; }
 .seg button { border: 0; background: transparent; color: var(--muted); font: 500 12px var(--body); padding: 5px 12px; border-radius: 999px; cursor: pointer; }
 .seg button[aria-pressed="true"] { background: var(--bg); color: var(--fg); }
-.sound { border: 1px solid var(--line); background: transparent; color: var(--muted); font: 500 12px var(--body); padding: 5px 12px; border-radius: 999px; cursor: pointer; }
-.sound[aria-pressed="true"] { color: var(--fg); border-color: var(--fg); }
+.sound { justify-self: start; border: 1px solid var(--fg); background: transparent; color: var(--fg); font: 500 12px var(--body); padding: 6px 14px; border-radius: 999px; cursor: pointer; }
+.sound[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
 .sound:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 .stage { position: relative; }
 canvas { display: block; width: 100%; touch-action: manipulation; }
@@ -88,6 +88,10 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 .tip .quote { margin: 0; font: 500 14px "Noto Sans SC", var(--body); line-height: 1.5; }
 .tip .meta { font: 12px var(--mono); color: var(--muted); }
 .bars { display: grid; gap: 5px; }
+.words { display: flex; flex-wrap: wrap; gap: 6px 10px; }
+.words > span { display: inline-flex; align-items: center; gap: 5px; font: 500 14px "Noto Sans SC", var(--body); }
+.words i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+.words b { font: 400 11px var(--mono); color: var(--muted); }
 .bar { display: grid; grid-template-columns: 92px 1fr 30px; gap: 8px; align-items: center; font-size: 12px; }
 .bar span:last-child { font-family: var(--mono); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
 .bar b { display: block; height: 6px; border-radius: 3px; }
@@ -111,6 +115,7 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
     </div>
   </header>
 
+  <button class="sound" id="sound" aria-pressed="false" hidden>♪ Turn sound on</button>
   <div class="controls">
     <div class="chips" id="chips" role="group" aria-label="Filter by imagery"></div>
     <div class="seg" role="group" aria-label="View">
@@ -119,7 +124,7 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
       <button id="v-fuse" data-view="fuse" aria-pressed="false">Album blends</button>
       <button id="v-soul" data-view="soul" aria-pressed="false">Soul palette</button>
     </div>
-    <button class="sound" id="sound" aria-pressed="false" hidden>Sound off</button>
+
   </div>
 
   <div class="stage" id="stage">
@@ -129,9 +134,11 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 
     <p class="lede" id="intro">Every song is a vessel holding the images in its lyrics. Its color comes from the images that appear most, and its curves come from the song's tempo and mood. Hover over a vessel to see what it holds, and turn the sound on to hear it.</p>
   <dl class="key">
-    <div><dt>Color</dt><dd>The leading image sets the base color. The second image sets the other end of the gradient.</dd></div>
-    <div><dt>Number of curves</dt><dd>The faster the tempo, the more the outline bends.</dd></div>
+    <div><dt>Color</dt><dd>Every imagery word in the lyrics is counted into one of ten groups. The group with the most hits sets the base color, the second sets the other end of the gradient.</dd></div>
+    <div><dt>Beat</dt><dd>The faster the tempo, the more curves in the outline. Hover a vase and it pulses on every beat, at the song's real BPM.</dd></div>
+    <div><dt>Height and width</dt><dd>Brighter, happier songs (valence) stand taller. Songs with more energy are fuller and wider.</dd></div>
     <div><dt>Depth of curves</dt><dd>The stronger the emotion, the narrower the waist.</dd></div>
+    <div><dt>Flower</dt><dd>He sang about love all the time. Every song whose lyrics mention love 愛 gets flowers in its vase: one flower for every five mentions, and each petal is one mention, so you can count them.</dd></div>
     <div><dt>Pebble shape</dt><dd>A slow ballad, under 78 BPM.</dd></div>
     <div><dt>Background</dt><dd>The page fades through the places he lived as you scroll: the ocean of Kauaʻi where he was born, the harbor haze of Hong Kong where he grew up and made music, and the red earth of Yunnan where he went in his last years.</dd></div>
     <div><dt>Blends</dt><dd>A group of songs averaged into one outline, with each image as a flowing patch of color sized by its share. Album blends show each album's character. Soul palette pours every song into one smiling bowl: the bowl holds his whole palette, the two fins carry the second and third images, and each leaf is one song. Hover a leaf to hear it.</dd></div>
@@ -140,16 +147,80 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 </div>
 
 <script>
+// imagery groups from the hand-built lexicon matched against the full lyrics; terms are the most frequent hits on Soulboy
 const CATS = [
-  { id: "love",     zh: "Love",         color: "#DD7FF2" },
-  { id: "light",    zh: "Light & Sun",  color: "#F2B07E" },
-  { id: "sun",      zh: "Spring",       color: "#F5D84E" },
-  { id: "night",    zh: "Moon & Night", color: "#9A89F4" },
-  { id: "nature",   zh: "Wind & Trees", color: "#5CB35B" },
-  { id: "water",    zh: "Sea & Rain",   color: "#BBD6CF" },
-  { id: "solitude", zh: "Inner self",   color: "var(--solitude)" },
+  { id: "body_gesture",         zh: "心 Heart",     color: "#DD7FF2", terms: "跳 29 · 心 22 · 笑 8 · 手 6" },
+  { id: "time_memory",          zh: "每天 Every Day",    color: "#C9C2F6", terms: "每天 14 · 年 13 · 歲 8 · 從前 6" },
+  { id: "people_relationships", zh: "家 Home",    color: "#F2A0A8", terms: "家 15 · 女人 8 · 妹妹 4 · 朋友 4" },
+  { id: "city_street",          zh: "街 Street",    color: "#F2B07E", terms: "路上 4 · 電影 4 · 街上 3 · 酒家 3" },
+  { id: "cosmos",               zh: "世界 World",   color: "var(--solitude)", terms: "世界 32 · 神 4 · 宇宙 2 · 地球 2" },
+  { id: "sky_weather",          zh: "春風 Spring Breeze",       color: "#A9C9EC", terms: "春風 11 · 北風 3 · 雲煙 3 · 悶雷 2" },
+  { id: "nature_plants",        zh: "蝴蝶 Butterfly", color: "#5CB35B", terms: "蛇 3 · 蝴蝶 3 · 原野 3 · 原上草 3" },
+  { id: "light_fire",           zh: "彩虹 Rainbow",  color: "#F5D84E", terms: "彩虹 8 · 燭光 3 · 點亮 3 · 燈籠 3" },
+  { id: "night_moon",           zh: "月 Moon",     color: "#9A89F4", terms: "月 4 · 睡 3 · 漆黑 3 · 夜夜 3" },
+  { id: "water",                zh: "河 River",            color: "#8CCBC4", terms: "地中海 4 · 二泉 4 · 河水 1" },
 ];
-// his ten studio albums. Track counts marked est. still need checking against the real track lists.
+const CAT_IDS = CATS.map(c => c.id);
+
+// 30-second Apple Music previews, one per Soulboy track
+const PREVIEW = "https://audio-ssl.itunes.apple.com/itunes-assets/";
+const SOULBOY_PREVIEWS = [
+  "AudioPreview211/v4/55/88/a1/5588a103-31bf-3aa3-5b05-4f64fe52530c/mzaf_7906769655068276836",
+  "AudioPreview221/v4/1b/d8/10/1bd81065-e73f-6508-33c6-5800ea180b68/mzaf_9240509401817177528",
+  "AudioPreview221/v4/89/d6/26/89d62600-f8fe-2d9d-125b-2da04a1d1ea1/mzaf_8141115204770988923",
+  "AudioPreview221/v4/df/d2/c6/dfd2c65b-6682-1424-4da2-2cbf0187db01/mzaf_7495295061315326220",
+  "AudioPreview221/v4/26/43/0f/26430fdd-9350-73d3-cda2-e95336e2ea17/mzaf_600185344897575406",
+  "AudioPreview221/v4/c9/b8/d7/c9b8d733-d68e-7ce6-09ac-ec72c21c47c7/mzaf_9571532606197312054",
+  "AudioPreview221/v4/73/8a/6c/738a6c01-3531-861b-3d2f-68650546b936/mzaf_3108426352824120754",
+  "AudioPreview221/v4/86/e7/8f/86e78f33-6e12-2035-6ed7-7f72f0fc60bf/mzaf_2901120415602175318",
+  "AudioPreview211/v4/8b/bf/52/8bbf52dd-4e40-11ac-e80a-401f2e9f4c5c/mzaf_5658586915630607559",
+  "AudioPreview221/v4/11/18/58/111858d5-89f6-8f91-6b36-4b9d7990e96e/mzaf_17326809479464166157",
+  "AudioPreview221/v4/c7/99/57/c799572d-ba2f-5132-8476-3b26022d0b0c/mzaf_11919924700145781110",
+  "AudioPreview221/v4/73/e8/c9/73e8c9e5-cf51-71e1-1e90-eaa1c721f586/mzaf_17386622288859371085",
+  "AudioPreview221/v4/58/4a/d6/584ad6e9-e0ba-7b65-6a10-cf89a0285332/mzaf_14016357393222913804",
+  "AudioPreview221/v4/79/0d/8a/790d8a6c-2365-8219-74c4-adbbd330f9a5/mzaf_17210597967599967192"
+];
+// the imagery words found in each Soulboy song: word:group index:count
+const SOULBOY_TERMS = {
+  2: "多雲天:5:1 暴雨天:5:1 晴天:5:1 頭:0:1 手:0:1 笑:0:2 眨:0:1 眼:0:1 心:0:1 年:1:4 想起:1:1 小時候:1:1 當年:1:1 歲:1:3 永遠:1:1 表妹:2:2 媽媽:2:1 妹妹:2:4",
+  3: "桃花:6:1 柳樹:6:1 青蛙:6:1 燕子:6:1 玫瑰:6:1 蛇:6:3 原上草:6:3 烏龜:6:1 春風:5:10 雲堆:5:1 悶雷:5:2 河水:9:1 睡:8:3 路上:3:1 城裡:3:1 流淚:0:3 想起:1:3 歲:1:3 冬日:1:3 夏天:1:3 三月:1:2 年:1:2 世界:4:1",
+  4: "地中海:9:4 路旁:3:2 搞笑片:3:4 手:0:4 笑:0:3 每天:1:12 永遠:1:2 friend:2:4 朋友:2:1",
+  5: "眼:0:1 心:0:3 臉:0:1 手:0:1 時間:1:1 舊:1:1 年:1:1 女人:2:8 世界:4:1",
+  6: "街上:3:3 電影:3:3 笑:0:2 每天:1:2 舊:1:3 情男情女:2:3 神:4:3",
+  7: "頭:0:2 臉:0:2 雙目:0:2 眨:0:2 眼睛:0:2 心:0:5 舞:0:3 脈:0:1",
+  8: "北風:5:3 春風:5:1 二泉:9:4 燭光:7:3 彩虹:7:2 點亮:7:3 燈籠:7:3 月:8:4 漆黑:8:3 街頭:3:2 酒家:3:3 小巷:3:3 路上:3:1 路:3:1 墨鏡:0:2 雙眼:0:1 心:0:1 臉孔:0:2 流淚:0:1 臉:0:1 記得:1:1 年:1:1 歲:1:1 小時候:1:1 聽眾:2:3 家:2:1 老婆:2:1 老爸:2:1",
+  9: "路:3:1 心:0:12 年:1:2 今天:1:2 時間:1:1 家:2:4 朋友:2:2 人類:2:1 宇宙:4:2 地球:4:2 太陽:4:1 世界:4:12",
+  10: "彩虹:7:6 rays:7:1 blazin:7:1 睡眠:8:2 新聞:3:2 報紙:3:2 跳:0:29 今天:1:2 fall:1:1 homies:2:2 世界:4:16 sun:4:2 world:4:2",
+  11: "蝴蝶:6:3 原野:6:3 電:5:1 雲煙:5:3 失了幾次眠:8:1 吻:0:1 臉:0:2 眼:0:3 眼神:0:1 眼淚:0:1 眼睛:0:1 歷史:1:1 從前:1:6 祖先:2:1 人類:2:1 世界:4:2 神:4:1",
+  12: "風:5:1 光:7:1 夜夜:8:3 路上:3:2 早場:3:3 尾場:3:3 科場:3:2 試場:3:2 上班:3:1 下班:3:1 時間:1:3 年:1:3 記得:1:3 歲:1:1 往事:1:1 家:2:9 叔叔:2:1",
+  13: "燕子:6:1 春花:6:1 春光:5:2 熱淚:0:2 winter:1:1 spring:1:1 summer:1:1 fall:1:1",
+  14: "晚上:8:1 cappuccino:3:1 咖啡:3:1 手機:3:1 電話:3:1 電影:3:1 笑:0:1 明天:1:1 今天:1:1 時間:1:1 星期:1:4 小姐:2:1 朋友:2:1 家:2:1",
+};
+// Soulboy, built in so the page is never empty: imagery hit counts per song (order of CAT_IDS), times it sings of love (愛, 爱 or love),
+// tempo and intensity from the 30-second previews. data/songs.json, when present, adds previews and quotes.
+const SOULBOY = [
+  [1, "Prologue",   99.05, 0.623, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 1],
+  [2, "妹妹",       123.59, 0.717, [7, 11, 7, 0, 0, 3, 0, 0, 0, 0], 1],
+  [3, "春風吹",     114.59, 0.273, [3, 16, 0, 2, 1, 13, 12, 0, 3, 1], 0],
+  [4, "每天每天",   129.41, 0.152, [7, 14, 5, 6, 0, 0, 0, 0, 0, 4], 1],
+  [5, "女人",       102.52, 0.572, [6, 3, 8, 0, 1, 0, 0, 0, 0, 0], 9],
+  [6, "叫我怎麼說", 108.2,  0.25,  [2, 5, 3, 6, 3, 0, 0, 0, 0, 0], 12],
+  [7, "哪怕",       133.66, 0,     [19, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0],
+  [8, "南音",       105.02, 0.131, [8, 4, 6, 10, 0, 4, 0, 11, 7, 4], 1],
+  [9, "我們能不能", 153.6,  0.735, [12, 5, 7, 1, 17, 0, 0, 0, 0, 0], 0],
+  [10, "跳",        120.23, 0.786, [29, 3, 2, 4, 20, 0, 0, 8, 2, 0], 0],
+  [11, "總結",      107.24, 0.121, [9, 7, 2, 0, 3, 4, 6, 0, 1, 0], 3],
+  [12, "趕場",      125.7,  0.174, [0, 11, 10, 14, 0, 1, 0, 1, 3, 0], 0],
+  [13, "等著你回來", 118.63, 1,    [2, 4, 0, 0, 0, 2, 2, 0, 0, 0], 1],
+  [14, "認識你",    89.1,   0.136, [1, 7, 3, 5, 0, 0, 0, 0, 1, 0], 0],
+].map(([track, name, tempo, intensity, h, love]) => ({
+  preview_url: PREVIEW + SOULBOY_PREVIEWS[track - 1] + ".plus.aac.p.m4a",
+  terms: (SOULBOY_TERMS[track] || "").split(" ").filter(Boolean).map(x => { const [w, c, n] = x.split(":"); return [w, CAT_IDS[+c], +n]; }),
+  album: "Soulboy", year: 2005, track, name, tempo, intensity, love,
+  energy: [0.45, 0.49, 0.3, 0.25, 0.43, 0.3, 0.19, 0.25, 0.5, 0.52, 0.24, 0.26, 0.61, 0.25][track - 1], valence: [0.71, 0.76, 0.69, 0.49, 0.81, 0.79, 0.6, 0.53, 0.53, 0.72, 0.74, 0.57, 0.77, 0.61][track - 1],
+  imagery: Object.fromEntries(CAT_IDS.map((id, i) => [id, h[i]])),
+}));
+// his ten studio albums; track counts from the iTunes (tw) editions
 const DISCO = [
   { album: "Soulboy", zh: "Soulboy", year: 2005, tracks: 14 },
   { album: "This Love", zh: "愛愛愛", year: 2006, tracks: 13 },
@@ -171,9 +242,11 @@ function hash(str) { let h = 2166136261; for (const ch of str) h = Math.imul(h ^
 // turn one song record into a drawable vessel; the shape is seeded by album and title
 function toVessel(d) {
   const r = mulberry(hash(d.album + "/" + d.name));
-  let weights = CATS.map(c => Number(d.weights?.[c.id]) || 0);
+  // weights come from lyric hit counts; fewer than 4 hits is too thin to read, so it spreads evenly
+  let weights = CATS.map(c => Number(d.imagery?.[c.id]) || 0);
   const sum = weights.reduce((a, b) => a + b, 0);
-  weights = sum > 0 ? weights.map(v => v / sum) : weights.map(() => 1 / CATS.length);
+  d.sparse = sum < 4;
+  weights = d.sparse ? weights.map(() => 1 / CATS.length) : weights.map(v => v / sum);
   const order = weights.map((v, i) => i).sort((a, b) => weights[b] - weights[a]);
   const tempo = Math.round(Number(d.tempo) || 90);
   const intensity = Math.min(1, Math.max(0, d.intensity ?? d.energy ?? 0.5));
@@ -184,7 +257,7 @@ function toVessel(d) {
     return 0.36 + (edge ? -0.04 : 0) + amp * (r() * 2 - 1);
   });
   return {
-    ...d, tempo, intensity, weights, a: order[0], b: order[1], c: order[2],
+    ...d, tempo, intensity, weights, love: Math.max(0, Number(d.love) || 0), a: order[0], b: order[1], c: order[2],
     ballad: tempo < 78, radii,
     asym: radii.map(() => (r() - 0.5) * 0.07),
     angle: r() * Math.PI, phase: r() * 6.28, seed: r(),
@@ -205,6 +278,13 @@ function build(records) {
   ALBUMS.forEach((a, ai) => {
     const have = songs.filter(s => s.ai === ai).length;
     for (let k = have; k < Math.max(have, DISCO[ai]?.tracks || 0); k++) empties.push({ album: a, ai, x: 0, y: 0, tx: 0, ty: 0 });
+  });
+  // energy and valence are scaled across all loaded songs so the differences show
+  const span = (k) => { const v = songs.map(s => s[k]).filter(Number.isFinite); return [Math.min(...v), Math.max(...v)]; };
+  const [e0, e1] = span("energy"), [v0, v1] = span("valence");
+  songs.forEach(s => {
+    if (Number.isFinite(s.energy) && e1 > e0) s.eN = (s.energy - e0) / (e1 - e0);
+    if (Number.isFinite(s.valence) && v1 > v0) s.vN = (s.valence - v0) / (v1 - v0);
   });
   albumAggs = ALBUMS.map((a, i) => aggregate(songs.filter(s => s.ai === i), 900 + i, a));
   soulAgg = aggregate(songs, 999, "All works");
@@ -279,12 +359,12 @@ function layout() {
   let cols = 1, gap = 0;
   for (cols = 1; cols <= 60; cols++) {
     gap = Math.min(48, ((GW / cols) * 0.28));
-    const cw = (GW - gap * (cols - 1)) / cols, ch = cw * 1.55;
+    const cw = (GW - gap * (cols - 1)) / cols, ch = cw * CELL;
     const total = groups.reduce((sum, n) => sum + labelH + Math.ceil(n / cols) * (ch + gap) + groupGap, 0) - gap - groupGap;
     if (total <= avail && ch <= 300) break;
   }
   cellW = (GW - gap * (cols - 1)) / cols;
-  cellH = cellW * 1.55;
+  cellH = cellW * CELL;
   // when every group fits on one row, spread the row across the width instead of leaving it half empty
   const vgap = gap, widest = Math.max(...groups);
   if (cols > widest && widest > 1) { cols = widest; gap = Math.min(cellW * 1.4, (GW - cols * cellW) / (cols - 1)); }
@@ -350,13 +430,18 @@ function spline(pts) {
 
 let vesselPath = function (s, x, y, w, h, t) {
   const cx = x + w / 2;
-  const wob = (i) => reduce ? 0 : Math.sin(t * (0.6 + s.tempo / 200) + s.phase + i * 1.3) * (0.012 + s.hover * 0.035);
+  // idle: a slow drift. On hover the outline pulses on every beat of the song, at its real BPM;
+  // while its preview plays the pulse follows the audio clock
+  const clock = s.preview_url && playing === s.preview_url && !audio.paused ? audio.currentTime : t;
+  const beat = (clock * (s.tempo || 90)) / 60;
+  const pulse = Math.exp(-(beat - Math.floor(beat)) * 5);
+  const wob = (i) => reduce ? 0 : Math.sin(t * 0.6 + s.phase + i * 1.3) * 0.012 + s.hover * pulse * 0.06 * (i % 2 ? 1 : -0.7);
   ctx.beginPath();
   if (s.ballad) {
     const n = 48;
     for (let i = 0; i <= n; i++) {
       const th = (i / n) * Math.PI * 2;
-      const k = 1 + 0.05 * Math.sin(2 * th + s.phase) + 0.025 * Math.sin(3 * th + s.seed * 6) + Math.sin(t * 0.8 + s.phase + th) * (reduce ? 0 : 0.008 + s.hover * 0.025);
+      const k = 1 + 0.05 * Math.sin(2 * th + s.phase) + 0.025 * Math.sin(3 * th + s.seed * 6) + (reduce ? 0 : Math.sin(t * 0.8 + s.phase + th) * 0.008 + s.hover * pulse * 0.07 * Math.sin(2 * th));
       const px = cx + Math.cos(th) * w * 0.44 * k, py = y + h / 2 + Math.sin(th) * h * 0.48 * k;
       i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
     }
@@ -378,9 +463,12 @@ let vesselPath = function (s, x, y, w, h, t) {
 function drawVessel(s, t) {
   const pad = cellW * 0.04;
   const lift = s.hover * cellH * 0.03;
-  const x = s.x + pad, y = s.y + pad - lift, w = cellW - pad * 2, h = cellH - pad * 2;
+  const fullW = cellW - pad * 2, fullH = cellH * (1 - FLOWER) - pad * 2;
+  const w = fullW * (0.58 + 0.42 * (s.eN ?? 0.6)), h = fullH * (0.7 + 0.3 * (s.vN ?? 0.6));
+  const x = s.x + pad + (fullW - w) / 2, y = s.y + cellH * FLOWER + pad + (fullH - h) - lift;
   ctx.save();
   ctx.globalAlpha = s.alpha;
+  if (s.love > 0) drawBouquet(x + w / 2, y, cellH * FLOWER * 0.72, cellW * 0.16, t, s);
   vesselPath(s, x, y, w, h, t);
   ctx.clip();
   const ca = colorOf(s.a), cb = colorOf(s.b), cc = colorOf(s.c);
@@ -409,13 +497,40 @@ function drawVessel(s, t) {
   ctx.restore();
 }
 
+// the top of every cell is kept free so a song about love can carry a flower
+const FLOWER = 0.24, CELL = 1.55 / (1 - FLOWER);
+// one flower for every five mentions of love; each petal is one mention, so the count can be read exactly
+function drawPetals(fx, fy, r, petals, rot) {
+  ctx.fillStyle = "#F0607E";
+  for (let k = 0; k < petals; k++) {
+    const a = rot + (k * Math.PI * 2) / 5;
+    ctx.beginPath(); ctx.ellipse(fx + Math.cos(a) * r * 0.55, fy + Math.sin(a) * r * 0.55, r * 0.5, r * 0.32, a, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.fillStyle = "#F5D84E";
+  ctx.beginPath(); ctx.arc(fx, fy, r * 0.3, 0, Math.PI * 2); ctx.fill();
+}
+function drawBouquet(x, y, len, r, t, s) {
+  const n = Math.ceil(s.love / 5);
+  for (let j = 0; j < n; j++) {
+    const petals = j < n - 1 ? 5 : s.love - 5 * (n - 1);
+    const spread = n > 1 ? (j - (n - 1) / 2) * Math.min(0.34, 1.1 / n) : 0;
+    const sway = reduce ? 0 : Math.sin(t * 0.9 + s.phase + j) * 0.05;
+    const L = len * (j % 2 ? 0.82 : 1);
+    const fx = x + Math.sin(spread + sway) * L, fy = y - Math.cos(spread + sway) * L;
+    ctx.strokeStyle = "#4E9A4D"; ctx.lineWidth = Math.max(1, r * 0.16); ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(x, y + r); ctx.quadraticCurveTo(x + (fx - x) * 0.2, y - L * 0.5, fx, fy); ctx.stroke();
+    drawPetals(fx, fy, r, petals, -Math.PI / 2 + s.phase * 0.2);
+  }
+}
+
+
 // a blank vessel holding a place for a song that has no data yet
 const BLANK = { radii: [0.3, 0.38, 0.28, 0.36, 0.4], asym: [0, 0, 0, 0, 0], tempo: 90, phase: 0, hover: 0, ballad: false };
 function drawEmpty(e, t) {
   const pad = cellW * 0.04;
   ctx.save();
   ctx.globalAlpha = active === null ? 1 : 0.35;
-  vesselPath(BLANK, e.x + pad, e.y + pad, cellW - pad * 2, cellH - pad * 2, 0);
+  vesselPath(BLANK, e.x + pad, e.y + cellH * FLOWER + pad, cellW - pad * 2, cellH * (1 - FLOWER) - pad * 2, 0);
   ctx.fillStyle = css("--line"); ctx.fill();
   ctx.restore();
 }
@@ -514,6 +629,9 @@ function drawPlants(g, t) {
     ctx.quadraticCurveTo(mx + nx, my + ny, tx, ty);
     ctx.quadraticCurveTo(mx - nx, my - ny, px, py);
     ctx.fillStyle = colorOf(s.a); ctx.fill();
+    if (s.love > 0) {
+      drawPetals(tx, ty, w * 0.03, Math.min(5, s.love), s.phase);
+    }
     s.lx = mx; s.ly = my;
     soulLeaves.push(s);
   }));
@@ -591,11 +709,11 @@ function drawSoulView(t) {
     ctx.beginPath(); ctx.arc(L.x + 7, ry - 4, 7, 0, 6.29); ctx.fill();
     ctx.fillStyle = fg; ctx.font = '500 14px "Manrope", "Noto Sans SC", sans-serif';
     ctx.fillText(CATS[i].zh, L.x + 24, ry);
-    const bw = (sw - 190) * g.weights[i] / max;
+    const bw = (sw - 212) * g.weights[i] / max;
     ctx.fillStyle = colorOf(i);
-    ctx.fillRect(L.x + 128, ry - 7, Math.max(2, bw), 6);
+    ctx.fillRect(L.x + 156, ry - 7, Math.max(2, bw), 6);
     ctx.fillStyle = muted; ctx.font = '12px "IBM Plex Mono", monospace';
-    ctx.fillText(pct(g.weights[i]), L.x + 136 + Math.max(2, bw), ry);
+    ctx.fillText(pct(g.weights[i]), L.x + 164 + Math.max(2, bw), ry);
   });
   ctx.globalAlpha = 1;
 }
@@ -650,13 +768,17 @@ function frame(ms) {
 const esc = v => String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
 function showTip(s) {
   const fusedTip = s.n !== undefined;
+  const words = !fusedTip && s.terms && s.terms.length
+    ? `<div class="words">${[...s.terms].sort((p, q) => q[2] - p[2]).slice(0, 8).map(([w, c, n]) => `<span><i style="background:${colorOf(CAT_IDS.indexOf(c))}"></i><span lang="zh">${esc(w)}</span><b>${n}</b></span>`).join("")}</div>`
+    : "";
   const bars = s.weights.map((v, i) => ({ v, i })).sort((p, q) => q.v - p.v).slice(0, 4)
     .map(({ v, i }) => `<div class="bar"><span>${CATS[i].zh}</span><b style="width:${Math.max(4, v * 100)}%;background:${colorOf(i)}"></b><span>${Math.round(v * 100)}%</span></div>`).join("");
   const meta = fusedTip ? `${s.n} songs · avg ${s.tempo} BPM` : `${s.album}${s.year ? " · " + s.year : ""} · ${s.tempo} BPM · mood ${Math.round(s.intensity * 100)}`;
+  const loveLine = !fusedTip && s.love > 0 ? `<div class="meta">✿ Sings of love <span lang="zh">愛</span> ${s.love} time${s.love > 1 ? "s" : ""}</div>` : "";
   const quote = !fusedTip && s.quote ? `<p class="quote" lang="zh">「${esc(s.quote)}」</p>` : "";
   const sparse = !fusedTip && s.sparse ? `<div class="meta">Too few imagery words, so the shares are even.</div>` : "";
   const listen = !fusedTip && s.preview_url ? `<div class="meta">${soundOn ? "♪ Playing preview" : "Turn sound on to hear a preview"}</div>` : "";
-  tip.innerHTML = `<div><h3>${esc(s.name)}</h3><div class="meta">${esc(meta)}</div></div>${quote}<div class="bars">${bars}</div>${sparse}${listen}`;
+  tip.innerHTML = `<div><h3>${esc(s.name)}</h3><div class="meta">${esc(meta)}</div></div>${quote}${words || `<div class="bars">${bars}</div>`}${loveLine}${sparse}${listen}`;
   tip.hidden = false;
   const leaf = mode === "soul" && !fusedTip;
   const ox = leaf ? s.lx : s.x, oy = leaf ? s.ly - 20 : s.y;
@@ -709,7 +831,7 @@ function listen(s) {
 function setSound(on) {
   soundOn = on;
   soundBtn.setAttribute("aria-pressed", String(on));
-  soundBtn.textContent = on ? "Sound on" : "Sound off";
+  soundBtn.textContent = on ? "♪ Sound on · hover a vase to listen" : "♪ Turn sound on";
   if (on) { audio.play().catch(() => {}); audio.pause(); listen(hovered); }
   else { playing = null; fadeTo(0, 300, () => audio.pause()); }
 }
@@ -735,6 +857,7 @@ CATS.forEach((c, i) => {
   const b = document.createElement("button");
   b.className = "chip"; b.id = "chip-" + c.id; b.setAttribute("aria-pressed", "false");
   b.innerHTML = `<i style="background:${c.color}"></i>${c.zh}`;
+  b.title = c.terms;
   b.onclick = () => {
     active = active === i ? null : i;
     chips.querySelectorAll(".chip").forEach((el, j) => el.setAttribute("aria-pressed", String(active === j)));
@@ -757,18 +880,27 @@ viewButtons.forEach(b => b.onclick = () => setMode(b.dataset.view));
 
 const note = document.getElementById("note");
 async function load() {
+  let records = SOULBOY.map(d => ({ ...d }));
   try {
     const res = await fetch("data/songs.json", { cache: "no-cache" });
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
-    if (!Array.isArray(data) || !data.length) throw new Error("empty");
-    build(data);
+    if (!Array.isArray(data)) throw new Error("not a list");
+    // songs.json adds previews, quotes and later albums; built-in imagery counts fill any gaps
+    const key = d => `${String(d.album).toLowerCase()}/${d.track}`;
+    const extra = new Map(data.map(d => [key(d), d]));
+    records = records.map(d => {
+      const e = extra.get(key(d));
+      if (!e) return d;
+      extra.delete(key(d));
+      return { ...d, ...e, imagery: e.imagery || d.imagery };
+    });
+    records.push(...extra.values());
     realData = true;
-    note.innerHTML = `<strong>Data:</strong> ${songs.length} of ${songs.length + empties.length} songs tagged so far; blank vessels are still waiting for theirs. Imagery is tagged from the full lyrics; tempo and mood come from audio features of each 30-second preview. Previews courtesy of Apple Music.`;
-  } catch (err) {
-    build([]);
-    note.innerHTML = `<strong>Data:</strong> no tagged songs loaded yet. Every blank vessel holds a place for one track and fills in once its lyrics are tagged.`;
-  }
+  } catch (err) {}
+  build(records);
+  const tagged = songs.length;
+  note.innerHTML = `<strong>Data:</strong> ${tagged} of ${tagged + empties.length} songs tagged so far; blank vessels are still waiting for theirs. Imagery is counted from the full lyrics with a hand-built lexicon (hover a tag to see its top words); tempo and mood come from audio features of each 30-second preview.`;
   soundBtn.hidden = !songs.some(s => s.preview_url);
   layout();
 }

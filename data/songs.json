@@ -39,7 +39,7 @@
       "people_relationships": 0,
       "cosmos": 0
     },
-    "love": 0,
+    "love": 1,
     "love_en": 1,
     "palette": [
       "#F2E6D0",
@@ -198,7 +198,7 @@
       "people_relationships": 5,
       "cosmos": 0
     },
-    "love": 0,
+    "love": 1,
     "love_en": 1,
     "palette": [
       "#1F6FB2",
@@ -672,7 +672,7 @@
       "people_relationships": 0,
       "cosmos": 0
     },
-    "love": 0,
+    "love": 1,
     "love_en": 1,
     "palette": [
       "#F3B5C4",
