@@ -1,0 +1,544 @@
+[
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 1,
+    "name": "Prologue",
+    "tempo": 99.05,
+    "energy": 0.45,
+    "valence": 0.71,
+    "intensity": 0.623,
+    "weights": {
+      "love": 1.0,
+      "light": 0.0,
+      "sun": 0.0,
+      "night": 0.0,
+      "nature": 0.0,
+      "water": 0.0,
+      "solitude": 0.0
+    },
+    "sparse": false,
+    "hits": {
+      "love": 1,
+      "light": 0,
+      "sun": 0,
+      "night": 0,
+      "nature": 0,
+      "water": 0,
+      "solitude": 0
+    },
+    "palette": [
+      "#F2E6D0",
+      "#D9A441",
+      "#5B3A29"
+    ],
+    "quote": "life and love",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/55/88/a1/5588a103-31bf-3aa3-5b05-4f64fe52530c/mzaf_7906769655068276836.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/prologue/201549018?i=201549026&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  },
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 2,
+    "name": "妹妹",
+    "tempo": 123.59,
+    "energy": 0.49,
+    "valence": 0.76,
+    "intensity": 0.717,
+    "weights": {
+      "love": 0.375,
+      "light": 0.0,
+      "sun": 0.125,
+      "night": 0.0,
+      "nature": 0.125,
+      "water": 0.125,
+      "solitude": 0.25
+    },
+    "sparse": false,
+    "hits": {
+      "love": 3,
+      "light": 0,
+      "sun": 1,
+      "night": 0,
+      "nature": 1,
+      "water": 1,
+      "solitude": 2
+    },
+    "palette": [
+      "#7A8691",
+      "#8EC5E8",
+      "#F6D365",
+      "#F4B6C2"
+    ],
+    "quote": "好像變了晴天",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1b/d8/10/1bd81065-e73f-6508-33c6-5800ea180b68/mzaf_9240509401817177528.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/%E5%A6%B9%E5%A6%B9/201549018?i=201549085&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  },
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 3,
+    "name": "春風吹",
+    "tempo": 114.59,
+    "energy": 0.3,
+    "valence": 0.69,
+    "intensity": 0.273,
+    "weights": {
+      "love": 0.0,
+      "light": 0.0,
+      "sun": 0.326,
+      "night": 0.13,
+      "nature": 0.326,
+      "water": 0.087,
+      "solitude": 0.13
+    },
+    "sparse": false,
+    "hits": {
+      "love": 0,
+      "light": 0,
+      "sun": 15,
+      "night": 6,
+      "nature": 15,
+      "water": 4,
+      "solitude": 6
+    },
+    "palette": [
+      "#F4A6A0",
+      "#8DB86B",
+      "#C0392B",
+      "#EEF1F4",
+      "#6F9FAF"
+    ],
+    "quote": "春風一吹想起誰",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/89/d6/26/89d62600-f8fe-2d9d-125b-2da04a1d1ea1/mzaf_8141115204770988923.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/%E6%98%A5%E9%A2%A8%E5%90%B9/201549018?i=201549157&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  },
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 4,
+    "name": "每天每天",
+    "tempo": 129.41,
+    "energy": 0.25,
+    "valence": 0.49,
+    "intensity": 0.152,
+    "weights": {
+      "love": 0.188,
+      "light": 0.0,
+      "sun": 0.0,
+      "night": 0.0,
+      "nature": 0.0,
+      "water": 0.25,
+      "solitude": 0.562
+    },
+    "sparse": false,
+    "hits": {
+      "love": 3,
+      "light": 0,
+      "sun": 0,
+      "night": 0,
+      "nature": 0,
+      "water": 4,
+      "solitude": 9
+    },
+    "palette": [
+      "#1F6FB2",
+      "#9A9A9A",
+      "#E8D9C0"
+    ],
+    "quote": "約好去看地中海 的藍",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/df/d2/c6/dfd2c65b-6682-1424-4da2-2cbf0187db01/mzaf_7495295061315326220.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/%E6%AF%8F%E5%A4%A9%E6%AF%8F%E5%A4%A9/201549018?i=201549203&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  },
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 5,
+    "name": "女人",
+    "tempo": 102.52,
+    "energy": 0.43,
+    "valence": 0.81,
+    "intensity": 0.572,
+    "weights": {
+      "love": 0.75,
+      "light": 0.0,
+      "sun": 0.0,
+      "night": 0.0,
+      "nature": 0.0,
+      "water": 0.0,
+      "solitude": 0.25
+    },
+    "sparse": false,
+    "hits": {
+      "love": 9,
+      "light": 0,
+      "sun": 0,
+      "night": 0,
+      "nature": 0,
+      "water": 0,
+      "solitude": 3
+    },
+    "palette": [
+      "#E7A1B0",
+      "#B49A7A",
+      "#7D4E57"
+    ],
+    "quote": "你要對你的女人好",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/26/43/0f/26430fdd-9350-73d3-cda2-e95336e2ea17/mzaf_600185344897575406.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/%E5%A5%B3%E4%BA%BA/201549018?i=201549250&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  },
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 6,
+    "name": "叫我怎麼說",
+    "tempo": 108.2,
+    "energy": 0.3,
+    "valence": 0.79,
+    "intensity": 0.25,
+    "weights": {
+      "love": 0.939,
+      "light": 0.0,
+      "sun": 0.0,
+      "night": 0.0,
+      "nature": 0.0,
+      "water": 0.0,
+      "solitude": 0.061
+    },
+    "sparse": false,
+    "hits": {
+      "love": 31,
+      "light": 0,
+      "sun": 0,
+      "night": 0,
+      "nature": 0,
+      "water": 0,
+      "solitude": 2
+    },
+    "palette": [
+      "#F7C6C7",
+      "#C2A27C",
+      "#6E7F91"
+    ],
+    "quote": "我想在街上遇到你",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c9/b8/d7/c9b8d733-d68e-7ce6-09ac-ec72c21c47c7/mzaf_9571532606197312054.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/%E5%8F%AB%E6%88%91%E6%80%8E%E9%BA%BC%E8%AA%AA/201549018?i=201549321&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  },
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 7,
+    "name": "哪怕",
+    "tempo": 133.66,
+    "energy": 0.19,
+    "valence": 0.6,
+    "intensity": 0.0,
+    "weights": {
+      "love": 0.0,
+      "light": 0.0,
+      "sun": 0.0,
+      "night": 0.0,
+      "nature": 0.0,
+      "water": 0.0,
+      "solitude": 1.0
+    },
+    "sparse": false,
+    "hits": {
+      "love": 0,
+      "light": 0,
+      "sun": 0,
+      "night": 0,
+      "nature": 0,
+      "water": 0,
+      "solitude": 9
+    },
+    "palette": [
+      "#4B3B6B",
+      "#E0B84C",
+      "#C94C4C"
+    ],
+    "quote": "眼睛在說話",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/73/8a/6c/738a6c01-3531-861b-3d2f-68650546b936/mzaf_3108426352824120754.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/%E5%93%AA%E6%80%95/201549018?i=201549348&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  },
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 8,
+    "name": "南音",
+    "tempo": 105.02,
+    "energy": 0.25,
+    "valence": 0.53,
+    "intensity": 0.131,
+    "weights": {
+      "love": 0.029,
+      "light": 0.324,
+      "sun": 0.029,
+      "night": 0.206,
+      "nature": 0.088,
+      "water": 0.147,
+      "solitude": 0.176
+    },
+    "sparse": false,
+    "hits": {
+      "love": 1,
+      "light": 11,
+      "sun": 1,
+      "night": 7,
+      "nature": 3,
+      "water": 5,
+      "solitude": 6
+    },
+    "palette": [
+      "#14141A",
+      "#9E1B1B",
+      "#E8A23B",
+      "#C9CED6",
+      "#7B6FD0"
+    ],
+    "quote": "為人們奏出彩虹",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/86/e7/8f/86e78f33-6e12-2035-6ed7-7f72f0fc60bf/mzaf_2901120415602175318.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/%E5%8D%97%E9%9F%B3/201549018?i=201549388&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  },
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 9,
+    "name": "我們能不能",
+    "tempo": 153.6,
+    "energy": 0.5,
+    "valence": 0.53,
+    "intensity": 0.735,
+    "weights": {
+      "love": 0.0,
+      "light": 0.0,
+      "sun": 0.5,
+      "night": 0.0,
+      "nature": 0.0,
+      "water": 0.0,
+      "solitude": 0.5
+    },
+    "sparse": false,
+    "hits": {
+      "love": 0,
+      "light": 0,
+      "sun": 1,
+      "night": 0,
+      "nature": 0,
+      "water": 0,
+      "solitude": 1
+    },
+    "palette": [
+      "#0B1D3A",
+      "#2E6DA4",
+      "#F5C242",
+      "#A9745A"
+    ],
+    "quote": "很大的宇宙的小地球上",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8b/bf/52/8bbf52dd-4e40-11ac-e80a-401f2e9f4c5c/mzaf_5658586915630607559.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/%E6%88%91%E5%80%91%E8%83%BD%E4%B8%8D%E8%83%BD/201549018?i=201549479&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  },
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 10,
+    "name": "跳",
+    "tempo": 120.23,
+    "energy": 0.52,
+    "valence": 0.72,
+    "intensity": 0.786,
+    "weights": {
+      "love": 0.0,
+      "light": 0.471,
+      "sun": 0.118,
+      "night": 0.118,
+      "nature": 0.059,
+      "water": 0.0,
+      "solitude": 0.235
+    },
+    "sparse": false,
+    "hits": {
+      "love": 0,
+      "light": 8,
+      "sun": 2,
+      "night": 2,
+      "nature": 1,
+      "water": 0,
+      "solitude": 4
+    },
+    "palette": [
+      "#BDBAB2",
+      "#F26B1D",
+      "#7B4FD8",
+      "#2FB673"
+    ],
+    "quote": "我們要彩虹世界",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/11/18/58/111858d5-89f6-8f91-6b36-4b9d7990e96e/mzaf_17326809479464166157.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/%E8%B7%B3/201549018?i=201549528&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  },
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 11,
+    "name": "總結",
+    "tempo": 107.24,
+    "energy": 0.24,
+    "valence": 0.74,
+    "intensity": 0.121,
+    "weights": {
+      "love": 0.16,
+      "light": 0.04,
+      "sun": 0.0,
+      "night": 0.04,
+      "nature": 0.36,
+      "water": 0.04,
+      "solitude": 0.36
+    },
+    "sparse": false,
+    "hits": {
+      "love": 4,
+      "light": 1,
+      "sun": 0,
+      "night": 1,
+      "nature": 9,
+      "water": 1,
+      "solitude": 9
+    },
+    "palette": [
+      "#A47C48",
+      "#DDE7F5",
+      "#F0C75E",
+      "#6F8F5A",
+      "#8C8C94"
+    ],
+    "quote": "天飛過幾多蝴蝶",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c7/99/57/c799572d-ba2f-5132-8476-3b26022d0b0c/mzaf_11919924700145781110.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/%E7%B8%BD%E7%B5%90/201549018?i=201549662&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  },
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 12,
+    "name": "趕場",
+    "tempo": 125.7,
+    "energy": 0.26,
+    "valence": 0.57,
+    "intensity": 0.174,
+    "weights": {
+      "love": 0.0,
+      "light": 0.2,
+      "sun": 0.0,
+      "night": 0.6,
+      "nature": 0.2,
+      "water": 0.0,
+      "solitude": 0.0
+    },
+    "sparse": false,
+    "hits": {
+      "love": 0,
+      "light": 1,
+      "sun": 0,
+      "night": 3,
+      "nature": 1,
+      "water": 0,
+      "solitude": 0
+    },
+    "palette": [
+      "#707780",
+      "#7FA36B",
+      "#E3B778"
+    ],
+    "quote": "趕來趕去趕什麼",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/73/e8/c9/73e8c9e5-cf51-71e1-1e90-eaa1c721f586/mzaf_17386622288859371085.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/%E8%B6%95%E5%A0%B4/201549018?i=201549685&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  },
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 13,
+    "name": "等著你回來",
+    "tempo": 118.63,
+    "energy": 0.61,
+    "valence": 0.77,
+    "intensity": 1.0,
+    "weights": {
+      "love": 0.1,
+      "light": 0.0,
+      "sun": 0.25,
+      "night": 0.05,
+      "nature": 0.1,
+      "water": 0.1,
+      "solitude": 0.4
+    },
+    "sparse": false,
+    "hits": {
+      "love": 2,
+      "light": 0,
+      "sun": 5,
+      "night": 1,
+      "nature": 2,
+      "water": 2,
+      "solitude": 8
+    },
+    "palette": [
+      "#F3B5C4",
+      "#23304A",
+      "#9CCB7A",
+      "#9DB8D9"
+    ],
+    "quote": "庭前春花為你開",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/58/4a/d6/584ad6e9-e0ba-7b65-6a10-cf89a0285332/mzaf_14016357393222913804.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/%E7%AD%89%E8%91%97%E4%BD%A0%E5%9B%9E%E4%BE%86/201549018?i=201549768&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  },
+  {
+    "album": "Soulboy",
+    "year": 2005,
+    "track": 14,
+    "name": "認識你",
+    "tempo": 89.1,
+    "energy": 0.25,
+    "valence": 0.61,
+    "intensity": 0.136,
+    "weights": {
+      "love": 0.6,
+      "light": 0.0,
+      "sun": 0.0,
+      "night": 0.2,
+      "nature": 0.0,
+      "water": 0.0,
+      "solitude": 0.2
+    },
+    "sparse": false,
+    "hits": {
+      "love": 3,
+      "light": 0,
+      "sun": 0,
+      "night": 1,
+      "nature": 0,
+      "water": 0,
+      "solitude": 1
+    },
+    "palette": [
+      "#E8D6BF",
+      "#6F4E37",
+      "#F1C27D"
+    ],
+    "quote": "因為我只想認識你",
+    "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/79/0d/8a/790d8a6c-2365-8219-74c4-adbbd330f9a5/mzaf_17210597967599967192.plus.aac.p.m4a",
+    "apple_url": "https://music.apple.com/tw/album/%E8%AA%8D%E8%AD%98%E4%BD%A0/201549018?i=201549774&uo=4",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music/2e/80/c6/mzi.gcpdqqnf.jpg/600x600bb.jpg"
+  }
+]

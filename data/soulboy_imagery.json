@@ -1,0 +1,1022 @@
+{
+  "collectionId": 201549018,
+  "method": "Counts: greedy longest-first match of a hand-built lexicon over LRCLIB plainLyrics (repeated choruses count each time). nature = nature_plants + sky_weather + water; city = city_street. 紅 includes 紅與不紅 in 南音, where it also means fame. Palette, mood and hoverQuote are hand-curated interpretation, not measured.",
+  "categories": [
+    "nature_plants",
+    "sky_weather",
+    "water",
+    "light_fire",
+    "night_moon",
+    "city_street",
+    "body_gesture",
+    "time_memory",
+    "people_relationships",
+    "cosmos"
+  ],
+  "tracks": [
+    {
+      "trackNumber": 1,
+      "trackName": "Prologue",
+      "lyricLines": 10,
+      "imageryCounts": {
+        "nature_plants": 0,
+        "sky_weather": 0,
+        "water": 0,
+        "light_fire": 0,
+        "night_moon": 0,
+        "city_street": 0,
+        "body_gesture": 0,
+        "time_memory": 0,
+        "people_relationships": 0,
+        "cosmos": 0
+      },
+      "imageryTerms": {},
+      "colourWords": {},
+      "natureVsCity": {
+        "nature": 0,
+        "city": 0,
+        "natureShare": null
+      },
+      "palette": [
+        {
+          "hex": "#F2E6D0",
+          "reason": "warm cream: a spoken, welcoming opener"
+        },
+        {
+          "hex": "#D9A441",
+          "reason": "amber: soul and R&B warmth"
+        },
+        {
+          "hex": "#5B3A29",
+          "reason": "deep brown: vinyl-era soul roots"
+        }
+      ],
+      "mood": [
+        "reflective",
+        "grateful"
+      ],
+      "hoverQuote": "life and love"
+    },
+    {
+      "trackNumber": 2,
+      "trackName": "妹妹",
+      "lyricLines": 21,
+      "imageryCounts": {
+        "nature_plants": 0,
+        "sky_weather": 3,
+        "water": 0,
+        "light_fire": 0,
+        "night_moon": 0,
+        "city_street": 0,
+        "body_gesture": 7,
+        "time_memory": 11,
+        "people_relationships": 7,
+        "cosmos": 0
+      },
+      "imageryTerms": {
+        "sky_weather": {
+          "多雲天": 1,
+          "暴雨天": 1,
+          "晴天": 1
+        },
+        "body_gesture": {
+          "頭": 1,
+          "手": 1,
+          "笑": 2,
+          "眨": 1,
+          "眼": 1,
+          "心": 1
+        },
+        "time_memory": {
+          "年": 4,
+          "想起": 1,
+          "小時候": 1,
+          "當年": 1,
+          "歲": 3,
+          "永遠": 1
+        },
+        "people_relationships": {
+          "表妹": 2,
+          "媽媽": 1,
+          "妹妹": 4
+        }
+      },
+      "colourWords": {},
+      "natureVsCity": {
+        "nature": 3,
+        "city": 0,
+        "natureShare": 1.0
+      },
+      "palette": [
+        {
+          "hex": "#7A8691",
+          "reason": "storm grey: the cloudy and rainstorm days"
+        },
+        {
+          "hex": "#8EC5E8",
+          "reason": "clear sky blue: she turns them sunny"
+        },
+        {
+          "hex": "#F6D365",
+          "reason": "sunlight yellow: childhood laughter"
+        },
+        {
+          "hex": "#F4B6C2",
+          "reason": "soft pink: affection for a little sister"
+        }
+      ],
+      "mood": [
+        "tender",
+        "nostalgic",
+        "protective"
+      ],
+      "hoverQuote": "好像變了晴天"
+    },
+    {
+      "trackNumber": 3,
+      "trackName": "春風吹",
+      "lyricLines": 48,
+      "imageryCounts": {
+        "nature_plants": 12,
+        "sky_weather": 13,
+        "water": 1,
+        "light_fire": 0,
+        "night_moon": 3,
+        "city_street": 2,
+        "body_gesture": 3,
+        "time_memory": 16,
+        "people_relationships": 0,
+        "cosmos": 1
+      },
+      "imageryTerms": {
+        "nature_plants": {
+          "桃花": 1,
+          "柳樹": 1,
+          "青蛙": 1,
+          "燕子": 1,
+          "玫瑰": 1,
+          "蛇": 3,
+          "原上草": 3,
+          "烏龜": 1
+        },
+        "sky_weather": {
+          "春風": 10,
+          "雲堆": 1,
+          "悶雷": 2
+        },
+        "water": {
+          "河水": 1
+        },
+        "night_moon": {
+          "睡": 3
+        },
+        "city_street": {
+          "路上": 1,
+          "城裡": 1
+        },
+        "body_gesture": {
+          "流淚": 3
+        },
+        "time_memory": {
+          "想起": 3,
+          "歲": 3,
+          "冬日": 3,
+          "夏天": 3,
+          "三月": 2,
+          "年": 2
+        },
+        "cosmos": {
+          "世界": 1
+        }
+      },
+      "colourWords": {
+        "red": 1,
+        "green": 1
+      },
+      "natureVsCity": {
+        "nature": 26,
+        "city": 2,
+        "natureShare": 0.93
+      },
+      "palette": [
+        {
+          "hex": "#F4A6A0",
+          "reason": "peach blossom: the wind blows the peach trees red"
+        },
+        {
+          "hex": "#8DB86B",
+          "reason": "willow green: the wind blows the willows green"
+        },
+        {
+          "hex": "#C0392B",
+          "reason": "rose red: roses brought up from underground"
+        },
+        {
+          "hex": "#EEF1F4",
+          "reason": "cloud white: scattered cloud banks"
+        },
+        {
+          "hex": "#6F9FAF",
+          "reason": "river teal: wrinkled river water"
+        }
+      ],
+      "mood": [
+        "wistful",
+        "restless",
+        "pastoral"
+      ],
+      "hoverQuote": "春風一吹想起誰"
+    },
+    {
+      "trackNumber": 4,
+      "trackName": "每天每天",
+      "lyricLines": 49,
+      "imageryCounts": {
+        "nature_plants": 0,
+        "sky_weather": 0,
+        "water": 4,
+        "light_fire": 0,
+        "night_moon": 0,
+        "city_street": 6,
+        "body_gesture": 7,
+        "time_memory": 14,
+        "people_relationships": 5,
+        "cosmos": 0
+      },
+      "imageryTerms": {
+        "water": {
+          "地中海": 4
+        },
+        "city_street": {
+          "路旁": 2,
+          "搞笑片": 4
+        },
+        "body_gesture": {
+          "手": 4,
+          "笑": 3
+        },
+        "time_memory": {
+          "每天": 12,
+          "永遠": 2
+        },
+        "people_relationships": {
+          "friend": 4,
+          "朋友": 1
+        }
+      },
+      "colourWords": {
+        "blue": 4,
+        "white": 2
+      },
+      "natureVsCity": {
+        "nature": 4,
+        "city": 6,
+        "natureShare": 0.4
+      },
+      "palette": [
+        {
+          "hex": "#1F6FB2",
+          "reason": "Mediterranean blue: the one colour named"
+        },
+        {
+          "hex": "#9A9A9A",
+          "reason": "pavement grey: the busy, dull roadside"
+        },
+        {
+          "hex": "#E8D9C0",
+          "reason": "warm beige: easy everyday companionship"
+        }
+      ],
+      "mood": [
+        "comfortable",
+        "longing",
+        "devoted"
+      ],
+      "hoverQuote": "約好去看地中海 的藍"
+    },
+    {
+      "trackNumber": 5,
+      "trackName": "女人",
+      "lyricLines": 37,
+      "imageryCounts": {
+        "nature_plants": 0,
+        "sky_weather": 0,
+        "water": 0,
+        "light_fire": 0,
+        "night_moon": 0,
+        "city_street": 0,
+        "body_gesture": 6,
+        "time_memory": 3,
+        "people_relationships": 8,
+        "cosmos": 1
+      },
+      "imageryTerms": {
+        "body_gesture": {
+          "眼": 1,
+          "心": 3,
+          "臉": 1,
+          "手": 1
+        },
+        "time_memory": {
+          "時間": 1,
+          "舊": 1,
+          "年": 1
+        },
+        "people_relationships": {
+          "女人": 8
+        },
+        "cosmos": {
+          "世界": 1
+        }
+      },
+      "colourWords": {},
+      "natureVsCity": {
+        "nature": 0,
+        "city": 0,
+        "natureShare": null
+      },
+      "palette": [
+        {
+          "hex": "#E7A1B0",
+          "reason": "Venus rose: the 'world of Venus'"
+        },
+        {
+          "hex": "#B49A7A",
+          "reason": "faded sepia: the one old photograph left"
+        },
+        {
+          "hex": "#7D4E57",
+          "reason": "muted plum: quarrels and regret"
+        }
+      ],
+      "mood": [
+        "admonishing",
+        "tender"
+      ],
+      "hoverQuote": "你要對你的女人好"
+    },
+    {
+      "trackNumber": 6,
+      "trackName": "叫我怎麼說",
+      "lyricLines": 59,
+      "imageryCounts": {
+        "nature_plants": 0,
+        "sky_weather": 0,
+        "water": 0,
+        "light_fire": 0,
+        "night_moon": 0,
+        "city_street": 6,
+        "body_gesture": 2,
+        "time_memory": 5,
+        "people_relationships": 3,
+        "cosmos": 3
+      },
+      "imageryTerms": {
+        "city_street": {
+          "街上": 3,
+          "電影": 3
+        },
+        "body_gesture": {
+          "笑": 2
+        },
+        "time_memory": {
+          "每天": 2,
+          "舊": 3
+        },
+        "people_relationships": {
+          "情男情女": 3
+        },
+        "cosmos": {
+          "神": 3
+        }
+      },
+      "colourWords": {
+        "white": 2
+      },
+      "natureVsCity": {
+        "nature": 0,
+        "city": 6,
+        "natureShare": 0.0
+      },
+      "palette": [
+        {
+          "hex": "#F7C6C7",
+          "reason": "blush: a single smile is enough"
+        },
+        {
+          "hex": "#C2A27C",
+          "reason": "old-film sepia: romance from old movies"
+        },
+        {
+          "hex": "#6E7F91",
+          "reason": "street blue-grey: hoping to meet on the street"
+        }
+      ],
+      "mood": [
+        "smitten",
+        "shy",
+        "earnest"
+      ],
+      "hoverQuote": "我想在街上遇到你"
+    },
+    {
+      "trackNumber": 7,
+      "trackName": "哪怕",
+      "lyricLines": 40,
+      "imageryCounts": {
+        "nature_plants": 0,
+        "sky_weather": 0,
+        "water": 0,
+        "light_fire": 0,
+        "night_moon": 0,
+        "city_street": 0,
+        "body_gesture": 19,
+        "time_memory": 0,
+        "people_relationships": 0,
+        "cosmos": 0
+      },
+      "imageryTerms": {
+        "body_gesture": {
+          "頭": 2,
+          "臉": 2,
+          "雙目": 2,
+          "眨": 2,
+          "眼睛": 2,
+          "心": 5,
+          "舞": 3,
+          "脈": 1
+        }
+      },
+      "colourWords": {},
+      "natureVsCity": {
+        "nature": 0,
+        "city": 0,
+        "natureShare": null
+      },
+      "palette": [
+        {
+          "hex": "#4B3B6B",
+          "reason": "dim violet: a slow dance floor"
+        },
+        {
+          "hex": "#E0B84C",
+          "reason": "glint gold: blinking, talking eyes"
+        },
+        {
+          "hex": "#C94C4C",
+          "reason": "pulse red: a racing heart a doctor should check"
+        }
+      ],
+      "mood": [
+        "nervous",
+        "restrained",
+        "flustered"
+      ],
+      "hoverQuote": "眼睛在說話"
+    },
+    {
+      "trackNumber": 8,
+      "trackName": "南音",
+      "lyricLines": 49,
+      "imageryCounts": {
+        "nature_plants": 0,
+        "sky_weather": 4,
+        "water": 4,
+        "light_fire": 11,
+        "night_moon": 7,
+        "city_street": 10,
+        "body_gesture": 8,
+        "time_memory": 4,
+        "people_relationships": 6,
+        "cosmos": 0
+      },
+      "imageryTerms": {
+        "sky_weather": {
+          "北風": 3,
+          "春風": 1
+        },
+        "water": {
+          "二泉": 4
+        },
+        "light_fire": {
+          "燭光": 3,
+          "彩虹": 2,
+          "點亮": 3,
+          "燈籠": 3
+        },
+        "night_moon": {
+          "月": 4,
+          "漆黑": 3
+        },
+        "city_street": {
+          "街頭": 2,
+          "酒家": 3,
+          "小巷": 3,
+          "路上": 1,
+          "路": 1
+        },
+        "body_gesture": {
+          "墨鏡": 2,
+          "雙眼": 1,
+          "心": 1,
+          "臉孔": 2,
+          "流淚": 1,
+          "臉": 1
+        },
+        "time_memory": {
+          "記得": 1,
+          "年": 1,
+          "歲": 1,
+          "小時候": 1
+        },
+        "people_relationships": {
+          "聽眾": 3,
+          "家": 1,
+          "老婆": 1,
+          "老爸": 1
+        }
+      },
+      "colourWords": {
+        "red": 7,
+        "black": 3,
+        "rainbow": 2
+      },
+      "natureVsCity": {
+        "nature": 8,
+        "city": 10,
+        "natureShare": 0.44
+      },
+      "palette": [
+        {
+          "hex": "#14141A",
+          "reason": "night black: blindness, dark north wind, round sunglasses"
+        },
+        {
+          "hex": "#9E1B1B",
+          "reason": "blood red: erhu strings that cut the fingers"
+        },
+        {
+          "hex": "#E8A23B",
+          "reason": "candle gold: candlelight and lanterns lit along the way"
+        },
+        {
+          "hex": "#C9CED6",
+          "reason": "moon silver: the moon over the spring"
+        },
+        {
+          "hex": "#7B6FD0",
+          "reason": "rainbow violet: the rainbow he plays for people"
+        }
+      ],
+      "mood": [
+        "dignified",
+        "melancholic",
+        "hopeful"
+      ],
+      "hoverQuote": "為人們奏出彩虹"
+    },
+    {
+      "trackNumber": 9,
+      "trackName": "我們能不能",
+      "lyricLines": 63,
+      "imageryCounts": {
+        "nature_plants": 0,
+        "sky_weather": 0,
+        "water": 0,
+        "light_fire": 0,
+        "night_moon": 0,
+        "city_street": 1,
+        "body_gesture": 12,
+        "time_memory": 5,
+        "people_relationships": 7,
+        "cosmos": 17
+      },
+      "imageryTerms": {
+        "city_street": {
+          "路": 1
+        },
+        "body_gesture": {
+          "心": 12
+        },
+        "time_memory": {
+          "年": 2,
+          "今天": 2,
+          "時間": 1
+        },
+        "people_relationships": {
+          "家": 4,
+          "朋友": 2,
+          "人類": 1
+        },
+        "cosmos": {
+          "宇宙": 2,
+          "地球": 2,
+          "太陽": 1,
+          "世界": 12
+        }
+      },
+      "colourWords": {},
+      "natureVsCity": {
+        "nature": 0,
+        "city": 1,
+        "natureShare": 0.0
+      },
+      "palette": [
+        {
+          "hex": "#0B1D3A",
+          "reason": "space navy: a huge universe"
+        },
+        {
+          "hex": "#2E6DA4",
+          "reason": "earth blue: the small planet"
+        },
+        {
+          "hex": "#F5C242",
+          "reason": "sun yellow: everyone under one sun"
+        },
+        {
+          "hex": "#A9745A",
+          "reason": "warm brown: every skin colour"
+        }
+      ],
+      "mood": [
+        "pleading",
+        "idealistic",
+        "communal"
+      ],
+      "hoverQuote": "很大的宇宙的小地球上"
+    },
+    {
+      "trackNumber": 10,
+      "trackName": "跳",
+      "lyricLines": 42,
+      "imageryCounts": {
+        "nature_plants": 0,
+        "sky_weather": 0,
+        "water": 0,
+        "light_fire": 8,
+        "night_moon": 2,
+        "city_street": 4,
+        "body_gesture": 29,
+        "time_memory": 3,
+        "people_relationships": 2,
+        "cosmos": 20
+      },
+      "imageryTerms": {
+        "light_fire": {
+          "彩虹": 6,
+          "rays": 1,
+          "blazin": 1
+        },
+        "night_moon": {
+          "睡眠": 2
+        },
+        "city_street": {
+          "新聞": 2,
+          "報紙": 2
+        },
+        "body_gesture": {
+          "跳": 29
+        },
+        "time_memory": {
+          "今天": 2,
+          "fall": 1
+        },
+        "people_relationships": {
+          "homies": 2
+        },
+        "cosmos": {
+          "世界": 16,
+          "sun": 2,
+          "world": 2
+        }
+      },
+      "colourWords": {
+        "rainbow": 6
+      },
+      "natureVsCity": {
+        "nature": 0,
+        "city": 4,
+        "natureShare": 0.0
+      },
+      "palette": [
+        {
+          "hex": "#BDBAB2",
+          "reason": "newsprint grey: chaos in the papers"
+        },
+        {
+          "hex": "#F26B1D",
+          "reason": "blazing orange: rays of the sun, keep it blazing"
+        },
+        {
+          "hex": "#7B4FD8",
+          "reason": "rainbow violet: a rainbow world"
+        },
+        {
+          "hex": "#2FB673",
+          "reason": "rainbow green: unity and movement"
+        }
+      ],
+      "mood": [
+        "urgent",
+        "defiant",
+        "celebratory"
+      ],
+      "hoverQuote": "我們要彩虹世界"
+    },
+    {
+      "trackNumber": 11,
+      "trackName": "總結",
+      "lyricLines": 45,
+      "imageryCounts": {
+        "nature_plants": 6,
+        "sky_weather": 4,
+        "water": 0,
+        "light_fire": 0,
+        "night_moon": 1,
+        "city_street": 0,
+        "body_gesture": 9,
+        "time_memory": 7,
+        "people_relationships": 2,
+        "cosmos": 3
+      },
+      "imageryTerms": {
+        "nature_plants": {
+          "蝴蝶": 3,
+          "原野": 3
+        },
+        "sky_weather": {
+          "電": 1,
+          "雲煙": 3
+        },
+        "night_moon": {
+          "失了幾次眠": 1
+        },
+        "body_gesture": {
+          "吻": 1,
+          "臉": 2,
+          "眼": 3,
+          "眼神": 1,
+          "眼淚": 1,
+          "眼睛": 1
+        },
+        "time_memory": {
+          "歷史": 1,
+          "從前": 6
+        },
+        "people_relationships": {
+          "祖先": 1,
+          "人類": 1
+        },
+        "cosmos": {
+          "世界": 2,
+          "神": 1
+        }
+      },
+      "colourWords": {},
+      "natureVsCity": {
+        "nature": 10,
+        "city": 0,
+        "natureShare": 1.0
+      },
+      "palette": [
+        {
+          "hex": "#A47C48",
+          "reason": "ochre: ancestors tying knots in string"
+        },
+        {
+          "hex": "#DDE7F5",
+          "reason": "lightning white-blue: flashes of lightning"
+        },
+        {
+          "hex": "#F0C75E",
+          "reason": "butterfly yellow: butterflies over the sky"
+        },
+        {
+          "hex": "#6F8F5A",
+          "reason": "wilderness green: open plains"
+        },
+        {
+          "hex": "#8C8C94",
+          "reason": "smoke grey: everything passes like smoke and cloud"
+        }
+      ],
+      "mood": [
+        "contemplative",
+        "regretful",
+        "philosophical"
+      ],
+      "hoverQuote": "天飛過幾多蝴蝶"
+    },
+    {
+      "trackNumber": 12,
+      "trackName": "趕場",
+      "lyricLines": 28,
+      "imageryCounts": {
+        "nature_plants": 0,
+        "sky_weather": 1,
+        "water": 0,
+        "light_fire": 1,
+        "night_moon": 3,
+        "city_street": 14,
+        "body_gesture": 0,
+        "time_memory": 11,
+        "people_relationships": 10,
+        "cosmos": 0
+      },
+      "imageryTerms": {
+        "sky_weather": {
+          "風": 1
+        },
+        "light_fire": {
+          "光": 1
+        },
+        "night_moon": {
+          "夜夜": 3
+        },
+        "city_street": {
+          "路上": 2,
+          "早場": 3,
+          "尾場": 3,
+          "科場": 2,
+          "試場": 2,
+          "上班": 1,
+          "下班": 1
+        },
+        "time_memory": {
+          "時間": 3,
+          "年": 3,
+          "記得": 3,
+          "歲": 1,
+          "往事": 1
+        },
+        "people_relationships": {
+          "家": 9,
+          "叔叔": 1
+        }
+      },
+      "colourWords": {},
+      "natureVsCity": {
+        "nature": 1,
+        "city": 14,
+        "natureShare": 0.07
+      },
+      "palette": [
+        {
+          "hex": "#707780",
+          "reason": "rush-hour grey: hurrying between shifts and exams"
+        },
+        {
+          "hex": "#7FA36B",
+          "reason": "riverbank green: look at the scenery on both banks"
+        },
+        {
+          "hex": "#E3B778",
+          "reason": "warm lamp: reunions always postponed"
+        }
+      ],
+      "mood": [
+        "hurried",
+        "nostalgic",
+        "wry"
+      ],
+      "hoverQuote": "趕來趕去趕什麼"
+    },
+    {
+      "trackNumber": 13,
+      "trackName": "等著你回來",
+      "lyricLines": 18,
+      "imageryCounts": {
+        "nature_plants": 2,
+        "sky_weather": 2,
+        "water": 0,
+        "light_fire": 0,
+        "night_moon": 0,
+        "city_street": 0,
+        "body_gesture": 2,
+        "time_memory": 4,
+        "people_relationships": 0,
+        "cosmos": 0
+      },
+      "imageryTerms": {
+        "nature_plants": {
+          "燕子": 1,
+          "春花": 1
+        },
+        "sky_weather": {
+          "春光": 2
+        },
+        "body_gesture": {
+          "熱淚": 2
+        },
+        "time_memory": {
+          "winter": 1,
+          "spring": 1,
+          "summer": 1,
+          "fall": 1
+        }
+      },
+      "colourWords": {},
+      "natureVsCity": {
+        "nature": 4,
+        "city": 0,
+        "natureShare": 1.0
+      },
+      "palette": [
+        {
+          "hex": "#F3B5C4",
+          "reason": "blossom pink: spring flowers in the courtyard"
+        },
+        {
+          "hex": "#23304A",
+          "reason": "swallow ink: swallows back under the beam"
+        },
+        {
+          "hex": "#9CCB7A",
+          "reason": "spring green: spring light that won't return"
+        },
+        {
+          "hex": "#9DB8D9",
+          "reason": "tear blue: cheeks full of hot tears"
+        }
+      ],
+      "mood": [
+        "yearning",
+        "patient",
+        "bittersweet"
+      ],
+      "hoverQuote": "庭前春花為你開"
+    },
+    {
+      "trackNumber": 14,
+      "trackName": "認識你",
+      "lyricLines": 82,
+      "imageryCounts": {
+        "nature_plants": 0,
+        "sky_weather": 0,
+        "water": 0,
+        "light_fire": 0,
+        "night_moon": 1,
+        "city_street": 5,
+        "body_gesture": 1,
+        "time_memory": 7,
+        "people_relationships": 3,
+        "cosmos": 0
+      },
+      "imageryTerms": {
+        "night_moon": {
+          "晚上": 1
+        },
+        "city_street": {
+          "cappuccino": 1,
+          "咖啡": 1,
+          "手機": 1,
+          "電話": 1,
+          "電影": 1
+        },
+        "body_gesture": {
+          "笑": 1
+        },
+        "time_memory": {
+          "明天": 1,
+          "今天": 1,
+          "時間": 1,
+          "星期": 4
+        },
+        "people_relationships": {
+          "小姐": 1,
+          "朋友": 1,
+          "家": 1
+        }
+      },
+      "colourWords": {
+        "white": 1
+      },
+      "natureVsCity": {
+        "nature": 0,
+        "city": 5,
+        "natureShare": 0.0
+      },
+      "palette": [
+        {
+          "hex": "#E8D6BF",
+          "reason": "cappuccino foam: the café order"
+        },
+        {
+          "hex": "#6F4E37",
+          "reason": "coffee brown: a café table"
+        },
+        {
+          "hex": "#F1C27D",
+          "reason": "warm café light: an easy first conversation"
+        }
+      ],
+      "mood": [
+        "playful",
+        "flirtatious",
+        "casual"
+      ],
+      "hoverQuote": "因為我只想認識你"
+    }
+  ]
+}
