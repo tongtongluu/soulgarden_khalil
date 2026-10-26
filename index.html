@@ -5,7 +5,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;900&family=Noto+Serif+SC:wght@600&display=swap">
 <style>
 /* Layout: a gallery of shelves. A one-line header, then the whole discography as ten shelves of vessels
    standing in the light of the places he lived; the key and legend sit quietly below. */
@@ -120,7 +120,13 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 .posters .plate-nav button:hover, .posters .plate-nav button[aria-pressed="true"] { color: var(--fg); }
 .posters .plate-nav button[aria-pressed="true"] { box-shadow: inset 0 -1px 0 var(--fg); border-radius: 0; }
 .posters .plate-nav button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
-@media (max-width: 860px) { .posters .viewer { grid-template-columns: 1fr; } }
+@media (max-width: 860px) { .posters .viewer { grid-template-columns: 1fr; } .posters .plate { order: -1; } }
+.posters .style-bar { display: flex; flex-wrap: wrap; gap: 4px 6px; justify-content: center; align-items: center; font-size: 11px; color: var(--muted); }
+.posters .style-bar span { font: 500 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; margin-right: 4px; }
+.posters .style-btn { border: 1px solid var(--shelf); background: transparent; color: var(--muted); font: 500 12px var(--body); padding: 5px 11px; border-radius: 999px; cursor: pointer; }
+.posters .style-btn:hover { color: var(--fg); }
+.posters .style-btn[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.posters .style-btn:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 
 .tip {
   position: absolute; pointer-events: none; z-index: 5; width: 250px;
@@ -198,7 +204,7 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
     <div><dt>Flower</dt><dd>He sang about love all the time. Every song whose lyrics mention love 愛 gets flowers in its vase: one flower for every five mentions, and each petal is one mention, so you can count them.</dd></div>
     <div><dt>Pebble shape</dt><dd>A slow ballad, under 78 BPM.</dd></div>
     <div><dt>Background</dt><dd>The garden sits in the light of the places he lived: the ocean of Kauaʻi where he was born at the top, the harbor haze of Hong Kong where he grew up and made music across the middle, and the red earth of Yunnan where he went in his last years rising from below.</dd></div>
-    <div><dt>Song posters</dt><dd>One poster per song, drawn from a scene card written from a close reading of its lyrics: the main image, the setting, the images around it and how they relate, its movement, mood and emotional arc. Counts in the picture, such as wind ribbons, ripples, rainbow bands and jumping figures, are how many times the lyrics sing them.</dd></div>
+    <div><dt>Song posters</dt><dd>One abstract poster per song, drawn from a scene card written from a close reading of its lyrics: the main image becomes a warped ring, the ground of the song a warped checker field, and its light and shadow follow the mood and emotional arc. Counts in the geometry, such as ring segments, bands and jumping squares, are how many times the lyrics sing them. The album poster comes first.</dd></div>
     <div><dt>Dreamscape</dt><dd>Every imagery word, freed from its song and recombined into one picture of flat gradient shapes: moon, rainbow, lanterns, swallows, the sea. Each image is sized by how often he sings it; birds, butterflies, flowers, people, lanterns and stars repeat instead, so you can count them. Recompose shuffles the arrangement, and hovering an image plays the song that sings it most.</dd></div>
     <div><dt>Blends</dt><dd>A group of songs averaged into one outline, with each image as a flowing patch of color sized by its share. Album blends show each album's character. Soul palette pours every song into one smiling bowl: the bowl holds his whole palette, the two fins carry the second and third images, and each leaf is one song. Hover a leaf to hear it.</dd></div>
   </dl>
@@ -1835,7 +1841,7 @@ function drawAlbum(c, w, h, t, card, hs = -1) {
     // track number and name, small, on the ground
     c.fillStyle = i === 7 ? "#EDE3CC" : "rgba(40,48,44,.75)"; c.textAlign = "center";
     c.font = `500 ${Math.max(9, h * 0.015)}px "IBM Plex Mono", monospace`; c.fillText(String(s.track).padStart(2, "0"), x, pathY(x) + h * 0.07);
-    c.font = `500 ${Math.max(10, h * 0.021)}px "Noto Serif SC", serif`; c.fillText(s.name, x, pathY(x) + h * 0.1);
+    c.font = `500 ${Math.max(8, Math.min(h * 0.021, (w / n) * 0.95 / Math.max(2, [...s.name].length * 0.95)))}px "Noto Serif SC", serif`; c.fillText(s.name, x, pathY(x) + h * 0.1);
   });
   c.textAlign = "left"; c.fillStyle = "rgba(40,48,44,.8)"; c.font = `500 ${Math.max(10, h * 0.02)}px "IBM Plex Mono", monospace`;
   c.fillText("SOULBOY · 2005", w * 0.03, h * 0.06);
@@ -1973,8 +1979,281 @@ const HEROES = {
     for (let k = 0; k < 7; k++) { disc(c, x - s * 0.3 + k * s * 0.1, y - s * 0.78, s * (k === 5 ? 0.04 : 0.025)); c.fillStyle = k <= day ? (k === 5 ? "#EE6F7C" : "#8A6A55") : "rgba(138,106,85,.3)"; c.fill(); }
   },
 };
+// ---- abstract posters: the scene card turned into geometry, light and shadow ----
+// a warped checker field for the ground of the song, one warped ring for its main image,
+// light falling from where the song's light comes from, and a cast shadow so the forms sit in space
+function poly(c, pts) { c.beginPath(); pts.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); c.closePath(); }
+function cell(c, pts, col) { poly(c, pts); c.fillStyle = col; c.strokeStyle = col; c.lineWidth = 0.8; c.fill(); c.stroke(); }
+// a checker field of cols × rows; warp(u, v) gives each corner its place on the poster
+function field(c, cols, rows, warp, color) {
+  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+    const p = (a, b) => warp(a / cols, b / rows);
+    cell(c, [p(i, j), p(i + 1, j), p(i + 1, j + 1), p(i, j + 1)], color(i, j));
+  }
+}
+// a ring of segs × bands checker cells; k(theta) bends the radius so the ring is never quite round
+function ring(c, o) {
+  const { x, y, r0, r1, segs, bands, k = () => 1, rot = 0, squash = 1, from = 0, to = Math.PI * 2, color } = o;
+  const at = (s, b) => { const th = rot + from + (s / segs) * (to - from), rr = (r0 + (r1 - r0) * (b / bands)) * k(th); return [x + Math.cos(th) * rr, y + Math.sin(th) * rr * squash]; };
+  for (let b = 0; b < bands; b++) for (let s = 0; s < segs; s++) cell(c, [at(s, b), at(s + 1, b), at(s + 1, b + 1), at(s, b + 1)], color(s, b));
+}
+// the ring's silhouette, used to cast its shadow
+function ringShape(c, o) {
+  const { x, y, r0, r1, k = () => 1, rot = 0, squash = 1, from = 0, to = Math.PI * 2 } = o, n = 90;
+  c.beginPath();
+  for (let i = 0; i <= n; i++) { const th = rot + from + (i / n) * (to - from), rr = r1 * k(th); c.lineTo(x + Math.cos(th) * rr, y + Math.sin(th) * rr * squash); }
+  for (let i = n; i >= 0; i--) { const th = rot + from + (i / n) * (to - from), rr = r0 * k(th); c.lineTo(x + Math.cos(th) * rr, y + Math.sin(th) * rr * squash); }
+  c.closePath();
+}
+function shadowOf(c, o, dx, dy, blur, col) {
+  c.save(); c.shadowColor = col; c.shadowBlur = blur; c.shadowOffsetX = dx; c.shadowOffsetY = dy;
+  ringShape(c, o); c.fillStyle = col; c.fill(); c.restore();
+}
+function glow(c, x, y, r, col, mode = "screen") { c.save(); c.globalCompositeOperation = mode; disc(c, x, y, r); c.fillStyle = rad(c, x, y, r, col, "rgba(0,0,0,0)"); c.fill(); c.restore(); }
+function shade(c, w, h, x0, y0, x1, y1, a) { c.save(); c.globalCompositeOperation = "multiply"; c.fillStyle = lin(c, x0, y0, x1, y1, "rgba(255,255,255,0)", `rgba(20,20,30,${a})`); c.fillRect(0, 0, w, h); c.restore(); }
+function beatOf(t, bpm) { const b = (t * bpm) / 60, f = b - Math.floor(b); return reduce ? 0 : Math.exp(-f * 5) * (Math.floor(b) % 4 === 0 ? 1 : 0.6); }
+// poster type: a big title, the lyric line, and a strip of small facts, like a gig print
+function posterType(c, w, h, p, ink, sub, opts = {}) {
+  const size = opts.size || w * 0.15, x = opts.x ?? w * 0.07, y = opts.y ?? h * 0.9;
+  c.save(); c.fillStyle = ink; c.textBaseline = "alphabetic";
+  c.font = `900 ${size}px "Noto Sans SC", "Noto Serif SC", sans-serif`; c.fillText(p.name, x, y);
+  // the lyric line sits under the title, or above it when the title is already at the foot of the page
+  const lineY = y + w * 0.05 < h - w * 0.02 ? y + w * 0.05 : y - size * 0.92;
+  c.font = `500 ${Math.max(10, w * 0.026)}px "Noto Serif SC", serif`; c.fillStyle = sub; c.fillText(`「${p.line}」`, x, lineY);
+  c.font = `500 ${Math.max(8, w * 0.017)}px "IBM Plex Mono", monospace`;
+  const meta = `KHALIL FONG 方大同 · SOULBOY 2005 · ${p.track ? "TRACK " + String(p.track).padStart(2, "0") + " · " + Math.round(p.bpm) + " BPM" : "14 SONGS"}`;
+  c.fillText(meta, x, opts.metaY ?? h * 0.055);
+  c.restore();
+}
+
+// 春風吹 — flow. Ground: a green and white field bent by the wind. Main image: a peach-red ring blown out of round,
+// 11 × 3 segments for the 11 times 春風 is sung. Light from the upper left, a long shadow downwind.
+function absWind(c, w, h, t, p) {
+  c.fillStyle = lin(c, 0, 0, 0, h, "#CFE2EC", "#EAF1EC"); c.fillRect(0, 0, w, h);
+  const T = reduce ? 0 : t;
+  field(c, 12, 9, (u, v) => {
+    const vv = Math.pow(v, 1.35);
+    return [u * w * 1.1 - w * 0.05 + Math.sin(vv * 3.2 + T * 0.7) * w * 0.06 * (1 - vv * 0.5), h * (0.5 + vv * 0.52) + Math.sin(u * 5.5 + T * 0.9) * h * 0.018 * (1 - vv)];
+  }, (i, j) => (i + j) % 2 ? "#4FA35E" : "#F4F1E6");
+  // eleven bars of wind across the sky
+  for (let i = 0; i < 11; i++) {
+    const y = h * (0.08 + i * 0.038), x0 = ((T * 30 * (1 + (i % 3) * 0.4) + i * 97) % (w * 1.6)) - w * 0.4;
+    c.fillStyle = i % 4 === 0 ? "rgba(255,255,255,.9)" : "rgba(255,255,255,.45)";
+    c.beginPath(); c.roundRect(x0, y, w * (0.25 + (i % 4) * 0.1), h * 0.007, h * 0.004); c.fill();
+  }
+  const o = { x: w * 0.47, y: h * 0.38, r0: w * 0.12, r1: w * 0.3, segs: p.heroCount * 3, bands: 4, squash: 0.86, rot: T * 0.08,
+    k: th => 1 + 0.2 * Math.sin(th * 2 + T * 0.6) + 0.06 * Math.sin(th * 5 - T),
+    color: (s, b) => (s + b) % 2 ? (b < 2 ? "#E8505B" : "#F4B6C2") : "#FBF7F0" };
+  shadowOf(c, o, w * 0.06, h * 0.06, w * 0.05, "rgba(30,50,40,.32)");
+  ring(c, o);
+  glow(c, w * 0.12, h * 0.06, w * 0.8, "rgba(255,250,235,.55)");
+  shade(c, w, h, w * 0.2, h * 0.2, w, h, 0.28);
+  posterType(c, w, h, p, "#1E2B3A", "#3E5566");
+}
+
+// 南音 — frame. Two dark rings for the glasses, five bands for the five times the moon over the spring returns.
+// Inside the left, the moon and its reflection; inside the right, the rainbow he plays. Red strings drop
+// to a gold point, and the sound spreads below in rings of gold. Light: one candle cone from above.
+function absLenses(c, w, h, t, p) {
+  c.fillStyle = lin(c, 0, 0, 0, h, "#121220", "#22182A"); c.fillRect(0, 0, w, h);
+  const T = reduce ? 0 : t, cy = h * 0.34, r1 = w * 0.2, r0 = w * 0.1;
+  // candlelight from above
+  c.save(); c.globalCompositeOperation = "screen";
+  poly(c, [[w * 0.47, 0], [w * 0.53, 0], [w * 0.9, h], [w * 0.1, h]]); c.fillStyle = lin(c, 0, 0, 0, h, "rgba(242,179,61,.22)", "rgba(242,179,61,0)"); c.fill(); c.restore();
+  // the sound, a half ring of gold and indigo opening upward from the drum
+  const snd = { x: w * 0.5, y: h * 0.9, r0: w * 0.05, r1: w * 0.52, segs: 26, bands: 6, from: Math.PI, to: Math.PI * 2,
+    k: th => 1 + 0.03 * Math.sin(th * 8 + T * 2), color: (s, b) => ((s + b) % 2 ? ["#F2B33D", "#E08A3C", "#C8323A", "#6B5CA5", "#3E4C8A", "#2B2A4A"][b] : "#1A1726") };
+  ring(c, snd);
+  [[-1, "left"], [1, "right"]].forEach(([d]) => {
+    const o = { x: w * 0.5 + d * w * 0.215, y: cy, r0, r1, segs: 36, bands: p.heroCount, k: th => 1 + 0.025 * Math.sin(th * 3 + d), color: (s, b) => (s + b) % 2 ? "#2B2A4A" : "#0B0A12" };
+    shadowOf(c, o, 0, h * 0.03, w * 0.04, "rgba(0,0,0,.6)");
+    ring(c, o);
+    c.save(); disc(c, o.x, cy, r0 * 1.02); c.clip();
+    if (d < 0) {
+      c.fillStyle = lin(c, 0, cy - r0, 0, cy, "#F4F1E6", "#B9B5D6"); c.fillRect(o.x - r0, cy - r0, r0 * 2, r0);
+      c.fillStyle = lin(c, 0, cy, 0, cy + r0, "#3E4C8A", "#1A2236"); c.fillRect(o.x - r0, cy, r0 * 2, r0);
+      for (let k = 0; k < 4; k++) { c.fillStyle = "rgba(232,230,240,.5)"; c.fillRect(o.x - r0 * (0.7 - k * 0.15), cy + r0 * (0.15 + k * 0.18) + Math.sin(T * 1.5 + k) * 1.5, r0 * (1.4 - k * 0.3), r0 * 0.05); }
+    } else {
+      ["#F2A0A8", "#F2B07E", "#F5D84E", "#9FD08F", "#A9C9EC", "#9A89F4"].forEach((col, k) => { c.fillStyle = col; c.fillRect(o.x - r0 + k * (r0 * 2 / 6), cy - r0, r0 * 2 / 6 + 1, r0 * 2); });
+      c.fillStyle = lin(c, 0, cy - r0, 0, cy + r0, "rgba(18,18,32,0)", "rgba(18,18,32,.55)"); c.fillRect(o.x - r0, cy - r0, r0 * 2, r0 * 2);
+    }
+    c.restore();
+  });
+  c.fillStyle = "#0B0A12"; c.fillRect(w * 0.47, cy - h * 0.008, w * 0.06, h * 0.016);
+  // two blood-red strings down to a gold point
+  c.fillStyle = "#C8323A"; [-0.006, 0.004].forEach(d => c.fillRect(w * (0.5 + d), cy + h * 0.06, Math.max(1.2, w * 0.003), h * 0.5));
+  c.fillStyle = "#F2B33D"; c.fillRect(w * 0.48, h * 0.86, w * 0.04, w * 0.04);
+  // three lanterns, just red light
+  [[0.1, 0.62], [0.9, 0.55], [0.84, 0.72]].forEach(([x, y], i) => { glow(c, w * x, h * y, w * 0.12, "rgba(232,80,60,.5)"); disc(c, w * x, h * y + Math.sin(T + i) * 2, w * 0.028); c.fillStyle = "#E8503C"; c.fill(); });
+  glow(c, w * 0.5, 0, w * 0.7, "rgba(242,179,61,.12)");
+  posterType(c, w, h, p, "#EDE3CC", "#B9AEC9", { y: h * 0.965, size: w * 0.11, x: w * 0.06 });
+}
+
+// 跳 — split, then healed. Above: a grey checker world, whole on the left and shattered on the right of a crack.
+// Below: an arch of six rainbow bands rising out of the crack, warm light inside it, and eight squares jumping on the beat.
+function absJump(c, w, h, t, p) {
+  const bg = c.createLinearGradient(0, 0, 0, h);
+  bg.addColorStop(0, "#22262E"); bg.addColorStop(0.45, "#4A4E58"); bg.addColorStop(0.7, "#D9BFA4"); bg.addColorStop(1, "#F6E2C6");
+  c.fillStyle = bg; c.fillRect(0, 0, w, h);
+  const T = reduce ? 0 : t, rnd = mulberry(10), beat = beatOf(t, p.bpm);
+  // the divided world: left half whole, right half drifting apart
+  const cols = 10, rows = 7, cw = w / cols, chh = h * 0.46 / rows;
+  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+    const right = i >= cols / 2, dx = right ? (rnd() - 0.3) * cw * 0.5 : 0, dy = right ? (rnd() - 0.5) * chh * 0.6 : 0, rot = right ? (rnd() - 0.5) * 0.5 : 0;
+    const x = i * cw + dx, y = j * chh + dy;
+    c.save(); c.translate(x + cw / 2, y + chh / 2); c.rotate(rot);
+    c.fillStyle = (i + j) % 2 ? (right ? "#5A5F69" : "#8E918F") : (right ? "#2E323B" : "#3A3E47"); c.fillRect(-cw / 2, -chh / 2, cw + 0.8, chh + 0.8); c.restore();
+  }
+  // the crack, with light leaking through it
+  const crack = [[w * 0.5, 0]]; for (let i = 1; i <= 8; i++) crack.push([w * 0.5 + (i % 2 ? 1 : -1) * w * (0.015 + rnd() * 0.02), h * i * 0.065]);
+  c.beginPath(); crack.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); for (let i = crack.length - 1; i >= 0; i--) c.lineTo(crack[i][0] + w * 0.01, crack[i][1]);
+  c.fillStyle = lin(c, 0, 0, 0, h * 0.52, "#0E1015", "#F5D84E"); c.fill();
+  // the rainbow arch: six bands, each its own checker, swelling on the beat
+  const cols6 = ["#E8505B", "#F2934A", "#F5CF3E", "#4FA35E", "#4F86C6", "#8A6CC8"];
+  const o = { x: w * 0.5, y: h * 0.8, r0: w * 0.13, r1: w * (0.47 + 0.015 * beat), segs: 22, bands: p.heroCount, from: Math.PI, to: Math.PI * 2,
+    k: th => 1 + 0.02 * Math.sin(th * 6 + T), color: (s, b) => (s % 2 ? cols6[p.heroCount - 1 - b] : hexMix(cols6[p.heroCount - 1 - b], "#FFFFFF", 0.35)) };
+  shadowOf(c, o, 0, -h * 0.02, w * 0.06, "rgba(20,20,30,.35)");
+  ring(c, o);
+  disc(c, w * 0.5, h * 0.8, w * 0.12); c.fillStyle = rad(c, w * 0.5, h * 0.8, w * 0.12, "#FFF1B8", "#F5A23E"); c.fill();
+  glow(c, w * 0.5, h * 0.8, w * 0.9, "rgba(255,214,140,.35)");
+  c.fillStyle = lin(c, 0, h * 0.8, 0, h, "#F2CFA8", "#F7E2C8"); c.fillRect(0, h * 0.8, w, h * 0.2);
+  // eight squares, one for each call to jump, landing together on the beat
+  for (let i = 0; i < p.jumpers; i++) {
+    const hop = reduce ? 0 : Math.max(0, Math.sin((((t * p.bpm) / 60 + (i % 2) * 0.5) % 1) * Math.PI));
+    const s = w * 0.05, x = w * (0.08 + i * 0.12) - s / 2, y = h * 0.86 - hop * h * 0.05;
+    c.fillStyle = "rgba(90,60,40,.18)"; c.fillRect(x + s * 0.1, h * 0.86 + s * 1.05, s * (0.8 - hop * 0.3), s * 0.12);
+    c.fillStyle = cols6[i % 6]; c.fillRect(x, y, s, s);
+  }
+  shade(c, w, h, 0, h * 0.6, 0, 0, 0.35);
+  posterType(c, w, h, p, "#F4E9D8", "#D9C7B0", { y: h * 0.4, size: w * 0.2, x: w * 0.06 });
+}
+
+// the album — fourteen checker columns, one per song in track order. Cell size follows tempo, colour follows mood,
+// height follows how bright the song is. Through them, one ring made of all fourteen colours: the album as a whole.
+function absAlbum(c, w, h, t, card, hs = -1) {
+  const S = card.stations, n = S.length, T = reduce ? 0 : t;
+  c.fillStyle = "#F3EFE6"; c.fillRect(0, 0, w, h);
+  const xs = S.map((_, i) => w * (0.06 + (i / (n - 1)) * 0.88)), sw = (xs[1] - xs[0]) * 0.92;
+  S.forEach((s, i) => {
+    const top = h * (0.12 + (1 - s.valence) * 0.5), rows = Math.round(s.bpm / 9), dark = s.accent;
+    const ch = (h * 0.86 - top) / rows, lift = i === hs ? -h * 0.03 : 0;
+    for (let j = 0; j < rows; j++) for (let k = 0; k < 2; k++) {
+      const wob = Math.sin(j * 0.9 + T * (s.bpm / 60) * 0.5 + i) * sw * 0.08 * s.energy;
+      c.fillStyle = (j + k) % 2 ? s.sky : dark;
+      c.fillRect(xs[i] - sw / 2 + k * sw / 2 + wob, top + j * ch + lift, sw / 2 + 0.8, ch + 0.8);
+    }
+    c.fillStyle = i === hs ? "#1E2B3A" : "rgba(30,43,58,.7)"; c.textAlign = "center";
+    c.font = `500 ${Math.max(9, h * 0.016)}px "IBM Plex Mono", monospace`; c.fillText(String(s.track).padStart(2, "0"), xs[i], h * 0.9);
+    // long names shrink to fit their column so neighbours never touch
+    c.font = `500 ${Math.max(8, Math.min(h * 0.02, (sw * 1.02) / Math.max(2, [...s.name].length * 0.95)))}px "Noto Serif SC", serif`; c.fillText(s.name, xs[i], h * 0.935);
+  });
+  c.textAlign = "left";
+  const o = { x: w * 0.5, y: h * 0.44, r0: h * 0.12, r1: h * 0.3, segs: n * 3, bands: 3, rot: -Math.PI / 2 + T * 0.04, squash: 0.92,
+    k: th => 1 + 0.08 * Math.sin(th * 3 + T * 0.5),
+    color: (s, b) => { const st = S[Math.floor(s / 3) % n]; return (s + b) % 2 ? st.sky : st.accent; } };
+  shadowOf(c, o, w * 0.03, h * 0.05, h * 0.06, "rgba(30,43,58,.35)");
+  ring(c, o);
+  glow(c, w * 0.15, 0, w * 0.9, "rgba(255,250,235,.5)");
+  shade(c, w, h, w * 0.3, h * 0.2, w, h, 0.18);
+  c.save(); c.fillStyle = "#1E2B3A"; c.font = `800 ${h * 0.1}px "Manrope", "Noto Sans SC", sans-serif`; c.fillText("Soulboy", w * 0.04, h * 0.13);
+  c.font = `500 ${Math.max(9, h * 0.017)}px "IBM Plex Mono", monospace`; c.fillText("KHALIL FONG 方大同 · 2005 · 14 SONGS", w * 0.045, h * 0.17); c.restore();
+}
+// ---- styles: the same scene card, reprinted in the manner of a painter or a print tradition ----
+// each style redraws the flat scene, then reworks its pixels: a palette of cut paper, carved woodblock lines, ink, or dots
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const STYLES = [
+  { id: "flat", label: "Abstract", note: "Geometry, light and shadow: a warped checker field for the ground of the song, one warped ring for its main image, light falling from where the song's light comes from." },
+  { id: "illus", label: "Illustrated (first draft)", note: "The first, literal drafts, kept for comparison." },
+  { id: "matisse", label: "Matisse cut-outs", note: "After Henri Matisse's paper cut-outs (1940s–50s): every shape cut from a handful of gouache-painted papers, no shading, laid on white.",
+    palette: ["#F7F3E8", "#1D4FA3", "#E2412F", "#F3C21C", "#2E8B57", "#F28AB2", "#151515"], paper: "#F7F3E8" },
+  { id: "ukiyoe", label: "Ukiyo-e woodblock", note: "After Hokusai and Hiroshige: a few carved colour blocks, Prussian blue and indigo, sumi key lines around every shape, on warm paper.",
+    palette: ["#EFE3C8", "#1F3A68", "#4F79A7", "#9DB8C9", "#C8553D", "#D9A441", "#6E8B5B", "#2B2622"], lines: "#2B2622", paper: "#EFE3C8" },
+  { id: "bauhaus", label: "Bauhaus", note: "After Kandinsky and the Bauhaus: primary red, yellow and blue with black, hard edges, thin black rules.",
+    palette: ["#F1EADB", "#D22F27", "#F2C230", "#1F4E9C", "#141414", "#BFB8A8"], lines: "#141414", paper: "#F1EADB" },
+  { id: "ink", label: "Ink wash 水墨", note: "Chinese ink painting: the scene in five tones of ink on rice paper, red kept only where it was red, and a seal stamped in the corner." },
+  { id: "seurat", label: "Seurat dots", note: "After Georges Seurat's pointillism: the picture rebuilt from small dots of colour that mix in the eye." },
+];
+function nearest(pal, r, g, b) {
+  let best = 0, bd = Infinity;
+  for (let i = 0; i < pal.length; i++) { const p = pal[i], d = (p[0] - r) ** 2 * 0.8 + (p[1] - g) ** 2 * 1.2 + (p[2] - b) ** 2; if (d < bd) { bd = d; best = i; } }
+  return best;
+}
+function paperGrain(c, w, h, a) { c.save(); c.globalCompositeOperation = "multiply"; c.globalAlpha = a; c.fillStyle = c.createPattern(grain, "repeat"); c.fillRect(0, 0, w, h); c.restore(); }
+function stylise(style, src, dst, w, h, d, title) {
+  const W = src.width, H = src.height, sc = src.getContext("2d"), img = sc.getImageData(0, 0, W, H), px = img.data;
+  dst.setTransform(1, 0, 0, 1, 0, 0);
+  if (style.palette) {
+    const pal = style.palette.map(hex), idx = new Uint8Array(W * H);
+    for (let i = 0, k = 0; i < px.length; i += 4, k++) { const n = nearest(pal, px[i], px[i + 1], px[i + 2]); idx[k] = n; px[i] = pal[n][0]; px[i + 1] = pal[n][1]; px[i + 2] = pal[n][2]; }
+    if (style.lines) {
+      // carved key lines wherever one colour block meets another
+      const L = hex(style.lines), t = Math.max(1, Math.round(d));
+      for (let y = 0; y < H - t; y++) for (let x = 0; x < W - t; x++) {
+        const k = y * W + x;
+        if (idx[k] !== idx[k + t] || idx[k] !== idx[k + t * W]) { const i = k * 4; px[i] = L[0]; px[i + 1] = L[1]; px[i + 2] = L[2]; }
+      }
+    }
+    dst.putImageData(img, 0, 0);
+    dst.setTransform(d, 0, 0, d, 0, 0);
+    paperGrain(dst, w, h, 0.12);
+    if (style.id === "matisse") {
+      // cut paper sits slightly above the page: a faint shadow under the whole sheet
+      dst.save(); dst.globalCompositeOperation = "multiply"; dst.strokeStyle = "rgba(0,0,0,.06)"; dst.lineWidth = 6; dst.strokeRect(3, 3, w - 6, h - 6); dst.restore();
+    }
+  } else if (style.id === "ink") {
+    const paper = hex("#EFE6D2"), ink = hex("#1E1C19"), red = hex("#B8312F");
+    for (let i = 0; i < px.length; i += 4) {
+      const r = px[i], g = px[i + 1], b = px[i + 2];
+      if (r > g + 55 && r > b + 45) { px[i] = red[0]; px[i + 1] = red[1]; px[i + 2] = red[2]; continue; }
+      let l = (0.3 * r + 0.55 * g + 0.15 * b) / 255;
+      l = Math.round(Math.pow(l, 1.6) * 4) / 4;           // five tones of ink, from scorched to clear water
+      const u = 1 - l;
+      for (let k = 0; k < 3; k++) px[i + k] = paper[k] + (ink[k] - paper[k]) * u * 0.92;
+    }
+    dst.putImageData(img, 0, 0);
+    // soften it into the paper, as wet ink spreads
+    const tmp = document.createElement("canvas"); tmp.width = W; tmp.height = H; tmp.getContext("2d").putImageData(img, 0, 0);
+    dst.filter = `blur(${0.9 * d}px)`; dst.globalAlpha = 0.65; dst.drawImage(tmp, 0, 0); dst.filter = "none"; dst.globalAlpha = 1;
+    dst.setTransform(d, 0, 0, d, 0, 0);
+    paperGrain(dst, w, h, 0.18);
+    // a red seal with the song's name, stamped bottom right
+    const sz = Math.max(26, Math.min(w, h) * 0.075), sx = w - sz * 1.5, sy = h - sz * 1.5;
+    dst.fillStyle = "#B8312F"; dst.beginPath(); dst.roundRect(sx, sy, sz, sz, sz * 0.08); dst.fill();
+    dst.fillStyle = "#EFE6D2"; dst.font = `700 ${sz * 0.36}px "Noto Serif SC", serif`; dst.textAlign = "center"; dst.textBaseline = "middle";
+    const chars = [..."方大同"].slice(0, 3);
+    dst.fillText(chars[0], sx + sz * 0.5, sy + sz * 0.3); dst.fillText(chars[1] + chars[2], sx + sz * 0.5, sy + sz * 0.68);
+  } else if (style.id === "seurat") {
+    dst.fillStyle = "#F4EEDF"; dst.fillRect(0, 0, W, H);
+    const step = Math.max(3, Math.round(4.2 * d)), rnd = mulberry(1);
+    for (let y = 0; y < H; y += step) for (let x = 0; x < W; x += step) {
+      const jx = x + (rnd() - 0.5) * step, jy = y + (rnd() - 0.5) * step;
+      const i = (Math.min(H - 1, Math.max(0, Math.round(jy))) * W + Math.min(W - 1, Math.max(0, Math.round(jx)))) * 4;
+      // each dot pushes its colour a little towards purer hues, the way divisionists split a tone
+      const r = px[i], g = px[i + 1], b = px[i + 2], m = (r + g + b) / 3, k = 1.35;
+      dst.fillStyle = `rgb(${m + (r - m) * k},${m + (g - m) * k},${m + (b - m) * k})`;
+      dst.beginPath(); dst.arc(jx, jy, step * 0.62, 0, Math.PI * 2); dst.fill();
+      if (rnd() < 0.18) { dst.fillStyle = `rgba(${255 - r},${255 - g},${255 - b},.35)`; dst.beginPath(); dst.arc(jx + step * 0.3, jy + step * 0.3, step * 0.28, 0, Math.PI * 2); dst.fill(); }
+    }
+    dst.setTransform(d, 0, 0, d, 0, 0);
+  }
+}
 // ---- the poster viewer: one poster at a time, filling the screen, with its card beside it ----
-const PLATES = [{ ...ALBUM, album: true, draw: drawAlbum }, ...CARDS];
+// tempo, brightness (valence) and energy of each Soulboy song, from its 30-second preview
+const TEMPO = [99.05, 123.59, 114.59, 129.41, 102.52, 108.2, 133.66, 105.02, 153.6, 120.23, 107.24, 125.7, 118.63, 89.1];
+const VAL = [0.71, 0.76, 0.69, 0.49, 0.81, 0.79, 0.6, 0.53, 0.53, 0.72, 0.74, 0.57, 0.77, 0.61];
+const EN = [0.45, 0.49, 0.3, 0.25, 0.43, 0.3, 0.19, 0.25, 0.5, 0.52, 0.24, 0.26, 0.61, 0.25];
+// each song's strongest colour, taken from its main image, paired with its mood colour in the checker
+const ACCENT = ["#F2934A", "#4F86C6", "#E8505B", "#2F7FB8", "#E46F8E", "#B07A4A", "#C45AD8", "#14121E", "#3E4C8A", "#F5B630", "#4FA35E", "#E0782E", "#7A5CC0", "#8A5A3A"];
+ALBUM.stations.forEach((s, i) => Object.assign(s, { bpm: TEMPO[i], valence: VAL[i], energy: EN[i], accent: ACCENT[i] }));
+// the abstract posters are the default; the first illustrated drafts stay one click away for comparison
+const ABS = {
+  3: [absWind, "A peach-red ring blown out of round over a green field bent by the wind. The ring has 33 segments, 11 × 3 for the 11 times 春風 is sung; eleven white bars of wind cross the sky."],
+  8: [absLenses, "Two dark rings for the glasses, five bands each for the five times the moon over the spring returns. In the left lens the moon and its reflection, in the right the rainbow he plays. Red strings fall to a gold point and the sound opens below in rings of gold."],
+  10: [absJump, "A grey checker world, whole on the left of a crack and shattered on the right. Out of the crack rises an arch of six rainbow bands, one for each time 彩虹 is sung, and eight squares jump on the beat at 120 BPM."],
+};
+CARDS.forEach(cd => { cd.drawIllus = cd.draw; cd.draw = (ABS[cd.track] || [cd.draw])[0]; cd.absNote = (ABS[cd.track] || [])[1]; });
+const PLATES = [{ ...ALBUM, album: true, draw: absAlbum, drawIllus: drawAlbum,
+  about: "Fourteen checker columns, one per song in track order. A column's cells get smaller as the song gets faster, it stands taller the brighter the song is, and its two colours are the song's mood and its main image. Through them turns one ring made of all fourteen colours: the album as a whole. Read left to right, the night of 南音 sits in the middle like a dark seam." }, ...CARDS];
 const prints = document.getElementById("prints");
 const esc = v => String(v).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
 prints.innerHTML = `
@@ -1986,9 +2265,15 @@ prints.innerHTML = `
     <button type="button" id="plate-prev" aria-label="Previous poster">←</button>
     ${PLATES.map((p, i) => `<button type="button" class="plate-tab" data-i="${i}" lang="zh">${p.album ? "Soulboy · the album" : esc(p.name)}</button>`).join("")}
     <button type="button" id="plate-next" aria-label="Next poster">→</button>
-  </nav>`;
+  </nav>
+  <div class="style-bar" role="group" aria-label="Print style">
+    <span>Print it as</span>
+    ${STYLES.map(st => `<button type="button" class="style-btn" data-style="${st.id}" aria-pressed="${st.id === "flat"}">${esc(st.label)}</button>`).join("")}
+  </div>`;
 const cv = document.getElementById("plate-canvas"), plateBox = document.getElementById("plate"), text = document.getElementById("plate-text");
 let cur = 0, pw = 0, ph = 0, dpr = 1, hoverStation = -1, hoverPlate = false;
+let style = STYLES[0], lastStyled = 0, dirty = true;
+const off = document.createElement("canvas");
 const songFor = track => (typeof songs !== "undefined" ? songs.find(s => /soulboy/i.test(s.album) && s.track === track) : null);
 
 function card(p) {
@@ -2000,7 +2285,7 @@ function card(p) {
   return `
     <h2 lang="zh">${esc(p.name)}<span>Soulboy · track ${p.track} · ${Math.round(p.bpm)} BPM</span></h2>
     <p class="line" lang="zh">「${esc(p.line)}」</p>
-    <p class="about">${esc(p.motion)}. ${esc(p.mood)}.</p>
+    <p class="about">${esc(style.id === "illus" || !p.absNote ? p.motion + ". " + p.mood + "." : p.absNote)}</p>
     <p class="hint">Hover the poster to hear the song${typeof soundOn !== "undefined" && soundOn ? "" : " (turn sound on first)"}.</p>
     <dl>
       <dt>Main image</dt><dd>${esc(p.hero)} <span class="count">→ ${p.heroCount} ${esc(p.heroUnit)}</span></dd>
@@ -2012,7 +2297,7 @@ function card(p) {
 }
 function show(i) {
   cur = (i + PLATES.length) % PLATES.length;
-  text.innerHTML = card(PLATES[cur]);
+  text.innerHTML = card(PLATES[cur]) + `<p class="hint style-note">${esc(style.label)}: ${esc(style.note)}</p>`;
   prints.querySelectorAll(".plate-tab").forEach((b, k) => b.setAttribute("aria-pressed", String(k === cur)));
   hoverStation = -1;
   size();
@@ -2025,36 +2310,54 @@ function size() {
   if (p.album) { pw = boxW; ph = Math.min(availH, boxW * 0.9); if (boxW < 700) ph = boxW * 1.05; }
   else { ph = Math.min(availH, boxW * 4 / 3); pw = ph * 3 / 4; }
   dpr = Math.max(1, Math.min(2, devicePixelRatio || 1));
-  cv.width = pw * dpr; cv.height = ph * dpr; cv.style.width = pw + "px"; cv.style.height = ph + "px";
+  cv.width = off.width = Math.round(pw * dpr); cv.height = off.height = Math.round(ph * dpr); cv.style.width = pw + "px"; cv.style.height = ph + "px";
+  dirty = true;
 }
 prints.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.style) {
+    style = STYLES.find(st => st.id === b.dataset.style);
+    prints.querySelectorAll(".style-btn").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    show(cur); return;
+  }
   if (b.id === "plate-prev") show(cur - 1); else if (b.id === "plate-next") show(cur + 1); else if (b.dataset.i) show(+b.dataset.i);
 });
 addEventListener("keydown", e => {
-  if (prints.closest("[hidden]") || e.target.closest("input, select, textarea")) return;
+  if (prints.closest("[hidden]") || e.target.closest?.("input, select, textarea")) return;
   if (e.key === "ArrowRight") show(cur + 1); if (e.key === "ArrowLeft") show(cur - 1);
 });
 // hover to listen: the whole song poster plays its song; on the album poster each station plays its own
 function hoverAt(e) {
   const r = cv.getBoundingClientRect(), x = e.clientX - r.left, p = PLATES[cur];
   let s = null;
+  const was = hoverStation;
   if (p.album) { hoverStation = Math.max(0, Math.min(p.stations.length - 1, Math.round(((x / pw) - 0.06) / 0.88 * (p.stations.length - 1)))); s = songFor(p.stations[hoverStation].track); }
   else s = songFor(p.track);
   hoverPlate = true;
+  if (was !== hoverStation) dirty = true;
   if (typeof listen === "function") listen(s);
 }
 cv.addEventListener("pointermove", hoverAt);
-cv.addEventListener("pointerleave", () => { hoverStation = -1; hoverPlate = false; if (typeof listen === "function") listen(null); });
+cv.addEventListener("pointerleave", () => { hoverStation = -1; dirty = true; hoverPlate = false; if (typeof listen === "function") listen(null); });
 cv.addEventListener("click", e => { if (typeof setSound === "function" && !soundOn) { setSound(true); text.innerHTML = card(PLATES[cur]); } hoverAt(e); });
 
 function frame(ms) {
   requestAnimationFrame(frame);
   if (prints.closest("[hidden]") || !pw) return;
   const t = ms / 1000, c = cv.getContext("2d"), p = PLATES[cur];
-  c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, pw, ph);
-  p.draw(c, pw, ph, t, p, hoverStation);
-  finish(c, pw, ph);
+  if (style.id === "flat" || style.id === "illus") {
+    c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, pw, ph);
+    (style.id === "illus" ? p.drawIllus : p.draw)(c, pw, ph, t, p, hoverStation);
+    finish(c, pw, ph);
+    return;
+  }
+  // the reprinted styles rework every pixel, so they redraw a few times a second rather than every frame
+  if (!dirty && ms - lastStyled < 500) return;
+  lastStyled = ms; dirty = false;
+  const oc = off.getContext("2d", { willReadFrequently: true });
+  oc.setTransform(dpr, 0, 0, dpr, 0, 0); oc.clearRect(0, 0, pw, ph);
+  p.draw(oc, pw, ph, t, p, hoverStation);
+  stylise(style, off, c, pw, ph, dpr, p.name);
 }
 new ResizeObserver(size).observe(plateBox);
 addEventListener("resize", size);
