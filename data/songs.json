@@ -9,15 +9,15 @@
     "valence": 0.71,
     "intensity": 0.623,
     "weights": {
-      "love": 1.0,
-      "light": 0.0,
-      "sun": 0.0,
-      "night": 0.0,
-      "nature": 0.0,
-      "water": 0.0,
-      "solitude": 0.0
+      "love": 0.143,
+      "light": 0.143,
+      "sun": 0.143,
+      "night": 0.143,
+      "nature": 0.143,
+      "water": 0.143,
+      "solitude": 0.143
     },
-    "sparse": false,
+    "sparse": true,
     "hits": {
       "love": 1,
       "light": 0,
@@ -318,15 +318,15 @@
     "valence": 0.53,
     "intensity": 0.735,
     "weights": {
-      "love": 0.0,
-      "light": 0.0,
-      "sun": 0.5,
-      "night": 0.0,
-      "nature": 0.0,
-      "water": 0.0,
-      "solitude": 0.5
+      "love": 0.143,
+      "light": 0.143,
+      "sun": 0.143,
+      "night": 0.143,
+      "nature": 0.143,
+      "water": 0.143,
+      "solitude": 0.143
     },
-    "sparse": false,
+    "sparse": true,
     "hits": {
       "love": 0,
       "light": 0,

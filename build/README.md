@@ -21,7 +21,7 @@ python3 songs.py           # → data/songs.json (7 weights from imagery_lexicon
 ## Imagery
 
 - `imagery.py`: 10 detailed categories and colour words, counted with a greedy longest-first lexicon match over the full LRCLIB lyrics. Choruses count each time they repeat. Palette, mood and hover quote (≤15 characters) are hand-curated, not measured.
-- `songs.py`: 7 weights (love, light, sun, night, nature, water, solitude) from `imagery_lexicon.json`, normalised to sum to 1. Equal weights and `sparse: true` when a track has no hits. `intensity` is energy min-max normalised across the album.
+- `songs.py`: 7 weights (love, light, sun, night, nature, water, solitude) from `imagery_lexicon.json`, normalised to sum to 1. Equal weights and `sparse: true` when a track has fewer than 4 hits in total. `intensity` is energy min-max normalised across the album.
 
 ## What is not published
 

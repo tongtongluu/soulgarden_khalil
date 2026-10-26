@@ -9,6 +9,7 @@ import os
 from common import DATA, RAW, read_json, write_json
 from imagery import EDITORIAL, tokenize
 
+SPARSE_BELOW = 4  # fewer total hits than this: too little evidence, use equal weights
 CATS = ["love", "light", "sun", "night", "nature", "water", "solitude"]
 
 
@@ -29,13 +30,14 @@ def main():
         hits = tokenize(text, lex)
         counts = {c: sum(hits.get(c, {}).values()) for c in CATS}
         total = sum(counts.values())
-        weights = {c: round(counts[c] / total, 3) if total else round(1 / 7, 3) for c in CATS}
+        sparse = total < SPARSE_BELOW
+        weights = {c: round(1 / 7, 3) if sparse else round(counts[c] / total, 3) for c in CATS}
         f = feats[n]
         songs.append({
             "album": "Soulboy", "year": 2005, "track": n, "name": t["trackName"],
             "tempo": round(f["tempo"], 2), "energy": round(f["energy"], 2), "valence": round(f["valence"], 2),
             "intensity": round((f["energy"] - lo) / (hi - lo), 3),
-            "weights": weights, "sparse": total == 0, "hits": counts,
+            "weights": weights, "sparse": sparse, "hits": counts,
             "palette": [h for h, _ in EDITORIAL[n]["palette"]],
             "quote": EDITORIAL[n]["quote"],
             "preview_url": t["previewUrl"], "apple_url": t["trackViewUrl"], "artwork": t["artworkUrl600"],
