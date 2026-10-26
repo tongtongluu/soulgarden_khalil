@@ -1,0 +1,752 @@
+[
+  {
+    "album": "Soulboy",
+    "zh": "Soulboy",
+    "year": 2005,
+    "collectionId": 201549018,
+    "itunesName": "Soulboy",
+    "trackCount": 14,
+    "editionNote": "Tracks 2, 3, 11-14 are dated 2005-11-16, the rest 2005-07-22: likely a reissue that added tracks to the July original.",
+    "tracks": [
+      {
+        "n": 1,
+        "name": "Prologue",
+        "seconds": 44
+      },
+      {
+        "n": 2,
+        "name": "妹妹",
+        "seconds": 227
+      },
+      {
+        "n": 3,
+        "name": "春風吹",
+        "seconds": 201
+      },
+      {
+        "n": 4,
+        "name": "每天每天",
+        "seconds": 251
+      },
+      {
+        "n": 5,
+        "name": "女人",
+        "seconds": 193
+      },
+      {
+        "n": 6,
+        "name": "叫我怎麼說",
+        "seconds": 252
+      },
+      {
+        "n": 7,
+        "name": "哪怕",
+        "seconds": 260
+      },
+      {
+        "n": 8,
+        "name": "南音",
+        "seconds": 216
+      },
+      {
+        "n": 9,
+        "name": "我們能不能",
+        "seconds": 249
+      },
+      {
+        "n": 10,
+        "name": "跳",
+        "seconds": 213
+      },
+      {
+        "n": 11,
+        "name": "總結",
+        "seconds": 249
+      },
+      {
+        "n": 12,
+        "name": "趕場",
+        "seconds": 214
+      },
+      {
+        "n": 13,
+        "name": "等著你回來",
+        "seconds": 216
+      },
+      {
+        "n": 14,
+        "name": "認識你",
+        "seconds": 331
+      }
+    ]
+  },
+  {
+    "album": "This Love",
+    "zh": "愛愛愛",
+    "year": 2006,
+    "collectionId": 220365864,
+    "itunesName": "愛愛愛",
+    "trackCount": 13,
+    "editionNote": "Track 9 詩人的情人 is dated 2006-12-31, the rest 2006-06-09; tracks 12-13 are a cover and a remix. Likely a reissue.",
+    "tracks": [
+      {
+        "n": 1,
+        "name": "愛愛愛",
+        "seconds": 213
+      },
+      {
+        "n": 2,
+        "name": "蘇麗珍",
+        "seconds": 217
+      },
+      {
+        "n": 3,
+        "name": "歌手與模特兒",
+        "seconds": 222
+      },
+      {
+        "n": 4,
+        "name": "唉! ",
+        "seconds": 221
+      },
+      {
+        "n": 5,
+        "name": "四人遊",
+        "seconds": 228
+      },
+      {
+        "n": 6,
+        "name": "手拖手",
+        "seconds": 164
+      },
+      {
+        "n": 7,
+        "name": "偷笑 ",
+        "seconds": 227
+      },
+      {
+        "n": 8,
+        "name": "Goodbye Melody Rose",
+        "seconds": 187
+      },
+      {
+        "n": 9,
+        "name": "詩人的情人 ",
+        "seconds": 232
+      },
+      {
+        "n": 10,
+        "name": "拖男帶女",
+        "seconds": 294
+      },
+      {
+        "n": 11,
+        "name": "Love Outrolude (Instrumental)",
+        "seconds": 92
+      },
+      {
+        "n": 12,
+        "name": "If You Leave Me Now",
+        "seconds": 223
+      },
+      {
+        "n": 13,
+        "name": "春風吹之吹吹風Mix",
+        "seconds": 204
+      }
+    ]
+  },
+  {
+    "album": "Wonderland",
+    "zh": "未來",
+    "year": 2007,
+    "collectionId": 272875165,
+    "itunesName": "未來",
+    "trackCount": 11,
+    "editionNote": null,
+    "tracks": [
+      {
+        "n": 1,
+        "name": "Love Song",
+        "seconds": 269
+      },
+      {
+        "n": 2,
+        "name": "夠不夠",
+        "seconds": 223
+      },
+      {
+        "n": 3,
+        "name": "暖",
+        "seconds": 224
+      },
+      {
+        "n": 4,
+        "name": "愛在",
+        "seconds": 244
+      },
+      {
+        "n": 5,
+        "name": "公園",
+        "seconds": 241
+      },
+      {
+        "n": 6,
+        "name": "簡單最浪漫",
+        "seconds": 253
+      },
+      {
+        "n": 7,
+        "name": "十九八七",
+        "seconds": 313
+      },
+      {
+        "n": 8,
+        "name": "未來",
+        "seconds": 181
+      },
+      {
+        "n": 9,
+        "name": "忘了美麗",
+        "seconds": 269
+      },
+      {
+        "n": 10,
+        "name": "Sorry",
+        "seconds": 223
+      },
+      {
+        "n": 11,
+        "name": "愛愛愛 (Acoustic Version)",
+        "seconds": 225
+      }
+    ]
+  },
+  {
+    "album": "Orange Moon",
+    "zh": "橙月",
+    "year": 2008,
+    "collectionId": 313404785,
+    "itunesName": "橙月",
+    "trackCount": 12,
+    "editionNote": null,
+    "tracks": [
+      {
+        "n": 1,
+        "name": "Singalongsong",
+        "seconds": 199
+      },
+      {
+        "n": 2,
+        "name": "小小蟲",
+        "seconds": 240
+      },
+      {
+        "n": 3,
+        "name": "1234567",
+        "seconds": 226
+      },
+      {
+        "n": 4,
+        "name": "黑白",
+        "seconds": 232
+      },
+      {
+        "n": 5,
+        "name": "如果愛",
+        "seconds": 249
+      },
+      {
+        "n": 6,
+        "name": "黑洞裡",
+        "seconds": 214
+      },
+      {
+        "n": 7,
+        "name": "三人遊",
+        "seconds": 237
+      },
+      {
+        "n": 8,
+        "name": "每個人都會 (Song for Cartier [Love Project])",
+        "seconds": 178
+      },
+      {
+        "n": 9,
+        "name": "100種表情",
+        "seconds": 223
+      },
+      {
+        "n": 10,
+        "name": "愛我吧",
+        "seconds": 287
+      },
+      {
+        "n": 11,
+        "name": "為妳寫的歌",
+        "seconds": 197
+      },
+      {
+        "n": 12,
+        "name": "Orange Moon",
+        "seconds": 336
+      }
+    ]
+  },
+  {
+    "album": "Timeless",
+    "zh": "可啦思刻",
+    "year": 2009,
+    "collectionId": 537029543,
+    "itunesName": "可啦思刻",
+    "trackCount": 9,
+    "editionNote": "Covers album. iTunes lists 9 tracks.",
+    "tracks": [
+      {
+        "n": 1,
+        "name": "You Are the Sunshine of My Life",
+        "seconds": 184
+      },
+      {
+        "n": 2,
+        "name": "Nothing's Gonna Change My Love for You",
+        "seconds": 209
+      },
+      {
+        "n": 3,
+        "name": "Bad",
+        "seconds": 212
+      },
+      {
+        "n": 4,
+        "name": "La Bamba",
+        "seconds": 302
+      },
+      {
+        "n": 5,
+        "name": "紅豆",
+        "seconds": 236
+      },
+      {
+        "n": 6,
+        "name": "Georgia on My Mind",
+        "seconds": 225
+      },
+      {
+        "n": 7,
+        "name": "記得",
+        "seconds": 227
+      },
+      {
+        "n": 8,
+        "name": "Wonderful Tonight",
+        "seconds": 224
+      },
+      {
+        "n": 9,
+        "name": "Moon River",
+        "seconds": 185
+      }
+    ]
+  },
+  {
+    "album": "15",
+    "zh": "15",
+    "year": 2011,
+    "collectionId": 540055014,
+    "itunesName": "15",
+    "trackCount": 12,
+    "editionNote": null,
+    "tracks": [
+      {
+        "n": 1,
+        "name": "Gotta Make a Change",
+        "seconds": 296
+      },
+      {
+        "n": 2,
+        "name": "曇花",
+        "seconds": 214
+      },
+      {
+        "n": 3,
+        "name": "張永成 (feat. Ghost Style)",
+        "seconds": 185
+      },
+      {
+        "n": 4,
+        "name": "因為你",
+        "seconds": 225
+      },
+      {
+        "n": 5,
+        "name": "情勝策略",
+        "seconds": 243
+      },
+      {
+        "n": 6,
+        "name": "無菇朋友",
+        "seconds": 167
+      },
+      {
+        "n": 7,
+        "name": "自以為 (feat. 徐佳瑩)",
+        "seconds": 220
+      },
+      {
+        "n": 8,
+        "name": "二人遊",
+        "seconds": 179
+      },
+      {
+        "n": 9,
+        "name": "Over",
+        "seconds": 319
+      },
+      {
+        "n": 10,
+        "name": "Take Me",
+        "seconds": 202
+      },
+      {
+        "n": 11,
+        "name": "好不容易",
+        "seconds": 380
+      },
+      {
+        "n": 12,
+        "name": "Over (Reprise)",
+        "seconds": 167
+      }
+    ]
+  },
+  {
+    "album": "Back to Wonderland",
+    "zh": "回到未來",
+    "year": 2012,
+    "collectionId": 577983280,
+    "itunesName": "回到未來",
+    "trackCount": 11,
+    "editionNote": null,
+    "tracks": [
+      {
+        "n": 1,
+        "name": "Can You Feel the Music",
+        "seconds": 163
+      },
+      {
+        "n": 2,
+        "name": "I Want You Back",
+        "seconds": 260
+      },
+      {
+        "n": 3,
+        "name": "你就是",
+        "seconds": 225
+      },
+      {
+        "n": 4,
+        "name": "千紙鶴",
+        "seconds": 246
+      },
+      {
+        "n": 5,
+        "name": "關於愛的定義",
+        "seconds": 239
+      },
+      {
+        "n": 6,
+        "name": "麥恩莉",
+        "seconds": 288
+      },
+      {
+        "n": 7,
+        "name": "孤獨孩兒",
+        "seconds": 217
+      },
+      {
+        "n": 8,
+        "name": "Romeo",
+        "seconds": 212
+      },
+      {
+        "n": 9,
+        "name": "媽媽說",
+        "seconds": 247
+      },
+      {
+        "n": 10,
+        "name": "愛立刻",
+        "seconds": 260
+      },
+      {
+        "n": 11,
+        "name": "BB88",
+        "seconds": 199
+      }
+    ]
+  },
+  {
+    "album": "Dangerous World",
+    "zh": "危險世界",
+    "year": 2014,
+    "collectionId": 1579903639,
+    "itunesName": "危險世界",
+    "trackCount": 15,
+    "editionNote": "Includes short interludes (Welcome 7s, Soundcheck 34s, Weather Report 61s, Boarding 21s) and a 17-minute closing track.",
+    "tracks": [
+      {
+        "n": 1,
+        "name": "Welcome",
+        "seconds": 7
+      },
+      {
+        "n": 2,
+        "name": "危險世界",
+        "seconds": 374
+      },
+      {
+        "n": 3,
+        "name": "Peace (feat. Tia Ray)",
+        "seconds": 332
+      },
+      {
+        "n": 4,
+        "name": "Soundcheck",
+        "seconds": 34
+      },
+      {
+        "n": 5,
+        "name": "黑白灰",
+        "seconds": 213
+      },
+      {
+        "n": 6,
+        "name": "桃花運",
+        "seconds": 203
+      },
+      {
+        "n": 7,
+        "name": "特別的人",
+        "seconds": 259
+      },
+      {
+        "n": 8,
+        "name": "Weather Report",
+        "seconds": 61
+      },
+      {
+        "n": 9,
+        "name": "天氣先生",
+        "seconds": 272
+      },
+      {
+        "n": 10,
+        "name": "楓葉做的風鈴",
+        "seconds": 226
+      },
+      {
+        "n": 11,
+        "name": "Boarding",
+        "seconds": 21
+      },
+      {
+        "n": 12,
+        "name": "巴黎",
+        "seconds": 253
+      },
+      {
+        "n": 13,
+        "name": "愛不來 (feat. MISS KO)",
+        "seconds": 280
+      },
+      {
+        "n": 14,
+        "name": "殭屍",
+        "seconds": 290
+      },
+      {
+        "n": 15,
+        "name": "Lights Up",
+        "seconds": 1016
+      }
+    ]
+  },
+  {
+    "album": "Journey to the West",
+    "zh": "西遊記",
+    "year": 2016,
+    "collectionId": 1587171414,
+    "itunesName": "JTW西遊記",
+    "trackCount": 21,
+    "editionNote": "iTunes edition 'JTW西遊記' has 21 tracks, including a marked bonus demo (track 11) and the 2016 singles.",
+    "tracks": [
+      {
+        "n": 1,
+        "name": "悟空",
+        "seconds": 258
+      },
+      {
+        "n": 2,
+        "name": "Flow (feat. 王力宏)",
+        "seconds": 231
+      },
+      {
+        "n": 3,
+        "name": "聽",
+        "seconds": 281
+      },
+      {
+        "n": 4,
+        "name": "味道 (feat. Crush & Zion.T)",
+        "seconds": 250
+      },
+      {
+        "n": 5,
+        "name": "Ring Finger",
+        "seconds": 284
+      },
+      {
+        "n": 6,
+        "name": "NMW",
+        "seconds": 267
+      },
+      {
+        "n": 7,
+        "name": "笑開",
+        "seconds": 205
+      },
+      {
+        "n": 8,
+        "name": "夢蝴蝶",
+        "seconds": 262
+      },
+      {
+        "n": 9,
+        "name": "Love You So Much",
+        "seconds": 265
+      },
+      {
+        "n": 10,
+        "name": "醉 (feat. 杭蓋樂隊)",
+        "seconds": 267
+      },
+      {
+        "n": 11,
+        "name": "悟空 2003 Demo (Bonus Track)",
+        "seconds": 246
+      },
+      {
+        "n": 12,
+        "name": "All Night (feat. 王詩安)",
+        "seconds": 215
+      },
+      {
+        "n": 13,
+        "name": "Right Girl",
+        "seconds": 206
+      },
+      {
+        "n": 14,
+        "name": "Run From Your Love (feat. Fifi Rong)",
+        "seconds": 276
+      },
+      {
+        "n": 15,
+        "name": "煩",
+        "seconds": 283
+      },
+      {
+        "n": 16,
+        "name": "Once",
+        "seconds": 172
+      },
+      {
+        "n": 17,
+        "name": "無所謂 (feat. 張靚穎)",
+        "seconds": 265
+      },
+      {
+        "n": 18,
+        "name": "黑夜",
+        "seconds": 313
+      },
+      {
+        "n": 19,
+        "name": "很不低調",
+        "seconds": 271
+      },
+      {
+        "n": 20,
+        "name": "放不過自己",
+        "seconds": 287
+      },
+      {
+        "n": 21,
+        "name": "As I Do",
+        "seconds": 252
+      }
+    ]
+  },
+  {
+    "album": "The Dreamer",
+    "zh": "夢想家",
+    "year": 2024,
+    "collectionId": 1772124855,
+    "itunesName": "The Dreamer",
+    "trackCount": 10,
+    "editionNote": null,
+    "tracks": [
+      {
+        "n": 1,
+        "name": "XZMHXDXH",
+        "seconds": 208
+      },
+      {
+        "n": 2,
+        "name": "江湖中人",
+        "seconds": 187
+      },
+      {
+        "n": 3,
+        "name": "GF",
+        "seconds": 285
+      },
+      {
+        "n": 4,
+        "name": "Tango",
+        "seconds": 164
+      },
+      {
+        "n": 5,
+        "name": "才二十三",
+        "seconds": 224
+      },
+      {
+        "n": 6,
+        "name": "誰知愛是什麼",
+        "seconds": 183
+      },
+      {
+        "n": 7,
+        "name": "我不是農人",
+        "seconds": 190
+      },
+      {
+        "n": 8,
+        "name": "那沙漠里的水",
+        "seconds": 161
+      },
+      {
+        "n": 9,
+        "name": "回留",
+        "seconds": 236
+      },
+      {
+        "n": 10,
+        "name": "沒啥好說",
+        "seconds": 210
+      }
+    ]
+  }
+]

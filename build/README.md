@@ -9,6 +9,7 @@ python3 fetch_features.py  # → raw/audio/NN.m4a (private) + data/soulboy_featu
 python3 coverage.py        # → data/coverage.md
 python3 imagery.py         # → data/soulboy_imagery.json (detailed imagery, colour, palette)
 python3 songs.py           # → data/songs.json (7 weights from imagery_lexicon.json + features)
+python3 fetch_discography.py  # → data/discography.json (10 studio albums, iTunes track lists)
 ```
 
 ## Sources

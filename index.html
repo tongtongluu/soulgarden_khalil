@@ -44,16 +44,22 @@ body {
   color: var(--fg); font-family: var(--body);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 96px 128px;
+  padding-block: 56px 128px;
 }
-.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 56px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 40px; }
 header { display: grid; gap: 12px; }
 .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 h1 { font-family: var(--display); font-weight: 400; font-size: 20px; line-height: 1.3; margin: 0; text-wrap: balance; }
 .subtitle { font-family: var(--display); font-size: clamp(26px, 3.6vw, 40px); line-height: 1.1; margin: 0; }
 .lede { max-width: 52ch; font-size: 13px; line-height: 1.7; color: var(--muted); margin: 0; }
 .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+@media (max-width: 640px) {
+  .controls { display: grid; justify-content: stretch; }
+  .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; }
+}
 .chip {
   display: inline-flex; align-items: center; gap: 8px; border: 1px solid transparent;
   background: var(--chip); color: var(--fg); font: 500 12px var(--body);
@@ -103,7 +109,6 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
       <span><i style="background: var(--hk)"></i>Hong Kong</span><span>→</span>
       <span><i style="background: var(--yunnan)"></i>Yunnan</span>
     </div>
-    <p class="lede">Every song is a vessel holding the images in its lyrics. Its color comes from the images that appear most, and its curves come from the song's tempo and mood. Hover over a vessel to see what it holds, and turn the sound on to hear it.</p>
   </header>
 
   <div class="controls">
@@ -122,13 +127,14 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
     <div class="tip" id="tip" hidden></div>
   </div>
 
+    <p class="lede" id="intro">Every song is a vessel holding the images in its lyrics. Its color comes from the images that appear most, and its curves come from the song's tempo and mood. Hover over a vessel to see what it holds, and turn the sound on to hear it.</p>
   <dl class="key">
     <div><dt>Color</dt><dd>The leading image sets the base color. The second image sets the other end of the gradient.</dd></div>
     <div><dt>Number of curves</dt><dd>The faster the tempo, the more the outline bends.</dd></div>
     <div><dt>Depth of curves</dt><dd>The stronger the emotion, the narrower the waist.</dd></div>
     <div><dt>Pebble shape</dt><dd>A slow ballad, under 78 BPM.</dd></div>
     <div><dt>Background</dt><dd>The page fades through the places he lived as you scroll: the ocean of Kauaʻi where he was born, the harbor haze of Hong Kong where he grew up and made music, and the red earth of Yunnan where he went in his last years.</dd></div>
-    <div><dt>Blends</dt><dd>A group of songs averaged into one outline, with each image as a flowing patch of color sized by its share. Album blends show each album's character. Soul palette pours every song into one vessel.</dd></div>
+    <div><dt>Blends</dt><dd>A group of songs averaged into one outline, with each image as a flowing patch of color sized by its share. Album blends show each album's character. Soul palette pours every song into one smiling bowl: the bowl holds his whole palette, the two fins carry the second and third images, and each leaf is one song. Hover a leaf to hear it.</dd></div>
   </dl>
   <p class="note" id="note"><strong>Prototype:</strong> the albums, tracks and imagery shares are randomly generated placeholders for testing the visual rules. They will be replaced once the real lyrics are collected and tagged.</p>
 </div>
@@ -143,31 +149,24 @@ const CATS = [
   { id: "water",    zh: "Sea & Rain",   color: "#BBD6CF" },
   { id: "solitude", zh: "Inner self",   color: "var(--solitude)" },
 ];
-let ALBUMS = [], ALBUM_YEAR = {}, songs = [], albumAggs = [], soulAgg = null, realData = false;
+// his ten studio albums. Track counts marked est. still need checking against the real track lists.
+const DISCO = [
+  { album: "Soulboy", zh: "Soulboy", year: 2005, tracks: 14 },
+  { album: "This Love", zh: "愛愛愛", year: 2006, tracks: 13 },
+  { album: "Wonderland", zh: "未來", year: 2007, tracks: 11 },
+  { album: "Orange Moon", zh: "橙月", year: 2008, tracks: 12 },
+  { album: "Timeless", zh: "可啦思刻", year: 2009, tracks: 9 },
+  { album: "15", zh: "15", year: 2011, tracks: 12 },
+  { album: "Back to Wonderland", zh: "回到未來", year: 2012, tracks: 11 },
+  { album: "Dangerous World", zh: "危險世界", year: 2014, tracks: 15 },
+  { album: "Journey to the West", zh: "西遊記", year: 2016, tracks: 21 },
+  { album: "The Dreamer", zh: "夢想家", year: 2024, tracks: 10 },
+];
+let ALBUMS = [], ALBUM_YEAR = {}, songs = [], empties = [], albumAggs = [], soulAgg = null, realData = false;
 
 // seeded random so the garden is the same on every load
 function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 function hash(str) { let h = 2166136261; for (const ch of str) h = Math.imul(h ^ ch.codePointAt(0), 16777619); return h >>> 0; }
-
-// placeholder songs in the same shape as data/songs.json, used when that file is missing
-function placeholderSongs() {
-  const out = [];
-  [10, 9, 11, 10, 8].forEach((n, ai) => {
-    for (let ti = 0; ti < n; ti++) {
-      const r = mulberry(ai * 100 + ti * 7 + 11);
-      const w = CATS.map(() => r() ** 3);
-      w[Math.floor(r() * CATS.length)] += 1.2;
-      const sum = w.reduce((a, b) => a + b, 0);
-      out.push({
-        album: `Album ${["I", "II", "III", "IV", "V"][ai]}`, track: ti + 1,
-        name: `Track ${String(ti + 1).padStart(2, "0")}`,
-        tempo: Math.round(60 + r() * 72), intensity: r(),
-        weights: Object.fromEntries(CATS.map((c, i) => [c.id, w[i] / sum])),
-      });
-    }
-  });
-  return out;
-}
 
 // turn one song record into a drawable vessel; the shape is seeded by album and title
 function toVessel(d) {
@@ -195,8 +194,18 @@ function toVessel(d) {
 
 function build(records) {
   songs = records.map(toVessel).sort((p, q) => (p.year || 0) - (q.year || 0) || (p.track || 0) - (q.track || 0));
-  ALBUMS = [...new Set(songs.map(s => s.album))];
+  const known = DISCO.map(d => d.album.toLowerCase());
+  songs.forEach(s => { const i = known.indexOf(String(s.album).toLowerCase()); if (i >= 0) s.album = DISCO[i].album; });
+  const extra = [...new Set(songs.map(s => s.album))].filter(a => !DISCO.some(d => d.album === a));
+  ALBUMS = [...DISCO.map(d => d.album), ...extra];
+  DISCO.forEach(d => { ALBUM_YEAR[d.album] = d.year; });
   songs.forEach(s => { s.ai = ALBUMS.indexOf(s.album); if (s.year) ALBUM_YEAR[s.album] = s.year; });
+  // one slot per track; songs not tagged yet stay as blank vessels until their data arrives
+  empties = [];
+  ALBUMS.forEach((a, ai) => {
+    const have = songs.filter(s => s.ai === ai).length;
+    for (let k = have; k < Math.max(have, DISCO[ai]?.tracks || 0); k++) empties.push({ album: a, ai, x: 0, y: 0, tx: 0, ty: 0 });
+  });
   albumAggs = ALBUMS.map((a, i) => aggregate(songs.filter(s => s.ai === i), 900 + i, a));
   soulAgg = aggregate(songs, 999, "All works");
 }
@@ -212,6 +221,11 @@ function profile(s, K) {
 }
 function aggregate(list, seed, name) {
   const K = 8, n = list.length, rnd = mulberry(seed);
+  if (!n) return {
+    name, n: 0, empty: true, weights: CATS.map(() => 0), order: CATS.map((_, i) => i), a: 0, b: 1, c: 2,
+    radii: [0.34, 0.4, 0.3, 0.33, 0.42, 0.44, 0.4, 0.34], asym: Array(K).fill(0), ballad: false, tempo: 90,
+    phase: rnd() * 6.28, seed: rnd(), hover: 0, alpha: 0, x: 0, y: 0, w: 0, h: 0, blobs: [],
+  };
   const weights = CATS.map((_, i) => list.reduce((a, s) => a + s.weights[i], 0) / n);
   const order = weights.map((v, i) => i).sort((a, b) => weights[b] - weights[a]);
   const profs = list.map(s => profile(s, K));
@@ -253,15 +267,32 @@ function layout() {
   if (!soulAgg) { W = 0; return; }
   // the viewer can load the page while it is still hidden or tiny; wait for a real width
   if (W < 120) { W = 0; return; }
-  const cols = W < 520 ? 3 : W < 820 ? 4 : W < 1100 ? 5 : 6;
-  const gap = W < 520 ? 18 : W < 1100 ? 32 : 48;
-  cellW = (W - gap * (cols - 1)) / cols;
+  // pick the fewest columns (largest vessels) that fit every song on one screen
+  const slots = (ai) => [...songs.filter(s => s.ai === ai), ...empties.filter(e => e.ai === ai)];
+  const groups = mode === "album" ? ALBUMS.map((a, ai) => slots(ai).length) : [Math.max(1, songs.length)];
+  // on wide screens the album name sits to the left of its row, which saves a line per album
+  const side = mode === "album";
+  const labelW = side ? (W >= 700 ? 180 : 84) : 0, GW = W - labelW;
+  const labelH = 0, groupGap = 0;
+  const top = stage.getBoundingClientRect().top + window.scrollY;
+  const avail = Math.max(260, window.innerHeight - top - 32);
+  let cols = 1, gap = 0;
+  for (cols = 1; cols <= 60; cols++) {
+    gap = Math.min(48, ((GW / cols) * 0.28));
+    const cw = (GW - gap * (cols - 1)) / cols, ch = cw * 1.55;
+    const total = groups.reduce((sum, n) => sum + labelH + Math.ceil(n / cols) * (ch + gap) + groupGap, 0) - gap - groupGap;
+    if (total <= avail && ch <= 300) break;
+  }
+  cellW = (GW - gap * (cols - 1)) / cols;
   cellH = cellW * 1.55;
+  // when every group fits on one row, spread the row across the width instead of leaving it half empty
+  const vgap = gap, widest = Math.max(...groups);
+  if (cols > widest && widest > 1) { cols = widest; gap = Math.min(cellW * 1.4, (GW - cols * cellW) / (cols - 1)); }
   labels = [];
   let y = 0;
   const place = (list) => list.forEach((s, i) => {
-    s.tx = (i % cols) * (cellW + gap);
-    s.ty = y + Math.floor(i / cols) * (cellH + gap);
+    s.tx = labelW + (i % cols) * (cellW + gap);
+    s.ty = y + Math.floor(i / cols) * (cellH + vgap);
   });
   if (mode === "fuse") {
     const c = W < 520 ? 2 : W < 900 ? 3 : 5, g = W < 520 ? 24 : 56, colW = (W - g * (c - 1)) / c;
@@ -269,32 +300,35 @@ function layout() {
     albumAggs.forEach((a, i) => {
       a.w = vw; a.h = vh;
       a.x = (i % c) * (colW + g) + (colW - vw) / 2;
-      a.y = Math.floor(i / c) * (vh + 124);
+      a.y = Math.floor(i / c) * (vh + 140);
     });
-    y = Math.ceil(albumAggs.length / c) * (vh + 124);
+    y = Math.ceil(albumAggs.length / c) * (vh + 140);
   } else if (mode === "soul") {
+    // a round bowl with plants growing out of it; the plants need room above
     const a = soulAgg;
     if (W >= 760) {
-      a.w = Math.min(380, W * 0.36); a.h = a.w * 1.65; a.x = W * 0.06; a.y = 0;
-      legend = { x: a.x + a.w + Math.max(48, W * 0.08), y: 30 };
-      y = Math.max(a.h, legend.y + 120 + CATS.length * 32) + 10;
+      a.w = Math.min(400, W * 0.34); a.h = a.w * 0.9; a.x = W * 0.04 + a.w * 0.16; a.y = a.w * 1.02;
+      legend = { x: a.x + a.w * 1.16 + Math.max(56, W * 0.06), y: a.y };
+      y = Math.max(a.y + a.h + 40, legend.y + 120 + CATS.length * 32) + 10;
     } else {
-      a.w = W * 0.62; a.h = a.w * 1.65; a.x = (W - a.w) / 2; a.y = 0;
-      legend = { x: 0, y: a.h + 40 };
+      a.w = W * 0.62; a.h = a.w * 0.9; a.x = (W - a.w) / 2; a.y = a.w * 1.02;
+      legend = { x: 0, y: a.y + a.h + 64 };
       y = legend.y + 120 + CATS.length * 32;
     }
   } else if (mode === "album") {
-    ALBUMS.forEach((album) => {
-      labels.push({ text: ALBUM_YEAR[album] ? `${album} · ${ALBUM_YEAR[album]}` : album, y: y + 12 });
-      y += 36;
-      const list = songs.filter(s => s.album === album);
+    ALBUMS.forEach((album, ai) => {
+      const year = ALBUM_YEAR[album] ? String(ALBUM_YEAR[album]) : "";
+      labels.push({ text: album, sub: year, y: y + cellH / 2 - 2, w: labelW - 12 });
+      y += labelH;
+      const list = slots(ai);
       place(list);
-      y += Math.ceil(list.length / cols) * (cellH + gap) + 40;
+      y += Math.ceil(list.length / cols) * (cellH + vgap) + groupGap;
     });
+    y -= vgap + groupGap;
   } else if (mode === "color") {
     const list = [...songs].sort((p, q) => p.a - q.a || q.weights[q.a] - p.weights[p.a]);
     place(list);
-    y += Math.ceil(list.length / cols) * (cellH + gap);
+    y += Math.ceil(list.length / cols) * (cellH + vgap);
   }
   const H = Math.ceil(y);
   const dpr = Math.min(2, devicePixelRatio || 1);
@@ -314,7 +348,7 @@ function spline(pts) {
   }
 }
 
-function vesselPath(s, x, y, w, h, t) {
+let vesselPath = function (s, x, y, w, h, t) {
   const cx = x + w / 2;
   const wob = (i) => reduce ? 0 : Math.sin(t * (0.6 + s.tempo / 200) + s.phase + i * 1.3) * (0.012 + s.hover * 0.035);
   ctx.beginPath();
@@ -339,7 +373,7 @@ function vesselPath(s, x, y, w, h, t) {
   ctx.lineTo(left[0][0], left[0][1]);
   spline(left);
   ctx.closePath();
-}
+};
 
 function drawVessel(s, t) {
   const pad = cellW * 0.04;
@@ -375,12 +409,24 @@ function drawVessel(s, t) {
   ctx.restore();
 }
 
+// a blank vessel holding a place for a song that has no data yet
+const BLANK = { radii: [0.3, 0.38, 0.28, 0.36, 0.4], asym: [0, 0, 0, 0, 0], tempo: 90, phase: 0, hover: 0, ballad: false };
+function drawEmpty(e, t) {
+  const pad = cellW * 0.04;
+  ctx.save();
+  ctx.globalAlpha = active === null ? 1 : 0.35;
+  vesselPath(BLANK, e.x + pad, e.y + pad, cellW - pad * 2, cellH - pad * 2, 0);
+  ctx.fillStyle = css("--line"); ctx.fill();
+  ctx.restore();
+}
+
 function drawFused(g, t) {
   const { x, w, h } = g, y = g.y - g.hover * h * 0.02;
   ctx.save();
   ctx.globalAlpha = g.alpha;
   vesselPath(g, x, y, w, h, t);
   ctx.clip();
+  if (g.empty) { ctx.fillStyle = css("--line"); ctx.fillRect(x - w, y - h, w * 3, h * 3); ctx.restore(); return; }
   ctx.fillStyle = colorOf(g.a);
   ctx.fillRect(x - w, y - h, w * 3, h * 3);
   // smaller imagery first, so the leading image ends up on top
@@ -414,29 +460,131 @@ function drawFuseView(t) {
     ctx.fillStyle = css("--fg");
     ctx.font = '400 19px "Young Serif", serif';
     ctx.fillText(g.name, g.x, g.y + g.h + 30);
-    if (ALBUM_YEAR[g.name]) { ctx.fillStyle = css("--muted"); ctx.font = '12px "IBM Plex Mono", monospace'; ctx.fillText(String(ALBUM_YEAR[g.name]), g.x + g.w - ctx.measureText(String(ALBUM_YEAR[g.name])).width, g.y + g.h + 30); }
-    strip(g, g.x, g.y + g.h + 42, g.w);
+    ctx.fillStyle = css("--muted"); ctx.font = '12px "IBM Plex Mono", monospace';
+    if (ALBUM_YEAR[g.name]) ctx.fillText(String(ALBUM_YEAR[g.name]), g.x, g.y + g.h + 50);
+    strip(g, g.x, g.y + g.h + 60, g.w);
     ctx.fillStyle = css("--muted");
     ctx.font = '12px "IBM Plex Mono", monospace';
-    ctx.fillText(`${CATS[g.a].zh} ${pct(g.weights[g.a])}`, g.x, g.y + g.h + 66);
-    ctx.fillText(`${CATS[g.b].zh} ${pct(g.weights[g.b])}`, g.x, g.y + g.h + 84);
+    if (g.empty) ctx.fillText("Not tagged yet", g.x, g.y + g.h + 84);
+    else {
+      ctx.fillText(`${CATS[g.a].zh} ${pct(g.weights[g.a])}`, g.x, g.y + g.h + 84);
+      ctx.fillText(`${CATS[g.b].zh} ${pct(g.weights[g.b])}`, g.x, g.y + g.h + 102);
+    }
     ctx.globalAlpha = 1;
   });
 }
 
+// ---- the soul palette as one picture: a smiling bowl, one leaf per song ----
+let soulLeaves = [];
+function bowlPath(x, y, w, h, t) {
+  const b = reduce ? 1 : 1 + 0.006 * Math.sin(t * 0.7);
+  ctx.beginPath();
+  ctx.ellipse(x + w / 2, y + h / 2, (w / 2) * b, (h / 2) * b, 0, -Math.PI / 2 + 0.62, Math.PI * 1.5 - 0.62);
+  ctx.closePath();
+}
+function quadAt(p0, c, p1, u) {
+  const m = 1 - u;
+  return [m * m * p0[0] + 2 * m * u * c[0] + u * u * p1[0], m * m * p0[1] + 2 * m * u * c[1] + u * u * p1[1],
+          Math.atan2(2 * m * (c[1] - p0[1]) + 2 * u * (p1[1] - c[1]), 2 * m * (c[0] - p0[0]) + 2 * u * (p1[0] - c[0]))];
+}
+function drawPlants(g, t) {
+  const { x, y, w, h } = g, cx = x + w / 2, rim = y + h * 0.1;
+  const sway = (k) => reduce ? 0 : Math.sin(t * 0.5 + k) * w * 0.02;
+  const stalks = [
+    [[cx - w * 0.14, rim], [cx - w * 0.08, y - w * 0.4], [cx - w * 0.3 + sway(0), y - w * 0.76]],
+    [[cx + w * 0.18, rim], [cx + w * 0.12, y - w * 0.36], [cx + w * 0.32 + sway(1), y - w * 0.64]],
+    [[cx + w * 0.01, rim], [cx + w * 0.02, y - w * 0.1], [cx + w * 0.07 + sway(2), y - w * 0.22]],
+  ];
+  ctx.strokeStyle = "#4E9A4D"; ctx.lineWidth = Math.max(2, w * 0.008); ctx.lineCap = "round";
+  stalks.forEach(([p0, c, p1]) => { ctx.beginPath(); ctx.moveTo(...p0); ctx.quadraticCurveTo(...c, ...p1); ctx.stroke(); });
+  const groups = [[], [], []];
+  songs.forEach((s, i) => groups[i % 5 === 4 ? 2 : i % 2].push(s));
+  soulLeaves = [];
+  groups.forEach((list, si) => list.forEach((s, j) => {
+    const u = 0.3 + 0.68 * (list.length > 1 ? j / (list.length - 1) : 0.5);
+    const [px, py, ang] = quadAt(...stalks[si], u);
+    const side = j % 2 ? 1 : -1;
+    s.hover += ((s === hovered ? 1 : 0) - s.hover) * (reduce ? 1 : 0.18);
+    const a = ang + side * (0.95 + (reduce ? 0 : 0.07 * Math.sin(t * 0.9 + j + si)));
+    const len = w * (0.1 + 0.08 * s.weights[s.a]) * (1 + s.hover * 0.25), wid = len * 0.3;
+    const tx = px + Math.cos(a) * len, ty = py + Math.sin(a) * len;
+    const nx = -Math.sin(a) * wid, ny = Math.cos(a) * wid;
+    const mx = (px + tx) / 2, my = (py + ty) / 2;
+    ctx.beginPath(); ctx.moveTo(px, py);
+    ctx.quadraticCurveTo(mx + nx, my + ny, tx, ty);
+    ctx.quadraticCurveTo(mx - nx, my - ny, px, py);
+    ctx.fillStyle = colorOf(s.a); ctx.fill();
+    s.lx = mx; s.ly = my;
+    soulLeaves.push(s);
+  }));
+}
+function drawFace(g) {
+  const { x, y, w, h } = g, cx = x + w / 2, cy = y + h * 0.54, fg = css("--fg");
+  ctx.lineWidth = Math.max(1.5, w * 0.006); ctx.strokeStyle = fg; ctx.lineJoin = "round";
+  // heart-shaped mask with a dip in the middle
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - h * 0.1);
+  ctx.bezierCurveTo(cx - w * 0.07, cy - h * 0.34, cx - w * 0.36, cy - h * 0.36, cx - w * 0.39, cy - h * 0.12);
+  ctx.bezierCurveTo(cx - w * 0.43, cy + h * 0.16, cx - w * 0.24, cy + h * 0.36, cx, cy + h * 0.36);
+  ctx.bezierCurveTo(cx + w * 0.24, cy + h * 0.36, cx + w * 0.43, cy + h * 0.16, cx + w * 0.39, cy - h * 0.12);
+  ctx.bezierCurveTo(cx + w * 0.36, cy - h * 0.36, cx + w * 0.07, cy - h * 0.34, cx, cy - h * 0.1);
+  ctx.fillStyle = "rgba(246, 206, 240, 0.42)"; ctx.fill(); ctx.stroke();
+  [-1, 1].forEach(sd => {
+    const ex = cx + sd * w * 0.15, ey = cy - h * 0.04;
+    ctx.beginPath(); ctx.ellipse(ex, ey, w * 0.065, h * 0.1, 0, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.85)"; ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(ex - sd * w * 0.012, ey + h * 0.005, w * 0.026, h * 0.055, 0, 0, Math.PI * 2);
+    ctx.fillStyle = "#26302C"; ctx.fill();
+    for (let k = 0; k < 3; k++) {
+      const an = -Math.PI / 2 + sd * (0.55 + k * 0.28);
+      const bx = ex + Math.cos(an) * w * 0.065, by = ey + Math.sin(an) * h * 0.1;
+      ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + Math.cos(an) * w * 0.02, by + Math.sin(an) * w * 0.02); ctx.stroke();
+    }
+  });
+  ctx.beginPath();
+  ctx.moveTo(cx - w * 0.22, cy + h * 0.13);
+  ctx.quadraticCurveTo(cx, cy + h * 0.36, cx + w * 0.22, cy + h * 0.13);
+  ctx.strokeStyle = "#D64545"; ctx.lineWidth = Math.max(2, w * 0.009); ctx.stroke();
+}
+function drawSoulScene(g, t) {
+  const { x, y, w, h } = g, cx = x + w / 2;
+  ctx.save();
+  ctx.globalAlpha = g.alpha;
+  // soft shadow on the table
+  ctx.fillStyle = "rgba(30, 40, 35, 0.08)";
+  ctx.beginPath(); ctx.ellipse(cx, y + h * 1.0, w * 0.4, h * 0.05, 0, 0, Math.PI * 2); ctx.fill();
+  drawPlants(g, t);
+  // fins take the second and third imagery colors
+  [[-1, g.b], [1, g.c]].forEach(([sd, ci]) => {
+    if (g.empty) ci = -1;
+    ctx.beginPath(); ctx.ellipse(cx + sd * w * 0.5, y + h * 0.5, w * 0.11, h * 0.09, sd * 0.35, 0, Math.PI * 2);
+    ctx.fillStyle = ci < 0 ? css("--chip") : colorOf(ci); ctx.fill();
+  });
+  ctx.restore();
+  const keep = vesselPath;
+  vesselPath = (s, x2, y2, w2, h2, t2) => bowlPath(x2, y2, w2, h2, t2);
+  drawFused(g, t);
+  vesselPath = keep;
+  ctx.save();
+  ctx.globalAlpha = g.alpha;
+  bowlPath(x, y, w, h, t); ctx.clip();
+  drawFace(g);
+  ctx.restore();
+}
+
 function drawSoulView(t) {
   const g = soulAgg, L = legend, fg = css("--fg"), muted = css("--muted");
-  drawFused(g, t);
+  drawSoulScene(g, t);
   ctx.globalAlpha = g.alpha;
   ctx.fillStyle = muted;
   ctx.font = '500 12px "IBM Plex Mono", monospace';
   ctx.fillText(`ALL WORKS · ${g.n} SONGS · SOUL PALETTE`, L.x, L.y);
   ctx.fillStyle = fg;
-  ctx.font = '400 44px "Young Serif", serif';
-  ctx.fillText(CATS[g.a].zh, L.x, L.y + 56);
+  ctx.font = '400 24px "Young Serif", serif';
+  ctx.fillText(g.empty ? "Not tagged yet" : CATS[g.a].zh, L.x, L.y + 44);
   const sw = Math.min(400, W - L.x);
-  strip(g, L.x, L.y + 76, sw);
-  const max = g.weights[g.a];
+  strip(g, L.x, L.y + 64, sw);
+  const max = g.weights[g.a] || 1;
   g.order.forEach((i, r) => {
     const ry = L.y + 120 + r * 32;
     ctx.fillStyle = colorOf(i);
@@ -466,7 +614,29 @@ function frame(ms) {
   });
   if (mode === "fuse") return drawFuseView(t);
   if (mode === "soul") return drawSoulView(t);
-  if (mode === "album") labels.forEach(l => ctx.fillText(l.text.toUpperCase(), 0, l.y));
+  if (mode === "album") {
+    const small = W < 700;
+    ctx.font = small ? '500 9px "IBM Plex Mono", monospace' : '500 12px "IBM Plex Mono", monospace';
+    const lh = small ? 11 : 18;
+    labels.forEach(l => {
+      // wrap long album names inside the label column
+      const lines = [];
+      l.text.toUpperCase().split(" ").forEach(word => {
+        const last = lines[lines.length - 1];
+        if (last && ctx.measureText(last + " " + word).width <= l.w) lines[lines.length - 1] = last + " " + word;
+        else lines.push(word);
+      });
+      const y0 = l.y - ((lines.length - 1) * lh) / 2;
+      ctx.fillStyle = css("--fg");
+      lines.forEach((ln, i) => ctx.fillText(ln, 0, y0 + i * lh));
+      if (l.sub) { ctx.fillStyle = css("--muted"); ctx.fillText(l.sub, 0, y0 + lines.length * lh); }
+    });
+    empties.forEach(e => {
+      const k = reduce ? 1 : 0.12;
+      e.x += (e.tx - e.x) * k; e.y += (e.ty - e.y) * k;
+      drawEmpty(e, t);
+    });
+  }
   songs.forEach(s => {
     const k = reduce ? 1 : 0.12;
     s.x += (s.tx - s.x) * k; s.y += (s.ty - s.y) * k;
@@ -484,22 +654,29 @@ function showTip(s) {
     .map(({ v, i }) => `<div class="bar"><span>${CATS[i].zh}</span><b style="width:${Math.max(4, v * 100)}%;background:${colorOf(i)}"></b><span>${Math.round(v * 100)}%</span></div>`).join("");
   const meta = fusedTip ? `${s.n} songs · avg ${s.tempo} BPM` : `${s.album}${s.year ? " · " + s.year : ""} · ${s.tempo} BPM · mood ${Math.round(s.intensity * 100)}`;
   const quote = !fusedTip && s.quote ? `<p class="quote" lang="zh">「${esc(s.quote)}」</p>` : "";
-  const sparse = !fusedTip && s.sparse ? `<div class="meta">No imagery words found, so the shares are even.</div>` : "";
+  const sparse = !fusedTip && s.sparse ? `<div class="meta">Too few imagery words, so the shares are even.</div>` : "";
   const listen = !fusedTip && s.preview_url ? `<div class="meta">${soundOn ? "♪ Playing preview" : "Turn sound on to hear a preview"}</div>` : "";
   tip.innerHTML = `<div><h3>${esc(s.name)}</h3><div class="meta">${esc(meta)}</div></div>${quote}<div class="bars">${bars}</div>${sparse}${listen}`;
   tip.hidden = false;
-  const w = fusedTip ? s.w : cellW;
-  let left = s.x + w + 8;
-  if (left + 250 > W) left = s.x - 258;
-  if (left < 0) left = Math.max(0, Math.min(W - 250, s.x + w / 2 - 125));
+  const leaf = mode === "soul" && !fusedTip;
+  const ox = leaf ? s.lx : s.x, oy = leaf ? s.ly - 20 : s.y;
+  const w = fusedTip ? s.w : leaf ? 16 : cellW;
+  let left = ox + w + 8;
+  if (left + 250 > W) left = ox - 258;
+  if (left < 0) left = Math.max(0, Math.min(W - 250, ox + w / 2 - 125));
   tip.style.left = left + "px";
-  tip.style.top = Math.max(0, s.y) + "px";
+  tip.style.top = Math.max(0, oy) + "px";
 }
 
 function pick(e) {
   const rect = canvas.getBoundingClientRect();
   const px = e.clientX - rect.left, py = e.clientY - rect.top;
-  if (mode === "soul") return null;
+  if (mode === "soul") {
+    const r = soulAgg.w * 0.07;
+    let best = null, bd = r * r;
+    soulLeaves.forEach(s => { const d = (s.lx - px) ** 2 + (s.ly - py) ** 2; if (d < bd) { bd = d; best = s; } });
+    return best;
+  }
   if (mode === "fuse") return albumAggs.find(g => px >= g.x && px <= g.x + g.w && py >= g.y && py <= g.y + g.h) || null;
   return songs.find(s => px >= s.x && px <= s.x + cellW && py >= s.y && py <= s.y + cellH && s.alpha > 0.5) || null;
 }
@@ -587,14 +764,16 @@ async function load() {
     if (!Array.isArray(data) || !data.length) throw new Error("empty");
     build(data);
     realData = true;
-    note.innerHTML = `<strong>Data:</strong> ${songs.length} songs. Imagery is tagged from the full lyrics; tempo and mood come from audio features of each 30-second preview. Previews courtesy of Apple Music.`;
+    note.innerHTML = `<strong>Data:</strong> ${songs.length} of ${songs.length + empties.length} songs tagged so far; blank vessels are still waiting for theirs. Imagery is tagged from the full lyrics; tempo and mood come from audio features of each 30-second preview. Previews courtesy of Apple Music.`;
   } catch (err) {
-    build(placeholderSongs());
+    build([]);
+    note.innerHTML = `<strong>Data:</strong> no tagged songs loaded yet. Every blank vessel holds a place for one track and fills in once its lyrics are tagged.`;
   }
   soundBtn.hidden = !songs.some(s => s.preview_url);
   layout();
 }
 new ResizeObserver(() => layout()).observe(stage);
+addEventListener("resize", () => layout());
 requestAnimationFrame(frame);
 load();
 </script>
