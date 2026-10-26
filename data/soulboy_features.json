@@ -1,0 +1,273 @@
+{
+  "collectionId": 201549018,
+  "note": "Features describe the 30-second iTunes preview, not the full track.",
+  "librosaAvailable": false,
+  "tracks": [
+    {
+      "trackNumber": 1,
+      "trackName": "Prologue",
+      "trackId": 201549026,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 99.0527,
+        "energy": 0.4511,
+        "valence": 0.7098,
+        "danceability": 0.7908,
+        "acousticness": 0.4591,
+        "instrumentalness": 0.0,
+        "speechiness": 0.3644,
+        "liveness": 0.1584,
+        "loudness": -11.1844
+      },
+      "librosa": null,
+      "errors": []
+    },
+    {
+      "trackNumber": 2,
+      "trackName": "妹妹",
+      "trackId": 201549085,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 123.5894,
+        "energy": 0.4906,
+        "valence": 0.7557,
+        "danceability": 0.8457,
+        "acousticness": 0.0902,
+        "instrumentalness": 0.0123,
+        "speechiness": 0.1171,
+        "liveness": 0.1077,
+        "loudness": -9.094
+      },
+      "librosa": null,
+      "errors": []
+    },
+    {
+      "trackNumber": 3,
+      "trackName": "春風吹",
+      "trackId": 201549157,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 114.59,
+        "energy": 0.3045,
+        "valence": 0.6853,
+        "danceability": 0.8267,
+        "acousticness": 0.3315,
+        "instrumentalness": 0.0,
+        "speechiness": 0.3313,
+        "liveness": 0.1339,
+        "loudness": -12.2065
+      },
+      "librosa": null,
+      "errors": []
+    },
+    {
+      "trackNumber": 4,
+      "trackName": "每天每天",
+      "trackId": 201549203,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 129.4122,
+        "energy": 0.2539,
+        "valence": 0.4885,
+        "danceability": 0.6175,
+        "acousticness": 0.5819,
+        "instrumentalness": 0.0094,
+        "speechiness": 0.0768,
+        "liveness": 0.1032,
+        "loudness": -12.8607
+      },
+      "librosa": null,
+      "errors": []
+    },
+    {
+      "trackNumber": 5,
+      "trackName": "女人",
+      "trackId": 201549250,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 102.5233,
+        "energy": 0.4298,
+        "valence": 0.8056,
+        "danceability": 0.8111,
+        "acousticness": 0.3371,
+        "instrumentalness": 0.0034,
+        "speechiness": 0.1197,
+        "liveness": 0.1067,
+        "loudness": -10.9577
+      },
+      "librosa": null,
+      "errors": []
+    },
+    {
+      "trackNumber": 6,
+      "trackName": "叫我怎麼說",
+      "trackId": 201549321,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 108.203,
+        "energy": 0.2952,
+        "valence": 0.7867,
+        "danceability": 0.8187,
+        "acousticness": 0.3499,
+        "instrumentalness": 0.0058,
+        "speechiness": 0.121,
+        "liveness": 0.1018,
+        "loudness": -11.9618
+      },
+      "librosa": null,
+      "errors": []
+    },
+    {
+      "trackNumber": 7,
+      "trackName": "哪怕",
+      "trackId": 201549348,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 133.6644,
+        "energy": 0.1904,
+        "valence": 0.5971,
+        "danceability": 0.6782,
+        "acousticness": 0.8882,
+        "instrumentalness": 0.0039,
+        "speechiness": 0.0707,
+        "liveness": 0.1082,
+        "loudness": -13.7679
+      },
+      "librosa": null,
+      "errors": []
+    },
+    {
+      "trackNumber": 8,
+      "trackName": "南音",
+      "trackId": 201549388,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 105.0173,
+        "energy": 0.2452,
+        "valence": 0.5288,
+        "danceability": 0.7158,
+        "acousticness": 0.7853,
+        "instrumentalness": 0.0,
+        "speechiness": 0.053,
+        "liveness": 0.1062,
+        "loudness": -13.475
+      },
+      "librosa": null,
+      "errors": []
+    },
+    {
+      "trackNumber": 9,
+      "trackName": "我們能不能",
+      "trackId": 201549479,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 153.5985,
+        "energy": 0.498,
+        "valence": 0.5319,
+        "danceability": 0.731,
+        "acousticness": 0.2566,
+        "instrumentalness": 0.0034,
+        "speechiness": 0.15,
+        "liveness": 0.1191,
+        "loudness": -7.9994
+      },
+      "librosa": null,
+      "errors": []
+    },
+    {
+      "trackNumber": 10,
+      "trackName": "跳",
+      "trackId": 201549528,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 120.2313,
+        "energy": 0.5195,
+        "valence": 0.7231,
+        "danceability": 0.8349,
+        "acousticness": 0.1228,
+        "instrumentalness": 0.0267,
+        "speechiness": 0.1045,
+        "liveness": 0.1181,
+        "loudness": -9.886
+      },
+      "librosa": null,
+      "errors": []
+    },
+    {
+      "trackNumber": 11,
+      "trackName": "總結",
+      "trackId": 201549662,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 107.2417,
+        "energy": 0.241,
+        "valence": 0.7359,
+        "danceability": 0.7982,
+        "acousticness": 0.6332,
+        "instrumentalness": 0.0,
+        "speechiness": 0.1277,
+        "liveness": 0.1082,
+        "loudness": -11.7469
+      },
+      "librosa": null,
+      "errors": []
+    },
+    {
+      "trackNumber": 12,
+      "trackName": "趕場",
+      "trackId": 201549685,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 125.699,
+        "energy": 0.2634,
+        "valence": 0.5698,
+        "danceability": 0.7275,
+        "acousticness": 0.488,
+        "instrumentalness": 0.0101,
+        "speechiness": 0.0607,
+        "liveness": 0.1032,
+        "loudness": -13.2477
+      },
+      "librosa": null,
+      "errors": []
+    },
+    {
+      "trackNumber": 13,
+      "trackName": "等著你回來",
+      "trackId": 201549768,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 118.6257,
+        "energy": 0.6091,
+        "valence": 0.7715,
+        "danceability": 0.7616,
+        "acousticness": 0.3247,
+        "instrumentalness": 0.0,
+        "speechiness": 0.1272,
+        "liveness": 0.1062,
+        "loudness": -7.2542
+      },
+      "librosa": null,
+      "errors": []
+    },
+    {
+      "trackNumber": 14,
+      "trackName": "認識你",
+      "trackId": 201549774,
+      "featureSource": "reccobeats analysis of 30s iTunes preview",
+      "reccobeats": {
+        "tempo": 89.1024,
+        "energy": 0.2473,
+        "valence": 0.6143,
+        "danceability": 0.7837,
+        "acousticness": 0.4958,
+        "instrumentalness": 0.0034,
+        "speechiness": 0.2176,
+        "liveness": 0.1182,
+        "loudness": -12.0745
+      },
+      "librosa": null,
+      "errors": []
+    }
+  ]
+}
