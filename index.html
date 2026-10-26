@@ -95,6 +95,21 @@ h1 { font-family: var(--display); font-weight: 400; font-size: 20px; line-height
 #scene-cap { flex-basis: 100%; min-width: 0; }
 .scene-ctl[hidden] { display: none; }
 canvas { display: block; width: 100%; touch-action: manipulation; }
+/* song posters: three prints side by side, each with its scene card */
+.posters { display: grid; gap: 22px; }
+.posters[hidden], .stage[hidden] { display: none; }
+.posters .prints { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px 28px; align-items: start; }
+.posters figure { margin: 0; display: grid; gap: 16px; min-width: 0; }
+.posters canvas { aspect-ratio: 3 / 4; max-width: 100%; border-radius: 4px; box-shadow: 0 1px 0 var(--shelf), 0 18px 40px -24px rgba(0, 0, 0, .45); }
+.posters figcaption { display: grid; gap: 10px; }
+.posters figcaption h2 { margin: 0; font: 500 18px var(--display); }
+.posters figcaption h2 span { font: 400 12px var(--mono); color: var(--muted); margin-left: 8px; }
+.posters .line { font: 500 15px "Noto Serif SC", var(--display); margin: 0; }
+.posters dl { margin: 0; display: grid; grid-template-columns: 92px 1fr; gap: 6px 12px; font-size: 12px; line-height: 1.55; border-top: 1px solid var(--shelf); padding-top: 12px; }
+.posters dt { font: 500 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+.posters dd { margin: 0; min-width: 0; }
+.posters .count { font-family: var(--mono); color: var(--muted); }
+
 .tip {
   position: absolute; pointer-events: none; z-index: 5; width: 250px;
   background: var(--tip-bg); color: var(--fg); border: 1px solid var(--line);
@@ -136,7 +151,8 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
     </div>
     <div class="controls">
     <div class="seg" role="group" aria-label="View">
-      <button id="v-album" data-view="album" aria-pressed="true">By album</button>
+      <button id="v-posters" data-view="posters" aria-pressed="true">Song posters</button>
+      <button id="v-album" data-view="album" aria-pressed="false">By album</button>
       <button id="v-color" data-view="color" aria-pressed="false">By color</button>
       <button id="v-fuse" data-view="fuse" aria-pressed="false">Album blends</button>
       <button id="v-soul" data-view="soul" aria-pressed="false">Soul palette</button>
@@ -152,11 +168,15 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
     <button id="scene-shuffle" type="button">↻ Recompose</button>
     <span id="scene-cap"></span>
   </div>
-  <div class="stage" id="stage">
+  <section class="posters" id="posters">
+    <p class="lede">Each poster is drawn from one scene card: the song's main image, where and when it happens, the images around it and how they sit together, its movement, its mood and its emotional arc. The picture reads like the song plays, and the background colour follows its feeling. Every countable thing comes from the lyrics. A study from Soulboy, three songs so far.</p>
+    <div class="prints" id="prints"></div>
+  </section>
+  <div class="stage" id="stage" hidden>
     <canvas id="c" aria-label="A grid of vessels, one for each song"></canvas>
     <div class="tip" id="tip" hidden></div>
   </div>
-  <div class="chips" id="chips" role="group" aria-label="Filter by imagery"></div>
+  <div class="chips" id="chips" role="group" aria-label="Filter by imagery" data-off="true"></div>
 
     <p class="lede" id="intro">Every song is a vessel holding the images in its lyrics. Its color comes from the images that appear most, and its curves come from the song's tempo and mood. Hover over a vessel to see what it holds, and turn the sound on to hear it.</p>
   <dl class="key">
@@ -167,6 +187,7 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
     <div><dt>Flower</dt><dd>He sang about love all the time. Every song whose lyrics mention love 愛 gets flowers in its vase: one flower for every five mentions, and each petal is one mention, so you can count them.</dd></div>
     <div><dt>Pebble shape</dt><dd>A slow ballad, under 78 BPM.</dd></div>
     <div><dt>Background</dt><dd>The garden sits in the light of the places he lived: the ocean of Kauaʻi where he was born at the top, the harbor haze of Hong Kong where he grew up and made music across the middle, and the red earth of Yunnan where he went in his last years rising from below.</dd></div>
+    <div><dt>Song posters</dt><dd>One poster per song, drawn from a scene card written from a close reading of its lyrics: the main image, the setting, the images around it and how they relate, its movement, mood and emotional arc. Counts in the picture, such as wind ribbons, ripples, rainbow bands and jumping figures, are how many times the lyrics sing them.</dd></div>
     <div><dt>Dreamscape</dt><dd>Every imagery word, freed from its song and recombined into one picture of flat gradient shapes: moon, rainbow, lanterns, swallows, the sea. Each image is sized by how often he sings it; birds, butterflies, flowers, people, lanterns and stars repeat instead, so you can count them. Recompose shuffles the arrangement, and hovering an image plays the song that sings it most.</dd></div>
     <div><dt>Blends</dt><dd>A group of songs averaged into one outline, with each image as a flowing patch of color sized by its share. Album blends show each album's character. Soul palette pours every song into one smiling bowl: the bowl holds his whole palette, the two fins carry the second and third images, and each leaf is one song. Hover a leaf to hear it.</dd></div>
   </dl>
@@ -355,7 +376,7 @@ const ctx = canvas.getContext("2d");
 const stage = document.getElementById("stage");
 const tip = document.getElementById("tip");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-let W = 0, cellW = 0, cellH = 0, labels = [], mode = "album", active = null, hovered = null, first = true;
+let W = 0, cellW = 0, cellH = 0, labels = [], mode = "posters", active = null, hovered = null, first = true;
 
 function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 function colorOf(i) { const c = CATS[i].color; return c.startsWith("var") ? css("--solitude") : c; }
@@ -1357,6 +1378,9 @@ function setMode(m) {
   viewButtons.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === m)));
   chips.dataset.off = String(m === "fuse" || m === "soul" || m === "scene");
   document.getElementById("scene-ctl").hidden = m !== "scene";
+  document.getElementById("posters").hidden = m !== "posters";
+  stage.hidden = m === "posters";
+  if (m === "posters") chips.dataset.off = "true";
   hovered = null; tip.hidden = true; listen(null);
   if (m === "fuse" || m === "soul") [...albumAggs, soulAgg].forEach(g => g.alpha = 0);
   else if (wasFused) songs.forEach(s => s.alpha = 0);
@@ -1399,4 +1423,368 @@ new ResizeObserver(() => layout()).observe(stage);
 addEventListener("resize", () => layout());
 requestAnimationFrame(frame);
 load();
+(() => {
+
+// ---- the scene cards: the data each poster is drawn from ----
+const CARDS = [
+  {
+    track: 3, name: "春風吹", line: "吹紅了桃花", bpm: 114.6,
+    hero: "春風 spring wind, blowing through almost every line", heroCount: 11, heroUnit: "wind ribbons",
+    setting: "Countryside in spring, pulling back to the far north (玉門關, a river valley); day, breezy",
+    supporting: "桃花 red beside 柳樹 green · 青蛙 with 燕子 · 河水 ruffled, 雲堆 scattered · 悶雷 high, 烏龜 low · 蛇 winter → 原上草 spring → 夏天",
+    people: "You out on the road, I in the city",
+    motion: "Flow: the wind sweeps left to right and carries everything with it",
+    mood: "Light on the surface, sad underneath: pale airy sky, one warm red",
+    arc: "Close-up spring garden → wide, lonely northern landscape → the seasons turning; even and wistful throughout",
+    draw: drawWind,
+  },
+  {
+    track: 8, name: "南音", line: "命運的燈籠", bpm: 105.0,
+    hero: "墨鏡 a blind erhu player's dark glasses; inside them, the moon over the spring (二泉映月)", heroCount: 5, heroUnit: "rings of the moon over the spring",
+    setting: "A noisy alley of restaurants at night, north wind; then the road home",
+    supporting: "二胡 with blood-red strings · 漆黑 → 燭光 → 彩虹 → 燈籠 · 聽眾 along the route · 老婆 guiding him home",
+    people: "The player, his wife beside him, listeners he cannot see",
+    motion: "Frame: darkness held inside two lenses, light rising out of the strings",
+    mood: "The darkest song turns most colourful: black, candle gold, a rainbow, silver moon",
+    arc: "Blindness and memory in the dark → the noisy alley → candle, rainbow and lantern lit by his playing → the quiet road home",
+    draw: drawLenses,
+  },
+  {
+    track: 10, name: "跳", line: "叫你跟我跳", bpm: 120.2,
+    hero: "彩虹 a rainbow world, six times in the chorus", heroCount: 6, heroUnit: "rainbow bands",
+    setting: "A world at odds with itself: today's papers full of chaos, nights without sleep",
+    supporting: "新聞 · 報紙 front pages · 暗箭 hidden arrows · 左看擁有一切 a whole world on the left, 右看只有分裂 the same world broken on the right · one sun with many rays · homies all over the world",
+    people: "Two sides, eight people jumping together, hands joined across the line that split them",
+    motion: "Split, then healed: a crack down the middle, the rainbow rising out of it, bodies jumping on the beat",
+    mood: "Not simple joy: the rainbow comes after the darkness, so it is hard-won",
+    arc: "Verse: chaos and division, storm charcoal → Chorus: 我們要團結世界, the rainbow breaks through grey → Rap and hook: one sun, warm dawn, everyone jumping",
+    draw: drawJump, jumpers: 8, papers: 4,
+  },
+];
+
+// ---- drawing helpers: flat two-stop gradients, a little grain, nothing outlined ----
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function lin(c, x0, y0, x1, y1, a, b) { const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, a); g.addColorStop(1, b); return g; }
+function rad(c, x, y, r, a, b) { const g = c.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, a); g.addColorStop(1, b); return g; }
+function disc(c, x, y, r) { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); }
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const grain = document.createElement("canvas");
+grain.width = grain.height = 200;
+{ const g = grain.getContext("2d"), img = g.createImageData(200, 200);
+  for (let i = 0; i < img.data.length; i += 4) { const v = Math.random() * 255; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+  g.putImageData(img, 0, 0); }
+function finish(c, w, h) {
+  c.save(); c.globalCompositeOperation = "soft-light"; c.globalAlpha = 0.22;
+  c.fillStyle = c.createPattern(grain, "repeat"); c.fillRect(0, 0, w, h); c.restore();
+}
+function vtitle(c, text, x, y, size, color) {
+  c.save(); c.fillStyle = color; c.font = `700 ${size}px "Noto Serif SC", serif`; c.textAlign = "center"; c.textBaseline = "top";
+  [...text].forEach((ch, i) => c.fillText(ch, x, y + i * size * 1.12)); c.restore();
+}
+function blossom(c, x, y, r, col, rot) {
+  for (let k = 0; k < 5; k++) { const a = rot + (k * Math.PI * 2) / 5; disc(c, x + Math.cos(a) * r * 0.55, y + Math.sin(a) * r * 0.55, r * 0.5); c.fillStyle = lin(c, x, y - r, x, y + r, col, "#FFD9DC"); c.fill(); }
+  disc(c, x, y, r * 0.26); c.fillStyle = "#F5C64E"; c.fill();
+}
+function swallow(c, x, y, r, flip, col) {
+  c.save(); c.translate(x, y); c.scale(flip, 1);
+  c.beginPath(); c.moveTo(-r, -r * 0.35); c.quadraticCurveTo(-r * 0.35, -r * 0.15, 0, r * 0.25);
+  c.quadraticCurveTo(r * 0.35, -r * 0.5, r * 1.15, -r * 0.75); c.quadraticCurveTo(r * 0.3, r * 0.1, 0, r * 0.55);
+  c.quadraticCurveTo(-r * 0.4, 0, -r, -r * 0.35); c.fillStyle = lin(c, -r, 0, r, 0, col, "#6E86B8"); c.fill(); c.restore();
+}
+function figure(c, x, y, r, body, head, armsUp) {
+  // a person as two flat shapes: a rounded body and a round head; arms up when jumping
+  c.fillStyle = lin(c, x, y - r, x, y + r * 1.2, body, head);
+  c.beginPath(); c.roundRect(x - r * 0.42, y - r * 0.2, r * 0.84, r * 1.25, r * 0.42); c.fill();
+  if (armsUp) [-1, 1].forEach(s => { c.save(); c.translate(x + s * r * 0.3, y); c.rotate(s * 0.55); c.beginPath(); c.roundRect(-r * 0.12, -r * 0.95, r * 0.24, r * 0.95, r * 0.12); c.fill(); c.restore(); });
+  disc(c, x, y - r * 0.55, r * 0.32); c.fillStyle = head; c.fill();
+}
+
+// 春風吹 — flow: eleven ribbons of spring wind cross the whole picture and everything leans with them
+function drawWind(c, w, h, t, card) {
+  const rnd = mulberry(3);
+  c.fillStyle = lin(c, 0, 0, 0, h, "#D7E8F2", "#F6EEDA"); c.fillRect(0, 0, w, h);
+  // March thunder, high and small; scattered clouds
+  c.fillStyle = lin(c, 0, h * 0.05, 0, h * 0.16, "#F5D84E", "#F2B07E");
+  c.beginPath(); const tx = w * 0.8, ty = h * 0.05;
+  [[0.03, 0], [-0.025, 0.06], [0.004, 0.06], [-0.02, 0.12], [0.04, 0.045], [0.01, 0.045]].forEach(([dx, dy], i) => i ? c.lineTo(tx + dx * w, ty + dy * h) : c.moveTo(tx + dx * w, ty + dy * h)); c.closePath(); c.fill();
+  [[0.22, 0.13, 0.09], [0.55, 0.2, 0.06], [0.42, 0.09, 0.05]].forEach(([x, y, r]) => {
+    c.fillStyle = lin(c, 0, h * (y - r), 0, h * y + w * r * 0.5, "#FFFFFF", "#C9DCEB");
+    c.beginPath(); c.roundRect(w * (x - r), h * y - w * r * 0.32, w * r * 2, w * r * 0.64, w * r); c.fill();
+  });
+  // the far north: a frontier pass and a river valley
+  c.fillStyle = lin(c, 0, h * 0.36, 0, h * 0.5, "#B9C7D9", "#DCE3E6");
+  c.beginPath(); c.moveTo(0, h * 0.5); c.lineTo(w * 0.18, h * 0.38); c.lineTo(w * 0.34, h * 0.46); c.lineTo(w * 0.52, h * 0.35); c.lineTo(w * 0.78, h * 0.47); c.lineTo(w, h * 0.4); c.lineTo(w, h * 0.52); c.lineTo(0, h * 0.52); c.fill();
+  c.fillStyle = lin(c, 0, h * 0.4, 0, h * 0.5, "#C9A27E", "#E7C7A6");
+  c.fillRect(w * 0.5, h * 0.42, w * 0.13, h * 0.06);
+  c.fillStyle = "#DCE3E6"; c.beginPath(); c.arc(w * 0.565, h * 0.48, w * 0.025, Math.PI, 0); c.lineTo(w * 0.59, h * 0.48); c.fill();
+  // the river, ruffled by the wind (吹皺了河水)
+  for (let i = 0; i < 5; i++) {
+    const y0 = h * (0.5 + i * 0.012);
+    c.fillStyle = lin(c, 0, y0, w, y0, "#8CCBC4", "#BFE3DD");
+    c.beginPath(); c.moveTo(0, y0);
+    for (let u = 0; u <= 1.001; u += 0.02) c.lineTo(u * w, y0 + Math.sin(u * 26 + i * 1.7 + (reduce ? 0 : t * 1.6)) * h * 0.004);
+    c.lineTo(w, y0 + h * 0.008); c.lineTo(0, y0 + h * 0.008); c.fill();
+  }
+  // the city on the right where "I" am, the road on the left where "you" are
+  c.fillStyle = lin(c, 0, h * 0.45, 0, h * 0.7, "#F2B07E", "#F6D7BC");
+  [[0.74, 0.5, 0.08, 0.16], [0.83, 0.46, 0.07, 0.2], [0.91, 0.52, 0.09, 0.14]].forEach(([x, y, bw, bh]) => c.fillRect(w * x, h * y, w * bw, h * bh));
+  c.fillStyle = "#FFF4E2"; for (let i = 0; i < 9; i++) c.fillRect(w * (0.76 + (i % 3) * 0.06), h * (0.53 + Math.floor(i / 3) * 0.035), w * 0.014, h * 0.014);
+  c.fillStyle = lin(c, 0, h * 0.53, 0, h * 0.75, "#E3D2B4", "#F1E6CF");
+  c.beginPath(); c.moveTo(w * 0.1, h * 0.75); c.lineTo(w * 0.3, h * 0.53); c.lineTo(w * 0.33, h * 0.53); c.lineTo(w * 0.28, h * 0.75); c.fill();
+  figure(c, w * 0.27, h * 0.6, w * 0.022, "#F2A0A8", "#C46A73", false);
+  figure(c, w * 0.85, h * 0.63, w * 0.022, "#DD7FF2", "#8E5AA8", false);
+  // foreground meadow, and the close-up garden of verse 1
+  c.fillStyle = lin(c, 0, h * 0.66, 0, h, "#9FD08F", "#E8F1C9");
+  c.beginPath(); c.moveTo(0, h * 0.7); c.quadraticCurveTo(w * 0.5, h * 0.62, w, h * 0.72); c.lineTo(w, h); c.lineTo(0, h); c.fill();
+  // willow: a round crown with long green strands hanging from it, every strand leaning downwind
+  const lean = reduce ? 0 : Math.sin(t * 1.3) * 0.012;
+  c.fillStyle = "#8A6A55"; c.fillRect(w * 0.47, h * 0.58, w * 0.018, h * 0.18);
+  c.beginPath(); c.ellipse(w * 0.48, h * 0.58, w * 0.11, h * 0.035, 0, Math.PI, 0); c.fillStyle = lin(c, 0, h * 0.54, 0, h * 0.58, "#5CB35B", "#8FCB78"); c.fill();
+  for (let i = 0; i < 13; i++) {
+    const x0 = w * (0.38 + i * 0.016), len = h * (0.1 + (i % 4) * 0.025);
+    c.beginPath(); c.moveTo(x0, h * 0.575);
+    c.quadraticCurveTo(x0 + w * 0.01, h * 0.575 + len * 0.5, x0 + w * (0.035 + lean), h * 0.575 + len);
+    c.lineTo(x0 + w * (0.041 + lean), h * 0.575 + len);
+    c.quadraticCurveTo(x0 + w * 0.02, h * 0.575 + len * 0.5, x0 + w * 0.012, h * 0.575);
+    c.fillStyle = lin(c, 0, h * 0.57, 0, h * 0.575 + len, "#5CB35B", "#C6E8B0"); c.fill();
+  }
+  // peach branch: red, its blossoms lifting into the wind
+  c.strokeStyle = "#8A5A4A"; c.lineWidth = w * 0.012; c.lineCap = "round";
+  c.beginPath(); c.moveTo(0, h * 0.62); c.quadraticCurveTo(w * 0.15, h * 0.6, w * 0.33, h * 0.68); c.stroke();
+  [[0.06, 0.6], [0.12, 0.585], [0.19, 0.62], [0.26, 0.63], [0.31, 0.66], [0.16, 0.65], [0.23, 0.6]].forEach(([x, y], i) =>
+    blossom(c, w * x, h * y + (reduce ? 0 : Math.sin(t * 2 + i) * h * 0.003), w * (0.024 + (i % 3) * 0.006), "#EE6F7C", i));
+  // frog and swallow come as a pair
+  c.fillStyle = lin(c, 0, h * 0.8, 0, h * 0.85, "#5CB35B", "#A9D98C");
+  c.beginPath(); c.arc(w * 0.62, h * 0.84, w * 0.045, Math.PI, 0); c.fill();
+  [-1, 1].forEach(s => { disc(c, w * (0.62 + s * 0.022), h * 0.812, w * 0.012); c.fill(); });
+  swallow(c, w * 0.18, h * 0.24, w * 0.05, 1, "#2F4A6E"); swallow(c, w * 0.3, h * 0.29, w * 0.035, 1, "#2F4A6E");
+  // the turtle set free, low on the ground
+  c.fillStyle = lin(c, 0, h * 0.88, 0, h * 0.92, "#7AA67A", "#C3DDB0");
+  c.beginPath(); c.arc(w * 0.86, h * 0.92, w * 0.04, Math.PI, 0); c.fill(); disc(c, w * 0.91, h * 0.915, w * 0.011); c.fill();
+  // the season cycle of chorus B along the foot: a snake asleep in winter, grass in spring, summer
+  [["#DDE7F0", "#F7FAFC"], ["#9FD08F", "#E1F2C9"], ["#F5D84E", "#F7EAB8"]].forEach(([a, b], i) => {
+    const cx = w * (0.18 + i * 0.22), cy = h * 0.99;
+    c.fillStyle = lin(c, 0, cy - w * 0.1, 0, cy, a, b); c.beginPath(); c.arc(cx, cy, w * 0.1, Math.PI, 0); c.fill();
+  });
+  c.strokeStyle = "#5E7C66"; c.lineWidth = w * 0.009; c.beginPath();
+  for (let i = 0; i <= 40; i++) { const a = i * 0.32, rr = w * 0.004 + i * w * 0.0011; c.lineTo(w * 0.18 + Math.cos(a) * rr, h * 0.965 + Math.sin(a) * rr * 0.6); } c.stroke();
+  c.fillStyle = "#5CB35B"; for (let i = 0; i < 7; i++) { const gx = w * (0.33 + i * 0.022); c.beginPath(); c.moveTo(gx, h * 0.99); c.lineTo(gx + w * 0.008, h * 0.94 - (i % 2) * h * 0.012); c.lineTo(gx + w * 0.016, h * 0.99); c.fill(); }
+  disc(c, w * 0.62, h * 0.955, w * 0.03); c.fillStyle = "#F2B07E"; c.fill();
+  // eleven ribbons of wind, one for each time he sings 春風, drifting downwind
+  c.save(); c.globalCompositeOperation = "screen";
+  for (let i = 0; i < card.heroCount; i++) {
+    const y = h * (0.12 + i * 0.075 + rnd() * 0.02), amp = h * (0.03 + rnd() * 0.03), th = h * (0.006 + rnd() * 0.01);
+    const ph = (reduce ? 0 : t * (0.5 + rnd() * 0.3)) + i;
+    c.beginPath();
+    for (let u = -0.05; u <= 1.05; u += 0.02) c.lineTo(u * w, y + Math.sin(u * 4 + ph) * amp + u * h * 0.05);
+    for (let u = 1.05; u >= -0.05; u -= 0.02) c.lineTo(u * w, y + Math.sin(u * 4 + ph) * amp + u * h * 0.05 + th * Math.sin(u * Math.PI));
+    c.fillStyle = lin(c, 0, 0, w, 0, "rgba(255,255,255,0)", "rgba(255,255,255,.85)"); c.fill();
+  }
+  c.restore();
+  vtitle(c, card.name, w * 0.93, h * 0.07, w * 0.05, "#2F4A6E");
+}
+
+// 南音 — frame: the night held inside two dark lenses; light rises out of the erhu strings
+function drawLenses(c, w, h, t, card) {
+  c.fillStyle = lin(c, 0, 0, 0, h, "#121220", "#2C1A26"); c.fillRect(0, 0, w, h);
+  // north wind in the dark
+  c.save(); c.globalAlpha = 0.22;
+  for (let i = 0; i < 7; i++) { const y = h * (0.04 + i * 0.05), off = reduce ? 0 : ((t * 40 + i * 70) % (w * 1.4)) - w * 0.2;
+    c.fillStyle = lin(c, off - w * 0.3, 0, off + w * 0.3, 0, "rgba(200,205,230,0)", "rgba(200,205,230,1)");
+    c.beginPath(); c.roundRect(off - w * 0.3, y, w * 0.6, h * 0.004, h * 0.002); c.fill(); }
+  c.restore();
+  // the alley on both sides: restaurants with warm windows
+  [[0, 0.16, 0.5], [0.84, 0.16, 0.44]].forEach(([x, bw, top]) => {
+    c.fillStyle = lin(c, 0, h * top, 0, h, "#2A2230", "#3B2732"); c.fillRect(w * x, h * top, w * bw, h);
+    for (let i = 0; i < 6; i++) { c.fillStyle = i % 2 ? "#F2B07E" : "#F5D84E"; c.globalAlpha = 0.75; c.fillRect(w * (x + 0.03 + (i % 2) * 0.06), h * (top + 0.06 + Math.floor(i / 2) * 0.09), w * 0.035, h * 0.04); }
+    c.globalAlpha = 1;
+  });
+  // the lanterns of fate, hung along the route
+  [[0.12, 0.56], [0.88, 0.5], [0.8, 0.64]].forEach(([x, y], i) => {
+    const sway = reduce ? 0 : Math.sin(t * 1.2 + i) * w * 0.004;
+    c.fillStyle = "#3B2732"; c.fillRect(w * x + sway - 1, h * (y - 0.05), 2, h * 0.04);
+    c.beginPath(); c.ellipse(w * x + sway, h * y, w * 0.032, w * 0.04, 0, 0, Math.PI * 2);
+    c.fillStyle = rad(c, w * x + sway, h * y, w * 0.05, "#FF9A6A", "#C8323A"); c.fill();
+    c.save(); c.globalCompositeOperation = "screen"; disc(c, w * x + sway, h * y, w * 0.11); c.fillStyle = rad(c, w * x + sway, h * y, w * 0.11, "rgba(255,120,80,.35)", "rgba(255,120,80,0)"); c.fill(); c.restore();
+  });
+  // the dark glasses: two lenses, each holding a scene he can no longer see
+  const L = [w * 0.31, h * 0.27], R = [w * 0.69, h * 0.27], lr = w * 0.19;
+  c.fillStyle = "#0B0B12"; c.fillRect(w * 0.44, h * 0.25, w * 0.12, h * 0.012);
+  [L, R].forEach(([x, y]) => { disc(c, x, y, lr * 1.06); c.fillStyle = "#0B0B12"; c.fill(); disc(c, x, y, lr); c.fillStyle = lin(c, x, y - lr, x, y + lr, "#1C1B2E", "#2B2440"); c.fill(); });
+  // left lens: the moon over the spring and its reflection (二泉映月), five rings for five times it is sung
+  c.save(); disc(c, L[0], L[1], lr); c.clip();
+  c.fillStyle = lin(c, 0, L[1], 0, L[1] + lr, "#2F3E5C", "#1A2236"); c.fillRect(L[0] - lr, L[1] + lr * 0.15, lr * 2, lr);
+  disc(c, L[0], L[1] - lr * 0.42, lr * 0.28); c.fillStyle = rad(c, L[0], L[1] - lr * 0.42, lr * 0.5, "#F4F1E6", "rgba(244,241,230,0)"); c.fill();
+  disc(c, L[0], L[1] - lr * 0.42, lr * 0.2); c.fillStyle = lin(c, 0, L[1] - lr * 0.62, 0, L[1] - lr * 0.22, "#FFFFFF", "#C9C6E4"); c.fill();
+  for (let i = 0; i < card.heroCount; i++) {
+    const k = ((i / card.heroCount) + (reduce ? 0 : t * 0.08)) % 1;
+    c.beginPath(); c.ellipse(L[0], L[1] + lr * 0.45, lr * (0.15 + k * 0.8), lr * (0.04 + k * 0.18), 0, 0, Math.PI * 2);
+    c.strokeStyle = `rgba(220,225,245,${0.55 * (1 - k)})`; c.lineWidth = w * 0.004; c.stroke();
+  }
+  c.beginPath(); c.ellipse(L[0], L[1] + lr * 0.45, lr * 0.08, lr * 0.03, 0, 0, Math.PI * 2); c.fillStyle = "#EDEAF8"; c.fill();
+  c.restore();
+  // right lens: the rainbow he plays out of the dark, lit by candles
+  c.save(); disc(c, R[0], R[1], lr); c.clip();
+  ["#F2A0A8", "#F2B07E", "#F5D84E", "#9FD08F", "#A9C9EC", "#9A89F4"].forEach((col, i) => {
+    const rr = lr * (0.95 - i * 0.11); c.beginPath(); c.arc(R[0], R[1] + lr * 0.55, rr, Math.PI, 0); c.arc(R[0], R[1] + lr * 0.55, rr - lr * 0.1, 0, Math.PI, true); c.closePath();
+    c.fillStyle = lin(c, R[0] - rr, 0, R[0] + rr, 0, col, "#2B2440"); c.fill();
+  });
+  c.restore();
+  [[0.62, 0.36], [0.69, 0.345], [0.76, 0.36]].forEach(([x, y], i) => {
+    const f = reduce ? 1 : 0.85 + 0.15 * Math.sin(t * 9 + i * 2);
+    c.fillStyle = "#EDE3CC"; c.fillRect(w * x - w * 0.007, h * y, w * 0.014, h * 0.03);
+    c.beginPath(); c.ellipse(w * x, h * y - w * 0.014 * f, w * 0.007, w * 0.016 * f, 0, 0, Math.PI * 2); c.fillStyle = rad(c, w * x, h * y - w * 0.01, w * 0.02, "#FFF2B0", "#F5A23E"); c.fill();
+  });
+  // the erhu rising between the lenses; blood-red strings; its sound spreading in rings of colour
+  const ex = w * 0.5, top = h * 0.4, drum = h * 0.83;
+  for (let i = 0; i < 6; i++) {
+    const k = ((i / 6) + (reduce ? 0 : t * 0.12)) % 1, col = ["#F5D84E", "#F2B07E", "#F2A0A8", "#9A89F4", "#A9C9EC", "#9FD08F"][i];
+    c.beginPath(); c.arc(ex, drum, w * (0.06 + k * 0.42), Math.PI * 1.08, Math.PI * 1.92);
+    c.strokeStyle = col; c.globalAlpha = 0.6 * (1 - k); c.lineWidth = w * 0.01; c.stroke(); c.globalAlpha = 1;
+  }
+  c.fillStyle = lin(c, 0, top, 0, drum, "#C9A27E", "#7A5640"); c.fillRect(ex - w * 0.008, top, w * 0.016, drum - top);
+  [0.02, 0.05].forEach(d => { c.fillStyle = "#C9A27E"; c.beginPath(); c.roundRect(ex - w * 0.03, top + h * d, w * 0.06, h * 0.008, h * 0.004); c.fill(); });
+  c.strokeStyle = "#E0303C"; c.lineWidth = Math.max(1, w * 0.003);
+  [-0.004, 0.004].forEach(d => { c.beginPath(); c.moveTo(ex + w * d, top + h * 0.06); c.lineTo(ex + w * d, drum); c.stroke(); });
+  c.fillStyle = lin(c, ex - w * 0.05, 0, ex + w * 0.05, 0, "#7A5640", "#C9A27E"); c.beginPath(); c.roundRect(ex - w * 0.045, drum - h * 0.01, w * 0.09, h * 0.06, w * 0.01); c.fill();
+  c.strokeStyle = "#EDE3CC"; c.lineWidth = Math.max(1, w * 0.003);
+  const bow = reduce ? 0 : Math.sin(t * (card.bpm / 60) * Math.PI) * w * 0.08;
+  c.beginPath(); c.moveTo(ex - w * 0.24 + bow, h * 0.74); c.lineTo(ex + w * 0.2 + bow, h * 0.75); c.stroke();
+  // the road home: his wife guiding him, listeners along the way
+  c.fillStyle = lin(c, 0, h * 0.9, 0, h, "#3B2732", "#4A2E36"); c.fillRect(0, h * 0.9, w, h * 0.1);
+  figure(c, w * 0.66, h * 0.88, w * 0.026, "#F2A0A8", "#E8C6B0", false);
+  figure(c, w * 0.72, h * 0.885, w * 0.026, "#9A89F4", "#E8C6B0", false);
+  [[0.2, 0.9], [0.27, 0.905], [0.34, 0.895]].forEach(([x, y]) => { disc(c, w * x, h * y, w * 0.016); c.fillStyle = "#6A5162"; c.fill(); });
+  vtitle(c, card.name, w * 0.5, h * 0.045, w * 0.05, "#EDE3CC");
+}
+
+// 跳 — split, then healed: the poster reads top to bottom like the song. Verse: a dark front page of chaos,
+// hidden arrows, a world seen whole on the left and shattered on the right. Chorus: a rainbow rising out of the crack.
+// Rap and hook: one sun, and people from both sides jumping together across the line that divided them.
+function drawJump(c, w, h, t, card) {
+  // the background carries the feeling: storm charcoal at the top, a grey hour, then warm light where the rainbow is
+  const bg = c.createLinearGradient(0, 0, 0, h);
+  bg.addColorStop(0, "#262B35"); bg.addColorStop(0.36, "#4B505C"); bg.addColorStop(0.58, "#B9A79A"); bg.addColorStop(0.8, "#F4D9B6"); bg.addColorStop(1, "#FBEBD3");
+  c.fillStyle = bg; c.fillRect(0, 0, w, h);
+  const rnd = mulberry(10), cx = w * 0.5;
+  // the crack: one jagged line down the middle, from the top of the page to where the rainbow begins
+  const crack = [[cx, 0]];
+  for (let i = 1; i <= 9; i++) crack.push([cx + (i % 2 ? 1 : -1) * w * (0.012 + rnd() * 0.025), h * (i * 0.062)]);
+  const crackEnd = crack[crack.length - 1];
+  // today's papers, full of chaos: overlapping front pages, dimmer on the shattered right
+  for (let i = 0; i < card.papers + 4; i++) {
+    const right = i % 2, px = w * (right ? 0.56 + rnd() * 0.3 : 0.06 + rnd() * 0.3), py = h * (0.04 + rnd() * 0.22), pw = w * 0.2, ph = h * 0.1;
+    c.save(); c.translate(px, py); c.rotate((rnd() - 0.5) * (right ? 0.9 : 0.4));
+    c.beginPath(); c.moveTo(0, 0); c.lineTo(pw, 0); for (let k = 0; k <= 6; k++) c.lineTo(pw - (k % 2) * w * 0.012, (k / 6) * ph); c.lineTo(0, ph); c.closePath();
+    c.fillStyle = lin(c, 0, 0, pw, ph, right ? "#8E918F" : "#C9C6BC", right ? "#5C5F63" : "#8F8C84"); c.fill();
+    c.fillStyle = "rgba(30,32,38,.55)"; c.fillRect(w * 0.012, h * 0.01, pw * 0.7, h * 0.012);
+    for (let k = 0; k < 5; k++) c.fillRect(w * 0.012, h * (0.032 + k * 0.012), pw * (0.8 - (k % 2) * 0.25), h * 0.004);
+    c.restore();
+  }
+  // hidden arrows (暗箭): thin dark darts cutting across the page, keeping everyone awake
+  c.fillStyle = "#15181E";
+  [[0.04, 0.3, -0.18], [0.62, 0.12, 0.22], [0.2, 0.08, 0.12]].forEach(([x, y, a]) => {
+    c.save(); c.translate(w * x, h * y); c.rotate(a);
+    c.fillRect(0, -h * 0.002, w * 0.3, h * 0.004);
+    c.beginPath(); c.moveTo(w * 0.33, 0); c.lineTo(w * 0.29, -h * 0.01); c.lineTo(w * 0.29, h * 0.01); c.fill();
+    c.restore();
+  });
+  // look left and there is everything: a whole world. Look right: the same world, broken apart
+  const wy = h * 0.42, wr = w * 0.12;
+  disc(c, w * 0.25, wy, wr); c.fillStyle = lin(c, 0, wy - wr, 0, wy + wr, "#E8D7A8", "#9C8E74"); c.fill();
+  for (let i = 0; i < 6; i++) {
+    const a0 = (i / 6) * Math.PI * 2, a1 = a0 + Math.PI / 3, drift = w * (0.012 + (i % 3) * 0.01), mid = (a0 + a1) / 2;
+    const ox = w * 0.75 + Math.cos(mid) * drift, oy = wy + Math.sin(mid) * drift;
+    c.beginPath(); c.moveTo(ox, oy); c.arc(ox, oy, wr * (0.9 + (i % 2) * 0.1), a0 + 0.06, a1 - 0.06); c.closePath();
+    c.fillStyle = lin(c, 0, wy - wr, 0, wy + wr, "#9DA3AD", "#555A64"); c.fill();
+  }
+  // the crack itself, light leaking through it
+  c.beginPath(); crack.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y));
+  for (let i = crack.length - 1; i >= 0; i--) c.lineTo(crack[i][0] + w * 0.008, crack[i][1]);
+  c.closePath(); c.fillStyle = lin(c, 0, 0, 0, crackEnd[1], "#0E1015", "#F5D84E"); c.fill();
+  // the rainbow world, six bands rising out of the end of the crack, warm sun behind it
+  const ry = h * 0.78, rays = 32;
+  c.save(); c.globalCompositeOperation = "screen";
+  for (let i = 0; i < rays; i++) {
+    const a = Math.PI + (i / (rays - 1)) * Math.PI;
+    c.beginPath(); c.moveTo(cx, ry); c.lineTo(cx + Math.cos(a - 0.025) * w, ry + Math.sin(a - 0.025) * w); c.lineTo(cx + Math.cos(a + 0.025) * w, ry + Math.sin(a + 0.025) * w);
+    c.fillStyle = rad(c, cx, ry, w * 0.8, `rgba(255,214,140,${i % 2 ? 0.16 : 0.28})`, "rgba(255,214,140,0)"); c.fill();
+  }
+  c.restore();
+  const grow = reduce ? 1 : Math.min(1, 0.85 + 0.15 * Math.sin(t * 0.8));
+  ["#EE6F7C", "#F2B07E", "#F5D84E", "#5CB35B", "#A9C9EC", "#9A89F4"].slice(0, card.heroCount).forEach((col, i) => {
+    const rr = w * (0.46 - i * 0.05) * grow;
+    c.beginPath(); c.arc(cx, ry, rr, Math.PI, 0); c.arc(cx, ry, rr - w * 0.045, 0, Math.PI, true); c.closePath();
+    c.fillStyle = lin(c, 0, ry - rr, 0, ry, col, hexMix(col, "#F4D9B6", 0.55)); c.fill();
+  });
+  disc(c, cx, ry, w * 0.14); c.fillStyle = rad(c, cx, ry, w * 0.14, "#FFF1B8", "#F5B04E"); c.fill();
+  // ground of dawn; the torn papers left behind, small now
+  c.fillStyle = lin(c, 0, ry, 0, h, "#F2CFA8", "#F7E2C8"); c.fillRect(0, ry, w, h - ry);
+  // people from both sides jumping on the beat, hands joined across the middle
+  const beat = (t * card.bpm) / 60, pts = [];
+  const bodyCols = ["#EE6F7C", "#F2B07E", "#5CB35B", "#9A89F4", "#DD7FF2", "#8CCBC4", "#F2A0A8", "#A9C9EC"];
+  for (let i = 0; i < card.jumpers; i++) {
+    const hop = reduce ? 0.5 : Math.max(0, Math.sin(((beat + (i % 2) * 0.5) % 1) * Math.PI));
+    const x = w * (0.08 + i * (0.84 / (card.jumpers - 1))), base = h * 0.9, r = w * 0.042;
+    const y = base - hop * h * 0.06;
+    c.beginPath(); c.ellipse(x, base + r * 1.05, r * (0.7 - hop * 0.3), r * 0.12, 0, 0, Math.PI * 2); c.fillStyle = "rgba(120,80,60,.18)"; c.fill();
+    figure(c, x, y, r, bodyCols[i % 8], "#5B3B33", true);
+    pts.push([x, y, r]);
+  }
+  c.strokeStyle = "#5B3B33"; c.lineWidth = Math.max(1.5, w * 0.005); c.lineCap = "round"; c.beginPath();
+  // each right hand holds the next person's left hand
+  pts.slice(1).forEach(([x, y, r], i) => { const [px, py, pr] = pts[i]; c.moveTo(px + pr * 0.82, py - pr * 0.8); c.lineTo(x - r * 0.82, y - r * 0.8); }); c.stroke();
+  vtitle(c, card.name, w * 0.08, h * 0.05, w * 0.06, "#F4E9D8");
+}
+function hexMix(a, b, u) {
+  const p = s => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16));
+  const A = p(a), B = p(b);
+  return "#" + A.map((v, i) => Math.round(v + (B[i] - v) * u).toString(16).padStart(2, "0")).join("");
+}
+
+// ---- build the gallery ----
+const prints = document.getElementById("prints"), canvases = [];
+const esc = v => String(v).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+CARDS.forEach(card => {
+  const fig = document.createElement("figure");
+  fig.innerHTML = `<canvas aria-label="Poster for ${esc(card.name)}"></canvas>
+    <figcaption>
+      <h2 lang="zh">${esc(card.name)}<span>Soulboy · track ${card.track} · ${Math.round(card.bpm)} BPM</span></h2>
+      <p class="line" lang="zh">「${esc(card.line)}」</p>
+      <dl>
+        <dt>Main image</dt><dd>${esc(card.hero)} <span class="count">→ ${card.heroCount} ${esc(card.heroUnit)}</span></dd>
+        <dt>Setting</dt><dd>${esc(card.setting)}</dd>
+        <dt>Around it</dt><dd lang="zh">${esc(card.supporting)}</dd>
+        <dt>People</dt><dd>${esc(card.people)}</dd>
+        <dt>Movement</dt><dd>${esc(card.motion)}</dd>
+        <dt>Mood</dt><dd>${esc(card.mood)}</dd>
+        <dt>Arc</dt><dd lang="zh">${esc(card.arc)}</dd>
+      </dl>
+    </figcaption>`;
+  prints.appendChild(fig);
+  canvases.push([fig.querySelector("canvas"), card]);
+});
+function size() {
+  const dpr = Math.max(1, Math.min(2, devicePixelRatio || 1));
+  canvases.forEach(([cv]) => { const w = cv.clientWidth; cv.width = w * dpr; cv.height = w * 4 / 3 * dpr; cv._w = w; cv._dpr = dpr; });
+}
+function frame(ms) {
+  requestAnimationFrame(frame);
+  if (prints.closest("[hidden]")) return;
+  const t = ms / 1000;
+  canvases.forEach(([cv, card]) => {
+    if (!cv._w) return;
+    const c = cv.getContext("2d"), w = cv._w, h = w * 4 / 3;
+    c.setTransform(cv._dpr, 0, 0, cv._dpr, 0, 0);
+    c.clearRect(0, 0, w, h);
+    card.draw(c, w, h, t, card);
+    finish(c, w, h);
+  });
+}
+new ResizeObserver(size).observe(prints);
+size();
+requestAnimationFrame(frame);
+document.fonts && document.fonts.ready.then(size);
+
+})();
 </script>
