@@ -147,7 +147,7 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 
     <p class="lede" id="intro">Every song is a vessel holding the images in its lyrics. Its color comes from the images that appear most, and its curves come from the song's tempo and mood. Hover over a vessel to see what it holds, and turn the sound on to hear it.</p>
   <dl class="key">
-    <div><dt>Color</dt><dd>Every imagery word in the lyrics is counted into one of ten groups. The group with the most hits sets the base color, the second sets the other end of the gradient.</dd></div>
+    <div><dt>Color</dt><dd>Every imagery word in the lyrics is counted into one of ten groups. Only things you can see count: abstract words such as 歲 (age) or 世界 (world), time words and verbs are left out. The group with the most hits sets the base color, the second sets the other end of the gradient.</dd></div>
     <div><dt>Beat</dt><dd>The faster the tempo, the more curves in the outline. Hover a vase and it jumps on every beat at the song's real BPM, hardest on the first beat of each bar; with sound on it follows the kick drum in the music.</dd></div>
     <div><dt>Height and width</dt><dd>Brighter, happier songs (valence) stand taller. Songs with more energy are fuller and wider.</dd></div>
     <div><dt>Depth of curves</dt><dd>The stronger the emotion, the narrower the waist.</dd></div>
@@ -162,15 +162,15 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 <script>
 // imagery groups from the hand-built lexicon matched against the full lyrics; terms are the most frequent hits on Soulboy
 const CATS = [
-  { id: "body_gesture",         zh: "心 Heart",     color: "#DD7FF2", terms: "跳 29 · 心 22 · 笑 8 · 手 6" },
-  { id: "time_memory",          zh: "每天 Every Day",    color: "#C9C2F6", terms: "每天 14 · 年 13 · 歲 8 · 從前 6" },
-  { id: "people_relationships", zh: "家 Home",    color: "#F2A0A8", terms: "家 15 · 女人 8 · 妹妹 4 · 朋友 4" },
-  { id: "city_street",          zh: "街 Street",    color: "#F2B07E", terms: "路上 4 · 電影 4 · 街上 3 · 酒家 3" },
-  { id: "cosmos",               zh: "世界 World",   color: "var(--solitude)", terms: "世界 32 · 神 4 · 宇宙 2 · 地球 2" },
+  { id: "body_gesture",         zh: "心 Heart",     color: "#DD7FF2", terms: "心 22 · 手 6 · 臉 6 · 眼 5" },
+  { id: "time_memory",          zh: "四季 Seasons",    color: "#C9C2F6", terms: "冬日 3 · 夏天 3 · 三月 2 · winter 1" },
+  { id: "people_relationships", zh: "家 Home",    color: "#F2A0A8", terms: "家 15 · 女人 8 · 妹妹 4 · friend 4" },
+  { id: "city_street",          zh: "街 Street",    color: "#F2B07E", terms: "路上 4 · 搞笑片 4 · 電影 4 · 街上 3" },
+  { id: "cosmos",               zh: "太陽 Sun",   color: "var(--solitude)", terms: "宇宙 2 · 地球 2 · sun 2 · 太陽 1" },
   { id: "sky_weather",          zh: "春風 Spring Breeze",       color: "#A9C9EC", terms: "春風 11 · 北風 3 · 雲煙 3 · 悶雷 2" },
-  { id: "nature_plants",        zh: "蝴蝶 Butterfly", color: "#5CB35B", terms: "蛇 3 · 蝴蝶 3 · 原野 3 · 原上草 3" },
-  { id: "light_fire",           zh: "彩虹 Rainbow",  color: "#F5D84E", terms: "彩虹 8 · 燭光 3 · 點亮 3 · 燈籠 3" },
-  { id: "night_moon",           zh: "月 Moon",     color: "#9A89F4", terms: "月 4 · 睡 3 · 漆黑 3 · 夜夜 3" },
+  { id: "nature_plants",        zh: "蝴蝶 Butterfly", color: "#5CB35B", terms: "蛇 3 · 原上草 3 · 蝴蝶 3 · 原野 3" },
+  { id: "light_fire",           zh: "彩虹 Rainbow",  color: "#F5D84E", terms: "彩虹 8 · 燭光 3 · 燈籠 3 · rays 1" },
+  { id: "night_moon",           zh: "月 Moon",     color: "#9A89F4", terms: "月 4 · 漆黑 3 · 夜夜 3 · 晚上 1" },
   { id: "water",                zh: "河 River",            color: "#8CCBC4", terms: "地中海 4 · 二泉 4 · 河水 1" },
 ];
 const CAT_IDS = CATS.map(c => c.id);
@@ -195,37 +195,37 @@ const SOULBOY_PREVIEWS = [
 ];
 // the imagery words found in each Soulboy song: word:group index:count
 const SOULBOY_TERMS = {
-  2: "多雲天:5:1 暴雨天:5:1 晴天:5:1 頭:0:1 手:0:1 笑:0:2 眨:0:1 眼:0:1 心:0:1 年:1:4 想起:1:1 小時候:1:1 當年:1:1 歲:1:3 永遠:1:1 表妹:2:2 媽媽:2:1 妹妹:2:4",
-  3: "桃花:6:1 柳樹:6:1 青蛙:6:1 燕子:6:1 玫瑰:6:1 蛇:6:3 原上草:6:3 烏龜:6:1 春風:5:10 雲堆:5:1 悶雷:5:2 河水:9:1 睡:8:3 路上:3:1 城裡:3:1 流淚:0:3 想起:1:3 歲:1:3 冬日:1:3 夏天:1:3 三月:1:2 年:1:2 世界:4:1",
-  4: "地中海:9:4 路旁:3:2 搞笑片:3:4 手:0:4 笑:0:3 每天:1:12 永遠:1:2 friend:2:4 朋友:2:1",
-  5: "眼:0:1 心:0:3 臉:0:1 手:0:1 時間:1:1 舊:1:1 年:1:1 女人:2:8 世界:4:1",
-  6: "街上:3:3 電影:3:3 笑:0:2 每天:1:2 舊:1:3 情男情女:2:3 神:4:3",
-  7: "頭:0:2 臉:0:2 雙目:0:2 眨:0:2 眼睛:0:2 心:0:5 舞:0:3 脈:0:1",
-  8: "北風:5:3 春風:5:1 二泉:9:4 燭光:7:3 彩虹:7:2 點亮:7:3 燈籠:7:3 月:8:4 漆黑:8:3 街頭:3:2 酒家:3:3 小巷:3:3 路上:3:1 路:3:1 墨鏡:0:2 雙眼:0:1 心:0:1 臉孔:0:2 流淚:0:1 臉:0:1 記得:1:1 年:1:1 歲:1:1 小時候:1:1 聽眾:2:3 家:2:1 老婆:2:1 老爸:2:1",
-  9: "路:3:1 心:0:12 年:1:2 今天:1:2 時間:1:1 家:2:4 朋友:2:2 人類:2:1 宇宙:4:2 地球:4:2 太陽:4:1 世界:4:12",
-  10: "彩虹:7:6 rays:7:1 blazin:7:1 睡眠:8:2 新聞:3:2 報紙:3:2 跳:0:29 今天:1:2 fall:1:1 homies:2:2 世界:4:16 sun:4:2 world:4:2",
-  11: "蝴蝶:6:3 原野:6:3 電:5:1 雲煙:5:3 失了幾次眠:8:1 吻:0:1 臉:0:2 眼:0:3 眼神:0:1 眼淚:0:1 眼睛:0:1 歷史:1:1 從前:1:6 祖先:2:1 人類:2:1 世界:4:2 神:4:1",
-  12: "風:5:1 光:7:1 夜夜:8:3 路上:3:2 早場:3:3 尾場:3:3 科場:3:2 試場:3:2 上班:3:1 下班:3:1 時間:1:3 年:1:3 記得:1:3 歲:1:1 往事:1:1 家:2:9 叔叔:2:1",
+  2: "多雲天:5:1 暴雨天:5:1 晴天:5:1 頭:0:1 手:0:1 眼:0:1 心:0:1 表妹:2:2 媽媽:2:1 妹妹:2:4",
+  3: "桃花:6:1 柳樹:6:1 青蛙:6:1 燕子:6:1 玫瑰:6:1 蛇:6:3 原上草:6:3 烏龜:6:1 春風:5:10 雲堆:5:1 悶雷:5:2 河水:9:1 路上:3:1 城裡:3:1 流淚:0:3 冬日:1:3 夏天:1:3 三月:1:2",
+  4: "地中海:9:4 路旁:3:2 搞笑片:3:4 手:0:4 friend:2:4 朋友:2:1",
+  5: "眼:0:1 心:0:3 臉:0:1 手:0:1 女人:2:8",
+  6: "街上:3:3 電影:3:3 情男情女:2:3",
+  7: "頭:0:2 臉:0:2 雙目:0:2 眼睛:0:2 心:0:5 舞:0:3 脈:0:1",
+  8: "北風:5:3 春風:5:1 二泉:9:4 燭光:7:3 彩虹:7:2 燈籠:7:3 月:8:4 漆黑:8:3 街頭:3:2 酒家:3:3 小巷:3:3 路上:3:1 路:3:1 墨鏡:0:2 雙眼:0:1 心:0:1 臉孔:0:2 流淚:0:1 臉:0:1 聽眾:2:3 家:2:1 老婆:2:1 老爸:2:1",
+  9: "路:3:1 心:0:12 家:2:4 朋友:2:2 宇宙:4:2 地球:4:2 太陽:4:1",
+  10: "彩虹:7:6 rays:7:1 新聞:3:2 報紙:3:2 homies:2:2 sun:4:2",
+  11: "蝴蝶:6:3 原野:6:3 雲煙:5:3 臉:0:2 眼:0:3 眼神:0:1 眼淚:0:1 眼睛:0:1 祖先:2:1",
+  12: "風:5:1 光:7:1 夜夜:8:3 路上:3:2 早場:3:3 尾場:3:3 科場:3:2 試場:3:2 家:2:9 叔叔:2:1",
   13: "燕子:6:1 春花:6:1 春光:5:2 熱淚:0:2 winter:1:1 spring:1:1 summer:1:1 fall:1:1",
-  14: "晚上:8:1 cappuccino:3:1 咖啡:3:1 手機:3:1 電話:3:1 電影:3:1 笑:0:1 明天:1:1 今天:1:1 時間:1:1 星期:1:4 小姐:2:1 朋友:2:1 家:2:1",
+  14: "晚上:8:1 cappuccino:3:1 咖啡:3:1 手機:3:1 電話:3:1 電影:3:1 小姐:2:1 朋友:2:1 家:2:1",
 };
 // Soulboy, built in so the page is never empty: imagery hit counts per song (order of CAT_IDS), times it sings of love (愛, 爱 or love),
 // tempo and intensity from the 30-second previews. data/songs.json, when present, adds previews and quotes.
 const SOULBOY = [
   [1, "Prologue",   99.05, 0.623, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 1],
-  [2, "妹妹",       123.59, 0.717, [7, 11, 7, 0, 0, 3, 0, 0, 0, 0], 1],
-  [3, "春風吹",     114.59, 0.273, [3, 16, 0, 2, 1, 13, 12, 0, 3, 1], 0],
-  [4, "每天每天",   129.41, 0.152, [7, 14, 5, 6, 0, 0, 0, 0, 0, 4], 1],
-  [5, "女人",       102.52, 0.572, [6, 3, 8, 0, 1, 0, 0, 0, 0, 0], 9],
-  [6, "叫我怎麼說", 108.2,  0.25,  [2, 5, 3, 6, 3, 0, 0, 0, 0, 0], 12],
-  [7, "哪怕",       133.66, 0,     [19, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0],
-  [8, "南音",       105.02, 0.131, [8, 4, 6, 10, 0, 4, 0, 11, 7, 4], 1],
-  [9, "我們能不能", 153.6,  0.735, [12, 5, 7, 1, 17, 0, 0, 0, 0, 0], 0],
-  [10, "跳",        120.23, 0.786, [29, 3, 2, 4, 20, 0, 0, 8, 2, 0], 0],
-  [11, "總結",      107.24, 0.121, [9, 7, 2, 0, 3, 4, 6, 0, 1, 0], 3],
-  [12, "趕場",      125.7,  0.174, [0, 11, 10, 14, 0, 1, 0, 1, 3, 0], 0],
+  [2, "妹妹",       123.59, 0.717, [4, 0, 7, 0, 0, 3, 0, 0, 0, 0], 1],
+  [3, "春風吹",     114.59, 0.273, [3, 8, 0, 2, 0, 13, 12, 0, 0, 1], 0],
+  [4, "每天每天",   129.41, 0.152, [4, 0, 5, 6, 0, 0, 0, 0, 0, 4], 1],
+  [5, "女人",       102.52, 0.572, [6, 0, 8, 0, 0, 0, 0, 0, 0, 0], 9],
+  [6, "叫我怎麼說", 108.2,  0.25,  [0, 0, 3, 6, 0, 0, 0, 0, 0, 0], 12],
+  [7, "哪怕",       133.66, 0,     [17, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0],
+  [8, "南音",       105.02, 0.131, [8, 0, 6, 10, 0, 4, 0, 8, 7, 4], 1],
+  [9, "我們能不能", 153.6,  0.735, [12, 0, 6, 1, 5, 0, 0, 0, 0, 0], 0],
+  [10, "跳",        120.23, 0.786, [0, 0, 2, 4, 2, 0, 0, 7, 0, 0], 0],
+  [11, "總結",      107.24, 0.121, [8, 0, 1, 0, 0, 3, 6, 0, 0, 0], 3],
+  [12, "趕場",      125.7,  0.174, [0, 0, 10, 12, 0, 1, 0, 1, 3, 0], 0],
   [13, "等著你回來", 118.63, 1,    [2, 4, 0, 0, 0, 2, 2, 0, 0, 0], 1],
-  [14, "認識你",    89.1,   0.136, [1, 7, 3, 5, 0, 0, 0, 0, 1, 0], 0],
+  [14, "認識你",    89.1,   0.136, [0, 0, 3, 5, 0, 0, 0, 0, 1, 0], 0],
 ].map(([track, name, tempo, intensity, h, love]) => ({
   preview_url: PREVIEW + SOULBOY_PREVIEWS[track - 1] + ".plus.aac.p.m4a",
   terms: (SOULBOY_TERMS[track] || "").split(" ").filter(Boolean).map(x => { const [w, c, n] = x.split(":"); return [w, CAT_IDS[+c], +n]; }),

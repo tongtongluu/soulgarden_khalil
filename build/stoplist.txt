@@ -1,0 +1,42 @@
+# Imagery stoplist: words that match a lexicon group but are not something you can see.
+# The tagging pipeline for later albums must segment lyrics into whole words with jieba,
+# drop every word listed here, then count the rest into the 10 imagery groups and write
+# `imagery` (counts) and `terms` (word, group, count) per song into data/songs.json.
+# One word per line; text after # is a comment.
+
+# time and age
+歲
+年
+當年
+時間
+永遠
+今天
+明天
+星期
+每天
+從前
+記得
+想起
+歷史
+舊
+往事
+小時候
+# verbs
+跳
+笑
+眨
+睡
+睡眠
+點亮
+上班
+下班
+吻
+失了幾次眠
+blazin
+fall  # only when it is a verb ("fall" the season stays)
+# abstract
+世界
+world
+神
+人類
+電

@@ -24,6 +24,8 @@ python3 fetch_discography.py  # → data/discography.json (10 studio albums, iTu
 - `imagery.py`: 10 detailed categories and colour words, counted with a greedy longest-first lexicon match over the full LRCLIB lyrics. Choruses count each time they repeat. Palette, mood and hover quote (≤15 characters) are hand-curated, not measured.
 - `songs.py`: 7 weights (love, light, sun, night, nature, water, solitude) from `imagery_lexicon.json`, normalised to sum to 1. Equal weights and `sparse: true` when a track has fewer than 4 hits in total. `intensity` is energy min-max normalised across the album.
 
+- `stoplist.txt`: words that match a lexicon group but are not something you can see (time words, verbs, abstract words). `songs.py` drops them from the `imagery` counts; "fall" is kept only on lines that list the seasons. Later albums should be segmented into whole words with jieba before matching, and write `imagery` and `terms` per song into `data/songs.json`.
+
 ## What is not published
 
 `raw/` holds full lyrics and preview audio and is in `.gitignore`. Only derived data goes in `data/`.

@@ -12,6 +12,9 @@ from common import DATA, RAW, read_json, write_json
 from imagery import EDITORIAL, LEXICON, STOP, tokenize
 
 SPARSE_BELOW = 4  # fewer total hits than this: too little evidence, use equal weights
+# words that match a lexicon group but are not something you can see (see stoplist.txt)
+STOPLIST = [l.split("#")[0].strip() for l in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "stoplist.txt"), encoding="utf-8")]
+STOPLIST = [w for w in STOPLIST if w and w != "fall"]
 CATS = ["love", "light", "sun", "night", "nature", "water", "solitude"]
 
 
@@ -37,6 +40,14 @@ def main():
         counts = {c: sum(hits.get(c, {}).values()) for c in CATS}
         total = sum(counts.values())
         ghits = tokenize(text, groups)
+        for w in STOPLIST:
+            for g in ghits.values():
+                g.pop(w, None)
+        # "fall" is stoplisted only as a verb: keep it on lines that list the seasons
+        if "time_memory" in ghits and "fall" in ghits["time_memory"]:
+            seasons = sum(1 for line in text.splitlines() if re.search(r"\bfall\b", line, re.I)
+                          and re.search(r"\b(winter|spring|summer)\b", line, re.I))
+            ghits["time_memory"]["fall"] = seasons
         imagery = {g: sum(ghits.get(g, {}).values()) for g in LEXICON}
         love_zh = text.count("愛") + text.count("爱")
         love_en = len(re.findall(r"\blove\b", text, re.IGNORECASE))
