@@ -88,6 +88,12 @@ h1 { font-family: var(--display); font-weight: 400; font-size: 20px; line-height
 .sound[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
 .sound:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 .stage { position: relative; }
+.scene-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 12px; color: var(--muted); }
+.scene-ctl select, .scene-ctl button { font: 500 12px var(--body); color: var(--fg); background: transparent; border: 1px solid var(--shelf); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.scene-ctl select { max-width: 100%; }
+.scene-ctl select:focus-visible, .scene-ctl button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+#scene-cap { flex-basis: 100%; min-width: 0; }
+.scene-ctl[hidden] { display: none; }
 canvas { display: block; width: 100%; touch-action: manipulation; }
 .tip {
   position: absolute; pointer-events: none; z-index: 5; width: 250px;
@@ -134,11 +140,18 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
       <button id="v-color" data-view="color" aria-pressed="false">By color</button>
       <button id="v-fuse" data-view="fuse" aria-pressed="false">Album blends</button>
       <button id="v-soul" data-view="soul" aria-pressed="false">Soul palette</button>
+      <button id="v-scene" data-view="scene" aria-pressed="false">Dreamscape</button>
     </div>
     <button class="sound" id="sound" aria-pressed="false" hidden>♪ Turn sound on</button>
     </div>
   </header>
 
+  <div class="scene-ctl" id="scene-ctl" hidden>
+    <label for="scene-song">Draw from</label>
+    <select id="scene-song"><option value="all">Every tagged song</option></select>
+    <button id="scene-shuffle" type="button">↻ Recompose</button>
+    <span id="scene-cap"></span>
+  </div>
   <div class="stage" id="stage">
     <canvas id="c" aria-label="A grid of vessels, one for each song"></canvas>
     <div class="tip" id="tip" hidden></div>
@@ -154,6 +167,7 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
     <div><dt>Flower</dt><dd>He sang about love all the time. Every song whose lyrics mention love 愛 gets flowers in its vase: one flower for every five mentions, and each petal is one mention, so you can count them.</dd></div>
     <div><dt>Pebble shape</dt><dd>A slow ballad, under 78 BPM.</dd></div>
     <div><dt>Background</dt><dd>The garden sits in the light of the places he lived: the ocean of Kauaʻi where he was born at the top, the harbor haze of Hong Kong where he grew up and made music across the middle, and the red earth of Yunnan where he went in his last years rising from below.</dd></div>
+    <div><dt>Dreamscape</dt><dd>Every imagery word, freed from its song and recombined into one picture of flat gradient shapes: moon, rainbow, lanterns, swallows, the sea. Each image is sized by how often he sings it; birds, butterflies, flowers, people, lanterns and stars repeat instead, so you can count them. Recompose shuffles the arrangement, and hovering an image plays the song that sings it most.</dd></div>
     <div><dt>Blends</dt><dd>A group of songs averaged into one outline, with each image as a flowing patch of color sized by its share. Album blends show each album's character. Soul palette pours every song into one smiling bowl: the bowl holds his whole palette, the two fins carry the second and third images, and each leaf is one song. Hover a leaf to hear it.</dd></div>
   </dl>
   <p class="note" id="note"><strong>Prototype:</strong> the albums, tracks and imagery shares are randomly generated placeholders for testing the visual rules. They will be replaced once the real lyrics are collected and tagged.</p>
@@ -438,6 +452,11 @@ function layout() {
       y += rows * (cellH + vgap) + groupGap;
     });
     y -= vgap + groupGap;
+  } else if (mode === "scene") {
+    // a landscape picture on wide screens, a tall poster on phones
+    const h = small ? W * 1.3 : Math.max(380, Math.min(avail, W * 0.58));
+    sceneBox = { x: 0, y: 0, w: W, h };
+    y = h;
   } else if (mode === "color") {
     const list = [...songs].sort((p, q) => p.a - q.a || q.weights[q.a] - p.weights[p.a]);
     place(list);
@@ -783,6 +802,7 @@ function frame(ms) {
   });
   if (mode === "fuse") return drawFuseView(t);
   if (mode === "soul") return drawSoulView(t);
+  if (mode === "scene") return drawSceneView(t);
   if (mode === "album") {
     ctx.font = '500 11px "IBM Plex Mono", monospace';
     const lh = 15, fg = css("--fg"), muted = css("--muted");
@@ -826,6 +846,7 @@ function frame(ms) {
 
 const esc = v => String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
 function showTip(s) {
+  if (s.motif) return showMotifTip(s);
   const fusedTip = s.n !== undefined;
   const words = !fusedTip && s.terms && s.terms.length
     ? `<div class="words">${[...s.terms].sort((p, q) => q[2] - p[2]).slice(0, 8).map(([w, c, n]) => `<span><i style="background:${colorOf(CAT_IDS.indexOf(c))}"></i><span lang="zh">${esc(w)}</span><b>${n}</b></span>`).join("")}</div>`
@@ -849,9 +870,382 @@ function showTip(s) {
   tip.style.top = Math.max(0, oy) + "px";
 }
 
+// ---- Dreamscape: every imagery word in the lyrics, recombined into one flat picture ----
+// each kind of image is drawn once as a flat gradient shape, sized by how often he sings it;
+// birds, butterflies, flowers, people, lanterns and stars repeat instead, so they can be counted
+const KINDS = {
+  sun: "太陽 sun 晴天 光 rays", moon: "月 夜夜 晚上", night: "漆黑", rainbow: "彩虹",
+  cloud: "多雲天 雲堆 雲煙", rain: "暴雨天", thunder: "悶雷", wind: "春風 北風 風 春光",
+  bird: "燕子", butterfly: "蝴蝶", flower: "桃花 玫瑰 春花", willow: "柳樹", grass: "原上草 原野",
+  frog: "青蛙", turtle: "烏龜", snake: "蛇", sea: "地中海", spring: "二泉", river: "河水",
+  lantern: "燭光 燈籠", road: "街上 街頭 路上 路 路旁 小巷", building: "酒家 城裡 科場 試場",
+  screen: "電影 搞笑片 早場 尾場 新聞 報紙 手機 電話", cup: "咖啡 cappuccino", shades: "墨鏡",
+  star: "宇宙", earth: "地球", heart: "心", eye: "眼 眼睛 雙目 雙眼 眼神", face: "臉 臉孔 頭",
+  tear: "流淚 眼淚 熱淚", dance: "舞", pulse: "脈", hand: "手", home: "家",
+  person: "女人 妹妹 表妹 媽媽 friend 朋友 homies 小姐 叔叔 老婆 老爸 聽眾 祖先 情男情女",
+  season: "冬日 夏天 三月 winter spring summer fall",
+};
+const KIND_OF = {};
+Object.entries(KINDS).forEach(([k, words]) => words.split(" ").forEach(w => KIND_OF[w] = k));
+// where each kind lives in the picture, as a band of the height (0 top, 1 bottom); "stand" sits on the horizon
+const ZONE = {
+  sun: [0.1, 0.32], moon: [0.08, 0.3], rainbow: [0.2, 0.36], cloud: [0.08, 0.34], rain: [0.1, 0.3], thunder: [0.12, 0.34],
+  wind: [0.14, 0.5], bird: [0.08, 0.4], butterfly: [0.36, 0.62], star: [0.04, 0.3], earth: [0.12, 0.38],
+  heart: [0.3, 0.56], eye: [0.2, 0.5], face: [0.26, 0.54], tear: [0.3, 0.6], dance: [0.3, 0.56], pulse: [0.3, 0.56],
+  hand: [0.34, 0.58], shades: [0.26, 0.5], screen: [0.3, 0.56], cup: [0.4, 0.6], season: [0.16, 0.5], lantern: [0.18, 0.42],
+  spring: [0.86, 0.95], frog: [0.74, 0.84], turtle: [0.74, 0.84], snake: [0.76, 0.86], flower: [0.72, 0.86],
+  building: "stand", home: "stand", willow: "stand", person: "stand",
+};
+const REPEAT = { bird: 1, butterfly: 1, flower: 1, person: 1, lantern: 1, star: 3, building: 1 };
+const HORIZON = 0.66;
+let scene = null, sceneSeed = 7, sceneSong = "all", sceneBox = { x: 0, y: 0, w: 0, h: 0 };
+
+function hexMix(a, b, u) {
+  const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const A = p(a), B = p(b);
+  return "#" + A.map((v, i) => Math.round(v + (B[i] - v) * u).toString(16).padStart(2, "0")).join("");
+}
+function isDark() { const [r, g, b] = [1, 3, 5].map(i => parseInt(css("--bg").slice(i, i + 2), 16)); return r + g + b < 300; }
+
+// gather the words of one song, or of every tagged song, into kinds of image
+function composeScene() {
+  const rnd = mulberry(sceneSeed);
+  const pool = sceneSong === "all" ? songs : songs.filter(s => s.name === sceneSong);
+  const byKind = {};
+  pool.forEach(s => (s.terms || []).forEach(([w, cat, n]) => {
+    const k = KIND_OF[w]; if (!k) return;
+    const g = byKind[k] ??= { kind: k, cat: CAT_IDS.indexOf(cat), count: 0, words: {}, songs: {} };
+    g.count += n; g.words[w] = (g.words[w] || 0) + n; g.songs[s.name] = (g.songs[s.name] || 0) + n;
+    if (!g.best || n > g.best[1]) g.best = [s, n];
+  }));
+  const kinds = Object.values(byKind), max = Math.max(1, ...kinds.map(g => g.count));
+  const placed = [], items = [];
+  // the biggest images are placed first so the small ones settle into the gaps
+  kinds.sort((a, b) => b.count - a.count).forEach(g => {
+    g.motif = true; g.preview_url = g.best && g.best[0].preview_url;
+    g.size = 0.04 + 0.062 * Math.sqrt(g.count / max);
+    if (["night", "grass", "sea", "river", "road"].includes(g.kind)) { g.ground = true; items.push(g); return; }
+    const cap = { person: 6, building: 5 }[g.kind] || 9;
+    const n = REPEAT[g.kind] ? Math.min(cap, Math.max(1, Math.round(g.count * REPEAT[g.kind]))) : 1;
+    const r = REPEAT[g.kind] ? Math.max(0.028, g.size * 0.55) : g.size;
+    for (let i = 0; i < n; i++) {
+      const z = ZONE[g.kind] || [0.2, 0.6];
+      let best = null, bestGap = -Infinity;
+      for (let tries = 0; tries < 40; tries++) {
+        const m = Math.min(0.3, 0.04 + r * (g.kind === "rainbow" ? 1.7 : 1.1)), px = m + rnd() * (1 - 2 * m);
+        const py = z === "stand" ? HORIZON - r * 0.9 : z[0] + rnd() * (z[1] - z[0]);
+        const gap = Math.min(1, ...placed.map(o => Math.hypot((o.x - px) * 1.6, o.y - py) - o.r - r));
+        if (gap > bestGap) { bestGap = gap; best = [px, py]; }
+        if (gap > 0.03) break;
+      }
+      const inst = { g, x: best[0], y: best[1], r: r * (REPEAT[g.kind] ? 0.8 + rnd() * 0.4 : 1), ph: rnd() * 6.28, flip: rnd() < 0.5 ? -1 : 1, tilt: (rnd() - 0.5) * 0.6 };
+      placed.push(inst); items.push(inst);
+    }
+  });
+  scene = { items, kinds, words: kinds.reduce((a, g) => a + g.count, 0), songCount: pool.length };
+  const cap = document.getElementById("scene-cap");
+  if (cap) cap.textContent = kinds.length
+    ? `${scene.words} imagery words from ${pool.length === 1 ? "《" + pool[0].name + "》" : pool.filter(s => s.terms?.length).length + " songs"}, drawn as ${kinds.length} images. Bigger means sung more often.`
+    : "This song has no imagery words to draw yet.";
+}
+
+// paint helpers: every shape is filled with a flat two-stop gradient of its group color
+function paint(x0, y0, x1, y1, col) {
+  const g = ctx.createLinearGradient(x0, y0, x1, y1);
+  g.addColorStop(0, col);
+  g.addColorStop(1, hexMix(col, isDark() ? "#0B1214" : "#FFFFFF", 0.62));
+  return g;
+}
+function circle(x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); }
+
+const DRAW = {
+  sun(x, y, r, c, it) {
+    circle(x, y, r); ctx.fillStyle = paint(x, y - r, x, y + r, c); ctx.fill();
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2 + it.ph;
+      ctx.beginPath(); ctx.moveTo(x + Math.cos(a - 0.08) * r * 1.18, y + Math.sin(a - 0.08) * r * 1.18);
+      ctx.lineTo(x + Math.cos(a) * r * 1.5, y + Math.sin(a) * r * 1.5);
+      ctx.lineTo(x + Math.cos(a + 0.08) * r * 1.18, y + Math.sin(a + 0.08) * r * 1.18); ctx.fill();
+    }
+  },
+  moon(x, y, r, c) {
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.arc(x + r * 0.45, y - r * 0.2, r * 0.86, 0, Math.PI * 2, true);
+    ctx.fillStyle = paint(x - r, y - r, x + r, y + r, c); ctx.fill("evenodd");
+  },
+  rainbow(x, y, r) {
+    [7, 3, 2, 0, 8, 5].forEach((ci, i) => {
+      const rr = r * (1.6 - i * 0.18);
+      ctx.beginPath(); ctx.arc(x, y + r * 0.5, rr, Math.PI, 0); ctx.arc(x, y + r * 0.5, rr - r * 0.17, 0, Math.PI, true); ctx.closePath();
+      ctx.fillStyle = paint(x - rr, y, x + rr, y, colorOf(ci)); ctx.fill();
+    });
+  },
+  cloud(x, y, r, c) {
+    ctx.beginPath();
+    ctx.arc(x - r * 0.55, y + r * 0.1, r * 0.45, Math.PI * 0.5, Math.PI * 1.5);
+    ctx.arc(x - r * 0.1, y - r * 0.2, r * 0.55, Math.PI, Math.PI * 1.9);
+    ctx.arc(x + r * 0.5, y + r * 0.05, r * 0.5, Math.PI * 1.3, Math.PI * 0.5);
+    ctx.closePath(); ctx.fillStyle = paint(x, y - r * 0.8, x, y + r * 0.6, c); ctx.fill();
+  },
+  rain(x, y, r, c, it) {
+    DRAW.cloud(x, y, r, c, it);
+    for (let i = 0; i < 5; i++) { const dx = x - r * 0.6 + i * r * 0.3; ctx.beginPath(); ctx.ellipse(dx - r * 0.1, y + r * 0.95, r * 0.05, r * 0.2, 0.3, 0, Math.PI * 2); ctx.fill(); }
+  },
+  thunder(x, y, r, c) {
+    ctx.beginPath(); ctx.moveTo(x + r * 0.2, y - r); ctx.lineTo(x - r * 0.45, y + r * 0.1); ctx.lineTo(x, y + r * 0.1);
+    ctx.lineTo(x - r * 0.25, y + r); ctx.lineTo(x + r * 0.5, y - r * 0.2); ctx.lineTo(x + r * 0.05, y - r * 0.2); ctx.closePath();
+    ctx.fillStyle = paint(x, y - r, x, y + r, colorOf(7)); ctx.fill();
+  },
+  wind(x, y, r, c, it) {
+    for (let i = 0; i < 3; i++) {
+      const yy = y + (i - 1) * r * 0.45, L = r * (2.6 - i * 0.5);
+      ctx.beginPath(); ctx.moveTo(x - L, yy);
+      ctx.bezierCurveTo(x - L * 0.3, yy - r * 0.5, x + L * 0.3, yy + r * 0.5, x + L, yy - r * 0.1);
+      ctx.bezierCurveTo(x + L * 0.3, yy + r * 0.62, x - L * 0.3, yy - r * 0.28, x - L, yy);
+      ctx.fillStyle = paint(x - L, yy, x + L, yy, c); ctx.fill();
+    }
+  },
+  bird(x, y, r, c, it) {
+    ctx.save(); ctx.translate(x, y); ctx.scale(it.flip, 1);
+    ctx.beginPath(); ctx.moveTo(-r, -r * 0.3); ctx.quadraticCurveTo(-r * 0.4, -r * 0.2, 0, r * 0.3);
+    ctx.quadraticCurveTo(r * 0.4, -r * 0.5, r * 1.1, -r * 0.7); ctx.quadraticCurveTo(r * 0.3, r * 0.1, 0, r * 0.6);
+    ctx.quadraticCurveTo(-r * 0.4, 0, -r, -r * 0.3);
+    ctx.fillStyle = paint(-r, 0, r, 0, c); ctx.fill(); ctx.restore();
+  },
+  butterfly(x, y, r, c, it) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(it.tilt);
+    const flap = reduce ? 1 : 0.75 + 0.25 * Math.sin(performance.now() / 260 + it.ph);
+    [[-1, -1, 0.62], [1, -1, 0.62], [-1, 1, 0.42], [1, 1, 0.42]].forEach(([sx, sy, k]) => {
+      ctx.beginPath(); ctx.ellipse(sx * r * k * 0.8 * flap, sy * r * k * 0.55, r * k * flap, r * k * 0.75, sx * sy * 0.5, 0, Math.PI * 2);
+      ctx.fillStyle = paint(0, -r, sx * r, r, sy < 0 ? c : colorOf(0)); ctx.fill();
+    });
+    ctx.restore();
+  },
+  flower(x, y, r, c, it) {
+    ctx.fillStyle = colorOf(6); ctx.fillRect(x - r * 0.05, y, r * 0.1, r * 1.6);
+    for (let k = 0; k < 5; k++) {
+      const a = it.ph + (k * Math.PI * 2) / 5;
+      circle(x + Math.cos(a) * r * 0.5, y + Math.sin(a) * r * 0.5, r * 0.45);
+      ctx.fillStyle = paint(x, y - r, x, y + r, "#F0607E"); ctx.fill();
+    }
+    circle(x, y, r * 0.3); ctx.fillStyle = colorOf(7); ctx.fill();
+  },
+  willow(x, y, r, c) {
+    ctx.fillStyle = paint(x, y - r, x, y + r, "#8A6A55"); ctx.fillRect(x - r * 0.08, y - r * 0.6, r * 0.16, r * 1.5);
+    for (let i = -3; i <= 3; i++) {
+      ctx.beginPath(); ctx.moveTo(x, y - r * 0.6);
+      ctx.quadraticCurveTo(x + i * r * 0.35, y - r * 1.1, x + i * r * 0.42, y + r * 0.4);
+      ctx.quadraticCurveTo(x + i * r * 0.3, y - r * 0.7, x, y - r * 0.5);
+      ctx.fillStyle = paint(x, y - r, x, y + r * 0.5, c); ctx.fill();
+    }
+  },
+  frog(x, y, r, c) {
+    ctx.beginPath(); ctx.arc(x, y + r * 0.4, r * 0.8, Math.PI, 0); ctx.closePath(); ctx.fillStyle = paint(x, y - r * 0.4, x, y + r * 0.4, c); ctx.fill();
+    [-1, 1].forEach(s => { circle(x + s * r * 0.4, y - r * 0.35, r * 0.24); ctx.fill(); });
+  },
+  turtle(x, y, r, c) {
+    circle(x + r * 0.85, y + r * 0.15, r * 0.22); ctx.fillStyle = paint(x, y - r, x, y + r, c); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y + r * 0.4, r * 0.75, Math.PI, 0); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y + r * 0.4, r * 0.42, Math.PI, 0); ctx.closePath(); ctx.fillStyle = paint(x, y, x, y + r, colorOf(9)); ctx.fill();
+  },
+  snake(x, y, r, c, it) {
+    ctx.lineWidth = r * 0.28; ctx.lineCap = "round"; ctx.strokeStyle = paint(x - r * 1.6, y, x + r * 1.6, y, c);
+    ctx.beginPath();
+    for (let i = 0; i <= 24; i++) { const u = i / 24, px = x - r * 1.6 + u * r * 3.2, py = y + Math.sin(u * Math.PI * 3 + it.ph) * r * 0.35; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+    ctx.stroke();
+  },
+  spring(x, y, r, c) {
+    ctx.lineWidth = Math.max(1.5, r * 0.08);
+    [-1, 1].forEach(s => [1, 0.66, 0.33].forEach(k => {
+      ctx.beginPath(); ctx.ellipse(x + s * r * 0.9, y, r * k, r * k * 0.32, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = paint(x - r, y, x + r, y, c); ctx.stroke();
+    }));
+  },
+  lantern(x, y, r, c) {
+    ctx.fillStyle = paint(x, y - r, x, y + r, "#E8604C");
+    ctx.beginPath(); ctx.ellipse(x, y, r * 0.62, r * 0.78, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = paint(x, y - r, x, y + r, colorOf(7));
+    ctx.fillRect(x - r * 0.3, y - r * 0.95, r * 0.6, r * 0.2); ctx.fillRect(x - r * 0.3, y + r * 0.75, r * 0.6, r * 0.2);
+    ctx.fillRect(x - r * 0.03, y + r * 0.95, r * 0.06, r * 0.4);
+  },
+  building(x, y, r, c, it) {
+    const h = r * (1.6 + (it.ph % 1)), w = r * 1.1;
+    ctx.fillStyle = paint(x, y + r * 0.9 - h, x, y + r * 0.9, c);
+    ctx.beginPath(); ctx.moveTo(x - w / 2, y + r * 0.9); ctx.lineTo(x - w / 2, y + r * 0.9 - h + w / 2);
+    ctx.arc(x, y + r * 0.9 - h + w / 2, w / 2, Math.PI, 0); ctx.lineTo(x + w / 2, y + r * 0.9); ctx.closePath(); ctx.fill();
+  },
+  home(x, y, r, c) {
+    const b = y + r * 0.9;
+    ctx.fillStyle = paint(x, b - r * 1.8, x, b, c);
+    ctx.fillRect(x - r * 0.8, b - r * 1.05, r * 1.6, r * 1.05);
+    ctx.beginPath(); ctx.moveTo(x - r * 1.05, b - r * 1); ctx.lineTo(x, b - r * 1.9); ctx.lineTo(x + r * 1.05, b - r * 1); ctx.closePath();
+    ctx.fillStyle = paint(x, b - r * 1.9, x, b - r, colorOf(3)); ctx.fill();
+    ctx.fillStyle = paint(x, b - r * 0.6, x, b, colorOf(7));
+    ctx.beginPath(); ctx.arc(x, b - r * 0.35, r * 0.25, Math.PI, 0); ctx.lineTo(x + r * 0.25, b); ctx.lineTo(x - r * 0.25, b); ctx.closePath(); ctx.fill();
+  },
+  person(x, y, r, c, it) {
+    const b = y + r * 0.9;
+    ctx.beginPath(); ctx.arc(x, b, r * 0.62, Math.PI, 0); ctx.closePath(); ctx.fillStyle = paint(x, b - r, x, b, c); ctx.fill();
+    circle(x, b - r * 0.98, r * 0.3); ctx.fillStyle = paint(x, b - r * 1.3, x, b - r * 0.7, colorOf(it.flip > 0 ? 3 : 1)); ctx.fill();
+  },
+  screen(x, y, r, c) {
+    ctx.fillStyle = paint(x - r, y - r, x + r, y + r, c);
+    ctx.beginPath(); ctx.roundRect(x - r, y - r * 0.62, r * 2, r * 1.24, r * 0.16); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x - r * 0.22, y - r * 0.32); ctx.lineTo(x + r * 0.36, y); ctx.lineTo(x - r * 0.22, y + r * 0.32); ctx.closePath();
+    ctx.fillStyle = paint(x, y - r, x, y + r, colorOf(7)); ctx.fill();
+  },
+  cup(x, y, r, c) {
+    ctx.fillStyle = paint(x, y - r, x, y + r, c);
+    ctx.beginPath(); ctx.moveTo(x - r * 0.7, y - r * 0.5); ctx.lineTo(x + r * 0.7, y - r * 0.5); ctx.lineTo(x + r * 0.5, y + r * 0.6); ctx.lineTo(x - r * 0.5, y + r * 0.6); ctx.closePath(); ctx.fill();
+    ctx.lineWidth = r * 0.14; ctx.strokeStyle = ctx.fillStyle; ctx.beginPath(); ctx.arc(x + r * 0.72, y, r * 0.26, -Math.PI / 2, Math.PI / 2); ctx.stroke();
+  },
+  shades(x, y, r, c) {
+    ctx.fillStyle = paint(x - r, y, x + r, y, c);
+    [-1, 1].forEach(s => { circle(x + s * r * 0.55, y, r * 0.45); ctx.fill(); });
+    ctx.fillRect(x - r * 0.15, y - r * 0.2, r * 0.3, r * 0.1);
+  },
+  star(x, y, r, c, it) {
+    const k = r * 0.5, tw = reduce ? 1 : 0.7 + 0.3 * Math.sin(performance.now() / 500 + it.ph);
+    ctx.beginPath();
+    for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2, rr = (i % 2 ? k * 0.28 : k) * tw; ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    ctx.closePath(); ctx.fillStyle = paint(x, y - k, x, y + k, colorOf(7)); ctx.fill();
+  },
+  earth(x, y, r, c) {
+    circle(x, y, r); ctx.fillStyle = paint(x, y - r, x, y + r, colorOf(9)); ctx.fill();
+    ctx.save(); circle(x, y, r); ctx.clip();
+    ctx.fillStyle = paint(x - r, y, x + r, y, colorOf(6));
+    ctx.beginPath(); ctx.ellipse(x - r * 0.3, y - r * 0.2, r * 0.45, r * 0.3, 0.4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x + r * 0.45, y + r * 0.4, r * 0.35, r * 0.25, -0.3, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  },
+  heart(x, y, r, c) {
+    ctx.save(); ctx.translate(x, y + r * 0.15); ctx.rotate(Math.PI / 4);
+    ctx.fillStyle = paint(-r, -r, r, r, c);
+    ctx.fillRect(-r * 0.55, -r * 0.55, r * 1.1, r * 1.1);
+    circle(-r * 0.55, 0, r * 0.55); ctx.fill(); circle(0, -r * 0.55, r * 0.55); ctx.fill();
+    ctx.restore();
+  },
+  eye(x, y, r, c) {
+    ctx.beginPath(); ctx.moveTo(x - r, y); ctx.quadraticCurveTo(x, y - r * 1.1, x + r, y); ctx.quadraticCurveTo(x, y + r * 1.1, x - r, y);
+    ctx.fillStyle = paint(x - r, y, x + r, y, c); ctx.fill();
+    circle(x, y, r * 0.34); ctx.fillStyle = paint(x, y - r * 0.3, x, y + r * 0.3, colorOf(8)); ctx.fill();
+  },
+  face(x, y, r, c) {
+    circle(x, y, r * 0.8); ctx.fillStyle = paint(x - r, y, x + r, y, c); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, r * 0.8, -Math.PI / 2, Math.PI / 2); ctx.closePath(); ctx.fillStyle = paint(x, y - r, x, y + r, colorOf(2)); ctx.fill();
+  },
+  tear(x, y, r, c) {
+    ctx.beginPath(); ctx.moveTo(x, y - r); ctx.bezierCurveTo(x + r * 0.2, y - r * 0.4, x + r * 0.6, y, x + r * 0.6, y + r * 0.3);
+    ctx.arc(x, y + r * 0.3, r * 0.6, 0, Math.PI); ctx.bezierCurveTo(x - r * 0.6, y, x - r * 0.2, y - r * 0.4, x, y - r);
+    ctx.fillStyle = paint(x, y - r, x, y + r, colorOf(9)); ctx.fill();
+  },
+  dance(x, y, r, c) {
+    ctx.lineWidth = r * 0.16; ctx.lineCap = "round"; ctx.strokeStyle = paint(x - r, y - r, x + r, y + r, c);
+    ctx.beginPath(); for (let i = 0; i <= 60; i++) { const a = i * 0.22, rr = r * (i / 60); ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } ctx.stroke();
+  },
+  pulse(x, y, r, c) {
+    ctx.lineWidth = r * 0.14; ctx.lineJoin = "round"; ctx.strokeStyle = paint(x - r, y, x + r, y, c);
+    ctx.beginPath(); ctx.moveTo(x - r * 1.2, y); ctx.lineTo(x - r * 0.4, y); ctx.lineTo(x - r * 0.15, y - r * 0.7); ctx.lineTo(x + r * 0.15, y + r * 0.6); ctx.lineTo(x + r * 0.4, y); ctx.lineTo(x + r * 1.2, y); ctx.stroke();
+  },
+  hand(x, y, r, c) {
+    ctx.fillStyle = paint(x, y - r, x, y + r, c);
+    ctx.beginPath(); ctx.arc(x, y, r * 0.55, 0, Math.PI); ctx.closePath(); ctx.fill();
+    for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.roundRect(x - r * 0.52 + i * r * 0.28, y - r * (0.7 + (i % 3 ? 0.15 : 0)), r * 0.22, r * (0.75 + (i % 3 ? 0.15 : 0)), r * 0.11); ctx.fill(); }
+  },
+  season(x, y, r, c, it) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(Math.PI / 4 + it.tilt);
+    ctx.beginPath(); ctx.moveTo(0, -r); ctx.quadraticCurveTo(r * 0.8, 0, 0, r); ctx.quadraticCurveTo(-r * 0.8, 0, 0, -r);
+    ctx.fillStyle = paint(0, -r, 0, r, c); ctx.fill(); ctx.restore();
+  },
+};
+
+// the ground layers: night sky, hills of grass, the road, the river and the sea, laid down before everything else
+function drawGround(g, X, Y, w, h) {
+  const c = colorOf(g.cat), k = 0.6 + 0.4 * g.size / 0.12;
+  if (g.kind === "night") {
+    const gr = ctx.createLinearGradient(0, Y, 0, Y + h * 0.5 * k);
+    gr.addColorStop(0, c); gr.addColorStop(1, clear(c)); ctx.fillStyle = gr; ctx.fillRect(X, Y, w, h * 0.5 * k);
+  } else if (g.kind === "grass") {
+    [[0.18, 0.5], [0.62, 0.62], [0.95, 0.42]].forEach(([u, s]) => {
+      ctx.beginPath(); ctx.ellipse(X + w * u, Y + h * HORIZON + h * 0.06, w * s * 0.5 * k, h * 0.22 * k, 0, Math.PI, 0); ctx.closePath();
+      ctx.fillStyle = paint(0, Y + h * (HORIZON - 0.2), 0, Y + h * HORIZON, c); ctx.fill();
+    });
+  } else if (g.kind === "road") {
+    const cx = X + w * 0.42;
+    ctx.beginPath(); ctx.moveTo(cx - w * 0.01, Y + h * HORIZON); ctx.lineTo(cx + w * 0.01, Y + h * HORIZON);
+    ctx.lineTo(cx + w * 0.16 * k, Y + h); ctx.lineTo(cx - w * 0.16 * k, Y + h); ctx.closePath();
+    ctx.fillStyle = paint(0, Y + h * HORIZON, 0, Y + h, c); ctx.fill();
+  } else if (g.kind === "river") {
+    ctx.beginPath(); ctx.moveTo(X + w * 0.7, Y + h * HORIZON);
+    ctx.bezierCurveTo(X + w * 0.55, Y + h * 0.78, X + w * 0.9, Y + h * 0.86, X + w * 0.72, Y + h);
+    ctx.lineTo(X + w * 0.86, Y + h); ctx.bezierCurveTo(X + w * 1.0, Y + h * 0.84, X + w * 0.62, Y + h * 0.78, X + w * 0.72, Y + h * HORIZON);
+    ctx.closePath(); ctx.fillStyle = paint(0, Y + h * HORIZON, 0, Y + h, c); ctx.fill();
+  } else if (g.kind === "sea") {
+    for (let i = 0; i < 2; i++) {
+      const top = Y + h * (0.86 + i * 0.06);
+      ctx.beginPath(); ctx.moveTo(X, Y + h);
+      for (let u = 0; u <= 1.0001; u += 0.05) ctx.lineTo(X + w * u, top + Math.sin(u * 18 + i + performance.now() / 1400) * h * 0.008);
+      ctx.lineTo(X + w, Y + h); ctx.closePath();
+      ctx.fillStyle = paint(0, top, 0, Y + h, hexMix(c, colorOf(5), i * 0.3)); ctx.fill();
+    }
+  }
+}
+
+function drawSceneView(t) {
+  if (!scene) composeScene();
+  const { x: X, y: Y, w, h } = sceneBox, dark = isDark();
+  ctx.save();
+  // the picture's own sky follows his life too: Kauaʻi above, Hong Kong at the horizon, Yunnan underfoot
+  ctx.beginPath(); ctx.roundRect(X, Y, w, h, 18); ctx.clip();
+  const sky = ctx.createLinearGradient(0, Y, 0, Y + h);
+  sky.addColorStop(0, css("--kauai")); sky.addColorStop(HORIZON, css("--hk")); sky.addColorStop(1, css("--yunnan"));
+  ctx.fillStyle = sky; ctx.fillRect(X, Y, w, h);
+  ctx.globalCompositeOperation = dark ? "screen" : "multiply";
+  ctx.globalAlpha = 0.92;
+  scene.items.filter(i => i.ground).forEach(g => drawGround(g, X, Y, w, h));
+  ctx.globalAlpha = 0.9;
+  const unit = Math.max(Math.min(w, h * 1.4), w * 1.15 * (h > w ? 1 : 0));
+  scene.items.filter(i => !i.ground).forEach(it => {
+    const on = hovered && hovered === it.g, off = hovered && !on;
+    const bob = reduce ? 0 : Math.sin(t * 0.6 + it.ph) * unit * 0.004;
+    const px = X + it.x * w, py = Y + it.y * h + bob, r = it.r * unit * (on ? 1.08 : 1);
+    it.px = px; it.py = py; it.pr = r;
+    ctx.globalAlpha = off ? 0.35 : 0.9;
+    (DRAW[it.g.kind] || DRAW.face)(px, py, r, colorOf(it.g.cat), it);
+  });
+  ctx.globalCompositeOperation = "soft-light"; ctx.globalAlpha = dark ? 0.12 : 0.18;
+  ctx.fillStyle = grainPattern; ctx.fillRect(X, Y, w, h);
+  ctx.restore();
+}
+
+function pickMotif(px, py) {
+  if (!scene) return null;
+  let best = null, bd = Infinity;
+  scene.items.forEach(it => {
+    if (it.ground || it.px === undefined) return;
+    const d = Math.hypot(it.px - px, it.py - py);
+    if (d < Math.max(14, it.pr * 1.1) && d < bd) { bd = d; best = it.g; }
+  });
+  return best;
+}
+
+function showMotifTip(g, e) {
+  const words = Object.entries(g.words).sort((a, b) => b[1] - a[1])
+    .map(([w, n]) => `<span><i style="background:${colorOf(g.cat)}"></i><span lang="zh">${esc(w)}</span><b>${n}</b></span>`).join("");
+  const inSongs = Object.entries(g.songs).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([s, n]) => `${esc(s)} ${n}`).join(" · ");
+  tip.innerHTML = `<div><h3>${esc(CATS[g.cat].zh)}</h3><div class="meta">${g.count} mention${g.count > 1 ? "s" : ""}</div></div><div class="words">${words}</div><div class="meta" lang="zh">${inSongs}</div>` +
+    (g.preview_url ? `<div class="meta">${soundOn ? "♪ Playing the song that sings it most" : "Turn sound on to hear the song that sings it most"}</div>` : "");
+  tip.hidden = false;
+  const it = scene.items.find(i => i.g === g && i.px !== undefined) || { px: 0, py: 0, pr: 0 };
+  let left = it.px + it.pr + 12;
+  if (left + 250 > W) left = it.px - it.pr - 262;
+  tip.style.left = Math.max(0, left) + "px";
+  tip.style.top = Math.max(0, it.py - 40) + "px";
+}
+
 function pick(e) {
   const rect = canvas.getBoundingClientRect();
   const px = e.clientX - rect.left, py = e.clientY - rect.top;
+  if (mode === "scene") return pickMotif(px, py);
   if (mode === "soul") {
     const r = soulAgg.w * 0.07;
     let best = null, bd = r * r;
@@ -961,13 +1355,17 @@ function setMode(m) {
   const wasFused = mode === "fuse" || mode === "soul";
   mode = m;
   viewButtons.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === m)));
-  chips.dataset.off = String(m === "fuse" || m === "soul");
+  chips.dataset.off = String(m === "fuse" || m === "soul" || m === "scene");
+  document.getElementById("scene-ctl").hidden = m !== "scene";
   hovered = null; tip.hidden = true; listen(null);
   if (m === "fuse" || m === "soul") [...albumAggs, soulAgg].forEach(g => g.alpha = 0);
   else if (wasFused) songs.forEach(s => s.alpha = 0);
   layout();
 }
 viewButtons.forEach(b => b.onclick = () => setMode(b.dataset.view));
+const sceneSelect = document.getElementById("scene-song");
+sceneSelect.onchange = () => { sceneSong = sceneSelect.value; composeScene(); };
+document.getElementById("scene-shuffle").onclick = () => { sceneSeed = (sceneSeed * 7919 + 13) % 100003; composeScene(); };
 
 const note = document.getElementById("note");
 async function load() {
@@ -993,6 +1391,8 @@ async function load() {
   const tagged = songs.length;
   note.innerHTML = `<strong>Data:</strong> ${tagged} of ${tagged + empties.length} songs tagged so far; blank vessels are still waiting for theirs. Imagery is counted from the full lyrics with a hand-built lexicon (hover a tag to see its top words); tempo and mood come from audio features of each 30-second preview.`;
   soundBtn.hidden = !songs.some(s => s.preview_url);
+  songs.filter(s => s.terms && s.terms.length).forEach(s => sceneSelect.add(new Option(`${s.name} · ${s.album}`, s.name)));
+  scene = null;
   layout();
 }
 new ResizeObserver(() => layout()).observe(stage);
