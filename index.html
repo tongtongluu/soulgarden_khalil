@@ -135,7 +135,7 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
     <p class="lede" id="intro">Every song is a vessel holding the images in its lyrics. Its color comes from the images that appear most, and its curves come from the song's tempo and mood. Hover over a vessel to see what it holds, and turn the sound on to hear it.</p>
   <dl class="key">
     <div><dt>Color</dt><dd>Every imagery word in the lyrics is counted into one of ten groups. The group with the most hits sets the base color, the second sets the other end of the gradient.</dd></div>
-    <div><dt>Beat</dt><dd>The faster the tempo, the more curves in the outline. Hover a vase and it pulses on every beat, at the song's real BPM.</dd></div>
+    <div><dt>Beat</dt><dd>The faster the tempo, the more curves in the outline. Hover a vase and it jumps on every beat at the song's real BPM, hardest on the first beat of each bar; with sound on it follows the kick drum in the music.</dd></div>
     <div><dt>Height and width</dt><dd>Brighter, happier songs (valence) stand taller. Songs with more energy are fuller and wider.</dd></div>
     <div><dt>Depth of curves</dt><dd>The stronger the emotion, the narrower the waist.</dd></div>
     <div><dt>Flower</dt><dd>He sang about love all the time. Every song whose lyrics mention love 愛 gets flowers in its vase: one flower for every five mentions, and each petal is one mention, so you can count them.</dd></div>
@@ -430,18 +430,15 @@ function spline(pts) {
 
 let vesselPath = function (s, x, y, w, h, t) {
   const cx = x + w / 2;
-  // idle: a slow drift. On hover the outline pulses on every beat of the song, at its real BPM;
-  // while its preview plays the pulse follows the audio clock
-  const clock = s.preview_url && playing === s.preview_url && !audio.paused ? audio.currentTime : t;
-  const beat = (clock * (s.tempo || 90)) / 60;
-  const pulse = Math.exp(-(beat - Math.floor(beat)) * 5);
-  const wob = (i) => reduce ? 0 : Math.sin(t * 0.6 + s.phase + i * 1.3) * 0.012 + s.hover * pulse * 0.06 * (i % 2 ? 1 : -0.7);
+  // idle: a slow drift. On hover the outline kicks with the beat (see beatPulse)
+  const pulse = s.pulse || 0;
+  const wob = (i) => reduce ? 0 : Math.sin(t * 0.6 + s.phase + i * 1.3) * 0.012 + s.hover * pulse * 0.16 * (i % 2 ? 1 : -0.8);
   ctx.beginPath();
   if (s.ballad) {
     const n = 48;
     for (let i = 0; i <= n; i++) {
       const th = (i / n) * Math.PI * 2;
-      const k = 1 + 0.05 * Math.sin(2 * th + s.phase) + 0.025 * Math.sin(3 * th + s.seed * 6) + (reduce ? 0 : Math.sin(t * 0.8 + s.phase + th) * 0.008 + s.hover * pulse * 0.07 * Math.sin(2 * th));
+      const k = 1 + 0.05 * Math.sin(2 * th + s.phase) + 0.025 * Math.sin(3 * th + s.seed * 6) + (reduce ? 0 : Math.sin(t * 0.8 + s.phase + th) * 0.008 + s.hover * pulse * 0.16 * Math.sin(2 * th));
       const px = cx + Math.cos(th) * w * 0.44 * k, py = y + h / 2 + Math.sin(th) * h * 0.48 * k;
       i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
     }
@@ -460,11 +457,24 @@ let vesselPath = function (s, x, y, w, h, t) {
   ctx.closePath();
 };
 
+// how hard the vase is hit right now, 0 to 1. While its preview plays this follows the kick drum
+// heard in the audio; otherwise it falls on the song's BPM, with the first beat of each bar hit hardest.
+function beatPulse(s, t) {
+  if (reduce || s.hover < 0.01) return 0;
+  if (playing && playing === s.preview_url && !audio.paused && analyser) return kick;
+  const clock = playing && playing === s.preview_url && !audio.paused ? audio.currentTime : t;
+  const beat = (clock * (s.tempo || 90)) / 60, n = Math.floor(beat);
+  return Math.exp(-(beat - n) * 6) * (n % 4 === 0 ? 1 : 0.65);
+}
+
 function drawVessel(s, t) {
   const pad = cellW * 0.04;
   const lift = s.hover * cellH * 0.03;
   const fullW = cellW - pad * 2, fullH = cellH * (1 - FLOWER) - pad * 2;
-  const w = fullW * (0.58 + 0.42 * (s.eN ?? 0.6)), h = fullH * (0.7 + 0.3 * (s.vN ?? 0.6));
+  s.pulse = beatPulse(s, t);
+  // squash and stretch on every hit: taller and narrower, standing on its base
+  const hit = s.hover * s.pulse;
+  const w = fullW * (0.58 + 0.42 * (s.eN ?? 0.6)) * (1 - 0.12 * hit), h = fullH * (0.7 + 0.3 * (s.vN ?? 0.6)) * (1 + 0.22 * hit);
   const x = s.x + pad + (fullW - w) / 2, y = s.y + cellH * FLOWER + pad + (fullH - h) - lift;
   ctx.save();
   ctx.globalAlpha = s.alpha;
@@ -720,6 +730,7 @@ function drawSoulView(t) {
 
 function frame(ms) {
   requestAnimationFrame(frame);
+  listenForKick(ms / 1000);
   if (W <= 0 || !soulAgg) return;
   const t = ms / 1000;
   ctx.clearRect(0, 0, W, canvas.height);
@@ -803,8 +814,40 @@ function pick(e) {
   return songs.find(s => px >= s.x && px <= s.x + cellW && py >= s.y && py <= s.y + cellH && s.alpha > 0.5) || null;
 }
 // ---- sound: one shared player; browsers only allow it after a click ----
-const audio = new Audio();
+// try to hear the kick drum: route the preview through an analyser when the audio host allows it (CORS);
+// if it doesn't, fall back to a plain player and the BPM clock
+let audio = new Audio(), actx = null, analyser = null, bins = null, kick = 0, bassAvg = 0, lastKick = 0;
 audio.preload = "none";
+audio.crossOrigin = "anonymous";
+function plainAudio() {
+  const src = audio.src, vol = audio.volume;
+  audio.pause();
+  audio = new Audio(); audio.preload = "none";
+  analyser = null;
+  if (src) { audio.src = src; audio.volume = vol; audio.play().catch(() => {}); }
+}
+audio.addEventListener("error", () => { if (audio.crossOrigin) plainAudio(); });
+function ensureAnalyser() {
+  if (actx || !audio.crossOrigin) return;
+  try {
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    const node = actx.createMediaElementSource(audio);
+    analyser = actx.createAnalyser();
+    analyser.fftSize = 1024; analyser.smoothingTimeConstant = 0.5;
+    node.connect(analyser); analyser.connect(actx.destination);
+    bins = new Uint8Array(analyser.frequencyBinCount);
+  } catch (e) { analyser = null; }
+}
+function listenForKick(now) {
+  if (!analyser || audio.paused) { kick *= 0.85; return; }
+  analyser.getByteFrequencyData(bins);
+  let bass = 0;
+  for (let i = 1; i <= 6; i++) bass += bins[i];
+  bass /= 6;
+  if (bass > bassAvg * 1.18 && bass > 90 && now - lastKick > 0.22) { kick = 1; lastKick = now; }
+  else kick *= 0.86;
+  bassAvg = bassAvg * 0.94 + bass * 0.06;
+}
 let soundOn = false, playing = null, fadeTimer = null;
 const soundBtn = document.getElementById("sound");
 function fadeTo(target, ms, done) {
@@ -832,7 +875,7 @@ function setSound(on) {
   soundOn = on;
   soundBtn.setAttribute("aria-pressed", String(on));
   soundBtn.textContent = on ? "♪ Sound on · hover a vase to listen" : "♪ Turn sound on";
-  if (on) { audio.play().catch(() => {}); audio.pause(); listen(hovered); }
+  if (on) { ensureAnalyser(); actx && actx.resume(); audio.play().catch(() => {}); audio.pause(); listen(hovered); }
   else { playing = null; fadeTo(0, 300, () => audio.pause()); }
 }
 soundBtn.onclick = () => setSound(!soundOn);
