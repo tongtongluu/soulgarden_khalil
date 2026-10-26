@@ -7,72 +7,84 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@600&display=swap">
 <style>
-/* Layout: a quiet gallery wall. Header, legend chips, then a canvas grid of vessels, one row per album. */
+/* Layout: a gallery of shelves. A one-line header, then the whole discography as ten shelves of vessels
+   standing in the light of the places he lived; the key and legend sit quietly below. */
 :root {
-  --bg: #EDF0EA;
+  --bg: #ECEEE8;
   --fg: #22312C;
-  --muted: #66766F;
+  --muted: #6A7973;
   --line: #D5DCD3;
   --chip: #E3E8E0;
   --tip-bg: #FBFCF9;
   --solitude: #2F4A43;
-  /* the places he lived, top to bottom: Kauaʻi ocean, Hong Kong harbor haze, Yunnan red earth */
-  --kauai: #DFEFE9;
-  --hk: #E5E5EC;
-  --yunnan: #F2E0D3;
+  --shelf: rgba(34, 49, 44, .16);
+  --shadow: rgba(34, 49, 44, .16);
+  --ghost: rgba(34, 49, 44, .26);
+  --grain: .07;
+  /* the places he lived, as light falling on the garden: Kauaʻi ocean, Hong Kong harbor haze, Yunnan red earth */
+  --kauai: #C6E6E0;
+  --hk: #DCD9EC;
+  --yunnan: #F1CDB6;
   --display: "Young Serif", "Noto Serif SC", Georgia, serif;
   --body: "Manrope", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #1C2925; --fg: #E6ECE5; --muted: #93A39C; --line: #2F403A;
-    --chip: #263732; --tip-bg: #22322D; --solitude: #5E8478; color-scheme: dark;
-    --kauai: #172A28; --hk: #1D1F2B; --yunnan: #2C201D;
+    --bg: #10171A; --fg: #E8ECE6; --muted: #8E9C97; --line: #2A3835;
+    --chip: #1C2629; --tip-bg: #1A2427; --solitude: #5E8478; color-scheme: dark;
+    --shelf: rgba(232, 236, 230, .13); --shadow: rgba(0, 0, 0, .45); --ghost: rgba(232, 236, 230, .2); --grain: .1;
+    --kauai: #0E3134; --hk: #211E36; --yunnan: #3A1E17;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #1C2925; --fg: #E6ECE5; --muted: #93A39C; --line: #2F403A;
-  --chip: #263732; --tip-bg: #22322D; --solitude: #5E8478; color-scheme: dark;
-  --kauai: #172A28; --hk: #1D1F2B; --yunnan: #2C201D;
+  --bg: #10171A; --fg: #E8ECE6; --muted: #8E9C97; --line: #2A3835;
+  --chip: #1C2629; --tip-bg: #1A2427; --solitude: #5E8478; color-scheme: dark;
+  --shelf: rgba(232, 236, 230, .13); --shadow: rgba(0, 0, 0, .45); --ghost: rgba(232, 236, 230, .2); --grain: .1;
+  --kauai: #0E3134; --hk: #211E36; --yunnan: #3A1E17;
 }
 * { box-sizing: border-box; }
 body {
-  background-color: var(--bg);
-  background-image: linear-gradient(180deg, var(--kauai) 0%, var(--kauai) 12%, var(--hk) 45%, var(--hk) 62%, var(--yunnan) 92%);
+  background: var(--bg);
   min-height: 100vh;
   color: var(--fg); font-family: var(--body);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 56px 128px;
+  padding-block: clamp(20px, 4vh, 44px) 120px;
 }
-.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 40px; }
-header { display: grid; gap: 12px; }
+/* the light of Kauaʻi from the top left, Hong Kong haze across the middle, Yunnan earth rising from below */
+.atmos { position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(70% 60% at 8% -6%, var(--kauai), transparent 72%),
+    radial-gradient(60% 50% at 92% 42%, var(--hk), transparent 70%),
+    radial-gradient(80% 60% at 30% 112%, var(--yunnan), transparent 72%),
+    var(--bg); }
+.atmos::after { content: ""; position: absolute; inset: 0; opacity: var(--grain); mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.wrap { position: relative; z-index: 1; max-width: 1480px; margin: 0 auto; display: grid; gap: clamp(20px, 3vh, 32px); }
+header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; }
+header > div { display: grid; gap: 8px; min-width: 0; }
 .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 h1 { font-family: var(--display); font-weight: 400; font-size: 20px; line-height: 1.3; margin: 0; text-wrap: balance; }
 .subtitle { font-family: var(--display); font-size: clamp(26px, 3.6vw, 40px); line-height: 1.1; margin: 0; }
 .lede { max-width: 52ch; font-size: 13px; line-height: 1.7; color: var(--muted); margin: 0; }
-.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
-@media (max-width: 640px) {
-  .controls { display: grid; justify-content: stretch; }
-  .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
-  .chips::-webkit-scrollbar { display: none; }
-  .chip { flex: none; }
-}
+.controls { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between; }
+.chips { display: flex; flex-wrap: wrap; gap: 2px 4px; min-width: 0; }
 .chip {
-  display: inline-flex; align-items: center; gap: 8px; border: 1px solid transparent;
-  background: var(--chip); color: var(--fg); font: 500 12px var(--body);
-  padding: 5px 11px 5px 8px; border-radius: 999px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px; border: 1px solid transparent;
+  background: transparent; color: var(--muted); font: 500 12px var(--body);
+  padding: 4px 9px 4px 6px; border-radius: 999px; cursor: pointer;
 }
+.chip:hover, .chip[aria-pressed="true"] { color: var(--fg); }
 .chip i { width: 10px; height: 10px; border-radius: 50%; display: block; }
 .chip[aria-pressed="true"] { border-color: var(--fg); }
 .chip:focus-visible, .seg button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
-.seg { display: inline-flex; flex-wrap: wrap; background: var(--chip); border-radius: 18px; padding: 3px; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 2px; }
 .chips[data-off="true"] { display: none; }
-.seg button { border: 0; background: transparent; color: var(--muted); font: 500 12px var(--body); padding: 5px 12px; border-radius: 999px; cursor: pointer; }
-.seg button[aria-pressed="true"] { background: var(--bg); color: var(--fg); }
-.sound { justify-self: start; border: 1px solid var(--fg); background: transparent; color: var(--fg); font: 500 12px var(--body); padding: 6px 14px; border-radius: 999px; cursor: pointer; }
+.seg button { border: 0; background: transparent; color: var(--muted); font: 500 12px var(--body); padding: 5px 10px; border-radius: 999px; cursor: pointer; }
+.seg button:hover { color: var(--fg); }
+.seg button[aria-pressed="true"] { color: var(--fg); box-shadow: inset 0 -1px 0 var(--fg); border-radius: 0; }
+.sound { flex: none; border: 1px solid var(--fg); background: transparent; color: var(--fg); font: 500 12px var(--body); padding: 6px 14px; border-radius: 999px; cursor: pointer; }
 .sound[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
 .sound:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 .stage { position: relative; }
@@ -101,36 +113,37 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 .key dd { margin: 0; font-size: 12px; line-height: 1.6; color: var(--muted); }
 .note { font-size: 12px; color: var(--muted); line-height: 1.6; margin: 0; max-width: 70ch; }
 .journey { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font: 12px var(--mono); color: var(--muted); }
-.journey i { width: 22px; height: 10px; border-radius: 5px; display: inline-block; vertical-align: -1px; margin-right: 6px; border: 1px solid var(--line); }
+.journey i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; vertical-align: -1px; margin-right: 6px; box-shadow: 0 0 0 1px var(--shelf); }
 .note strong { color: var(--fg); font-weight: 500; }
 </style>
 
+<div class="atmos" aria-hidden="true"></div>
 <div class="wrap">
   <header>
-    <h1>Soul Garden · A tribute to Khalil Fong <span lang="zh">方大同</span> · 1983–2025</h1>
-    <div class="journey" aria-label="Background colors follow the places he lived">
-      <span><i style="background: var(--kauai)"></i>Kauaʻi, Hawaiʻi</span><span>→</span>
-      <span><i style="background: var(--hk)"></i>Hong Kong</span><span>→</span>
-      <span><i style="background: var(--yunnan)"></i>Yunnan</span>
+    <div>
+      <h1>Soul Garden · A tribute to Khalil Fong <span lang="zh">方大同</span> · 1983–2025</h1>
+      <div class="journey" aria-label="Background colors follow the places he lived">
+        <span><i style="background: var(--kauai)"></i>Kauaʻi, Hawaiʻi</span><span>→</span>
+        <span><i style="background: var(--hk)"></i>Hong Kong</span><span>→</span>
+        <span><i style="background: var(--yunnan)"></i>Yunnan</span>
+      </div>
     </div>
-  </header>
-
-  <button class="sound" id="sound" aria-pressed="false" hidden>♪ Turn sound on</button>
-  <div class="controls">
-    <div class="chips" id="chips" role="group" aria-label="Filter by imagery"></div>
+    <div class="controls">
     <div class="seg" role="group" aria-label="View">
       <button id="v-album" data-view="album" aria-pressed="true">By album</button>
       <button id="v-color" data-view="color" aria-pressed="false">By color</button>
       <button id="v-fuse" data-view="fuse" aria-pressed="false">Album blends</button>
       <button id="v-soul" data-view="soul" aria-pressed="false">Soul palette</button>
     </div>
-
-  </div>
+    <button class="sound" id="sound" aria-pressed="false" hidden>♪ Turn sound on</button>
+    </div>
+  </header>
 
   <div class="stage" id="stage">
     <canvas id="c" aria-label="A grid of vessels, one for each song"></canvas>
     <div class="tip" id="tip" hidden></div>
   </div>
+  <div class="chips" id="chips" role="group" aria-label="Filter by imagery"></div>
 
     <p class="lede" id="intro">Every song is a vessel holding the images in its lyrics. Its color comes from the images that appear most, and its curves come from the song's tempo and mood. Hover over a vessel to see what it holds, and turn the sound on to hear it.</p>
   <dl class="key">
@@ -140,7 +153,7 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
     <div><dt>Depth of curves</dt><dd>The stronger the emotion, the narrower the waist.</dd></div>
     <div><dt>Flower</dt><dd>He sang about love all the time. Every song whose lyrics mention love 愛 gets flowers in its vase: one flower for every five mentions, and each petal is one mention, so you can count them.</dd></div>
     <div><dt>Pebble shape</dt><dd>A slow ballad, under 78 BPM.</dd></div>
-    <div><dt>Background</dt><dd>The page fades through the places he lived as you scroll: the ocean of Kauaʻi where he was born, the harbor haze of Hong Kong where he grew up and made music, and the red earth of Yunnan where he went in his last years.</dd></div>
+    <div><dt>Background</dt><dd>The garden sits in the light of the places he lived: the ocean of Kauaʻi where he was born at the top, the harbor haze of Hong Kong where he grew up and made music across the middle, and the red earth of Yunnan where he went in his last years rising from below.</dd></div>
     <div><dt>Blends</dt><dd>A group of songs averaged into one outline, with each image as a flowing patch of color sized by its share. Album blends show each album's character. Soul palette pours every song into one smiling bowl: the bowl holds his whole palette, the two fins carry the second and third images, and each leaf is one song. Hover a leaf to hear it.</dd></div>
   </dl>
   <p class="note" id="note"><strong>Prototype:</strong> the albums, tracks and imagery shares are randomly generated placeholders for testing the visual rules. They will be replaced once the real lyrics are collected and tagged.</p>
@@ -277,7 +290,7 @@ function build(records) {
   empties = [];
   ALBUMS.forEach((a, ai) => {
     const have = songs.filter(s => s.ai === ai).length;
-    for (let k = have; k < Math.max(have, DISCO[ai]?.tracks || 0); k++) empties.push({ album: a, ai, x: 0, y: 0, tx: 0, ty: 0 });
+    for (let k = have; k < Math.max(have, DISCO[ai]?.tracks || 0); k++) empties.push({ album: a, ai, track: k + 1, x: 0, y: 0, tx: 0, ty: 0 });
   });
   // energy and valence are scaled across all loaded songs so the differences show
   const span = (k) => { const v = songs.map(s => s[k]).filter(Number.isFinite); return [Math.min(...v), Math.max(...v)]; };
@@ -351,23 +364,41 @@ function layout() {
   const slots = (ai) => [...songs.filter(s => s.ai === ai), ...empties.filter(e => e.ai === ai)];
   const groups = mode === "album" ? ALBUMS.map((a, ai) => slots(ai).length) : [Math.max(1, songs.length)];
   // on wide screens the album name sits to the left of its row, which saves a line per album
-  const side = mode === "album";
-  const labelW = side ? (W >= 700 ? 180 : 84) : 0, GW = W - labelW;
-  const labelH = 0, groupGap = 0;
+  // wide screens: every album is one shelf, its name standing at the left end like a museum label.
+  // phones: the name sits above its shelf and the vases wrap, so the page scrolls down instead of shrinking them to specks
+  const small = W < 700, shelves = mode === "album" && !small;
+  const labelW = shelves ? Math.min(200, Math.max(120, W * 0.13)) : 0, GW = W - labelW;
+  const labelH = mode === "album" && small ? 30 : 0, groupGap = mode === "album" && small ? 22 : 0;
   const top = stage.getBoundingClientRect().top + window.scrollY;
-  const avail = Math.max(260, window.innerHeight - top - 32);
-  let cols = 1, gap = 0;
-  for (cols = 1; cols <= 60; cols++) {
+  const avail = Math.max(260, window.innerHeight - top - 24);
+  const widest = Math.max(...groups);
+  let cols = 1, gap = 0, vgap = 0;
+  if (shelves) {
+    // the longest album sets the width of a vase; the screen height sets how tall the ten shelves can be
+    cols = widest;
+    const g = 0.2, vg = 0.06, rows = groups.length;
+    const byW = GW / (cols + g * (cols - 1));
+    const byH = avail / (rows + vg * (rows - 1)) / CELL;
+    cellW = Math.min(byW, byH, 300 / CELL);
+    cellH = cellW * CELL;
+    gap = Math.min(cellW * 0.9, (GW - cols * cellW) / Math.max(1, cols - 1));
+    vgap = cellH * vg;
+  } else {
+    // phones: as many vases per line as fit at a readable size
+    if (small && mode === "album") cols = Math.max(3, Math.min(widest, Math.floor(GW / 52)));
+    else for (cols = 1; cols <= 60; cols++) {
+      gap = Math.min(48, ((GW / cols) * 0.28));
+      const cw = (GW - gap * (cols - 1)) / cols, ch = cw * CELL;
+      const total = groups.reduce((sum, n) => sum + labelH + Math.ceil(n / cols) * (ch + gap) + groupGap, 0) - gap - groupGap;
+      if (total <= avail && ch <= 300) break;
+    }
     gap = Math.min(48, ((GW / cols) * 0.28));
-    const cw = (GW - gap * (cols - 1)) / cols, ch = cw * CELL;
-    const total = groups.reduce((sum, n) => sum + labelH + Math.ceil(n / cols) * (ch + gap) + groupGap, 0) - gap - groupGap;
-    if (total <= avail && ch <= 300) break;
+    cellW = (GW - gap * (cols - 1)) / cols;
+    cellH = cellW * CELL;
+    vgap = small && mode === "album" ? cellH * 0.08 : gap;
+    // when every group fits on one row, spread the row across the width instead of leaving it half empty
+    if (cols > widest && widest > 1) { cols = widest; gap = Math.min(cellW * 1.4, (GW - cols * cellW) / (cols - 1)); }
   }
-  cellW = (GW - gap * (cols - 1)) / cols;
-  cellH = cellW * CELL;
-  // when every group fits on one row, spread the row across the width instead of leaving it half empty
-  const vgap = gap, widest = Math.max(...groups);
-  if (cols > widest && widest > 1) { cols = widest; gap = Math.min(cellW * 1.4, (GW - cols * cellW) / (cols - 1)); }
   labels = [];
   let y = 0;
   const place = (list) => list.forEach((s, i) => {
@@ -398,11 +429,13 @@ function layout() {
   } else if (mode === "album") {
     ALBUMS.forEach((album, ai) => {
       const year = ALBUM_YEAR[album] ? String(ALBUM_YEAR[album]) : "";
-      labels.push({ text: album, sub: year, y: y + cellH / 2 - 2, w: labelW - 12 });
+      const list = slots(ai), rows = Math.ceil(list.length / cols);
+      // the shelf runs under the vases, at the foot of the last row
+      labels.push({ text: album, sub: year, above: !shelves, y: y + labelH - 10, w: shelves ? labelW - 20 : W,
+        shelf: y + labelH + rows * cellH + (rows - 1) * vgap - cellW * 0.04 });
       y += labelH;
-      const list = slots(ai);
       place(list);
-      y += Math.ceil(list.length / cols) * (cellH + vgap) + groupGap;
+      y += rows * (cellH + vgap) + groupGap;
     });
     y -= vgap + groupGap;
   } else if (mode === "color") {
@@ -411,7 +444,7 @@ function layout() {
     y += Math.ceil(list.length / cols) * (cellH + vgap);
   }
   const H = Math.ceil(y);
-  const dpr = Math.min(2, devicePixelRatio || 1);
+  const dpr = Math.max(1, Math.min(2, devicePixelRatio || 1));
   canvas.width = W * dpr; canvas.height = H * dpr;
   canvas.style.height = H + "px";
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -478,6 +511,12 @@ function drawVessel(s, t) {
   const x = s.x + pad + (fullW - w) / 2, y = s.y + cellH * FLOWER + pad + (fullH - h) - lift;
   ctx.save();
   ctx.globalAlpha = s.alpha;
+  // a soft contact shadow where the vase meets the shelf; it spreads when the vase jumps
+  const foot = s.y + cellH - pad, sh = ctx.createRadialGradient(x + w / 2, foot, 0, x + w / 2, foot, w * (0.62 + 0.2 * hit));
+  sh.addColorStop(0, css("--shadow")); sh.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = sh;
+  ctx.save(); ctx.translate(x + w / 2, foot); ctx.scale(1, 0.16); ctx.translate(-(x + w / 2), -foot);
+  ctx.fillRect(x - w, foot - w, w * 3, w * 2); ctx.restore();
   if (s.love > 0) drawBouquet(x + w / 2, y, cellH * FLOWER * 0.72, cellW * 0.16, t, s);
   vesselPath(s, x, y, w, h, t);
   ctx.clip();
@@ -540,8 +579,9 @@ function drawEmpty(e, t) {
   const pad = cellW * 0.04;
   ctx.save();
   ctx.globalAlpha = active === null ? 1 : 0.35;
-  vesselPath(BLANK, e.x + pad, e.y + cellH * FLOWER + pad, cellW - pad * 2, cellH * (1 - FLOWER) - pad * 2, 0);
-  ctx.fillStyle = css("--line"); ctx.fill();
+  const fw = cellW - pad * 2, fh = cellH * (1 - FLOWER) - pad * 2, k = 0.62 + 0.3 * ((e.track || 1) * 0.37 % 1);
+  vesselPath(BLANK, e.x + pad + fw * 0.12, e.y + cellH * FLOWER + pad + fh * (1 - k), fw * 0.76, fh * k, 0);
+  ctx.strokeStyle = css("--ghost"); ctx.lineWidth = 1; ctx.setLineDash([1.5, 3.5]); ctx.stroke(); ctx.setLineDash([]);
   ctx.restore();
 }
 
@@ -733,7 +773,7 @@ function frame(ms) {
   listenForKick(ms / 1000);
   if (W <= 0 || !soulAgg) return;
   const t = ms / 1000;
-  ctx.clearRect(0, 0, W, canvas.height);
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.restore();
   ctx.fillStyle = css("--muted");
   ctx.font = '500 12px "IBM Plex Mono", monospace';
   const fused = mode === "fuse" ? albumAggs : mode === "soul" ? [soulAgg] : [];
@@ -744,21 +784,28 @@ function frame(ms) {
   if (mode === "fuse") return drawFuseView(t);
   if (mode === "soul") return drawSoulView(t);
   if (mode === "album") {
-    const small = W < 700;
-    ctx.font = small ? '500 9px "IBM Plex Mono", monospace' : '500 12px "IBM Plex Mono", monospace';
-    const lh = small ? 11 : 18;
+    ctx.font = '500 11px "IBM Plex Mono", monospace';
+    const lh = 15, fg = css("--fg"), muted = css("--muted");
+    ctx.strokeStyle = css("--shelf"); ctx.lineWidth = 1;
     labels.forEach(l => {
-      // wrap long album names inside the label column
+      const sy = Math.round(l.shelf) + 0.5;
+      ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
+      if (l.above) {
+        ctx.fillStyle = fg; ctx.fillText(l.text.toUpperCase(), 0, l.y);
+        ctx.fillStyle = muted; ctx.fillText(l.sub, ctx.measureText(l.text.toUpperCase() + "  ").width, l.y);
+        return;
+      }
+      // wrap long album names inside the label column, the year last, all resting on the shelf
       const lines = [];
       l.text.toUpperCase().split(" ").forEach(word => {
         const last = lines[lines.length - 1];
         if (last && ctx.measureText(last + " " + word).width <= l.w) lines[lines.length - 1] = last + " " + word;
         else lines.push(word);
       });
-      const y0 = l.y - ((lines.length - 1) * lh) / 2;
-      ctx.fillStyle = css("--fg");
+      const y0 = sy - 8 - (lines.length - (l.sub ? 0 : 1)) * lh;
+      ctx.fillStyle = fg;
       lines.forEach((ln, i) => ctx.fillText(ln, 0, y0 + i * lh));
-      if (l.sub) { ctx.fillStyle = css("--muted"); ctx.fillText(l.sub, 0, y0 + lines.length * lh); }
+      if (l.sub) { ctx.fillStyle = muted; ctx.fillText(l.sub, 0, y0 + lines.length * lh); }
     });
     empties.forEach(e => {
       const k = reduce ? 1 : 0.12;
@@ -770,7 +817,8 @@ function frame(ms) {
     const k = reduce ? 1 : 0.12;
     s.x += (s.tx - s.x) * k; s.y += (s.ty - s.y) * k;
     const on = active === null || s.a === active || s.b === active;
-    s.alpha += ((on ? 1 : 0.14) - s.alpha) * (reduce ? 1 : 0.15);
+    const back = hovered && hovered !== s && mode !== "soul";
+    s.alpha += ((on ? (back ? 0.55 : 1) : 0.14) - s.alpha) * (reduce ? 1 : 0.15);
     s.hover += ((s === hovered ? 1 : 0) - s.hover) * (reduce ? 1 : 0.18);
     drawVessel(s, t);
   });
@@ -811,7 +859,7 @@ function pick(e) {
     return best;
   }
   if (mode === "fuse") return albumAggs.find(g => px >= g.x && px <= g.x + g.w && py >= g.y && py <= g.y + g.h) || null;
-  return songs.find(s => px >= s.x && px <= s.x + cellW && py >= s.y && py <= s.y + cellH && s.alpha > 0.5) || null;
+  return songs.find(s => px >= s.x && px <= s.x + cellW && py >= s.y && py <= s.y + cellH && s.alpha > 0.3) || null;
 }
 // ---- sound: one shared player; browsers only allow it after a click ----
 // try to hear the kick drum: route the preview through an analyser when the audio host allows it (CORS);
