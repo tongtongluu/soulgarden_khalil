@@ -1353,7 +1353,8 @@ function fadeTo(target, ms, done) {
     if (u === 1) { clearInterval(fadeTimer); done && done(); }
   }, 30);
 }
-function listen(s) {
+// at: where in the preview to start, so a poster can open on its key line
+function listen(s, at) {
   const url = s && !s.n && s.preview_url;
   if (!soundOn || (url && playing === url)) return;
   if (!url) { if (playing) fadeTo(0, 400, () => audio.pause()); playing = null; return; }
@@ -1361,6 +1362,7 @@ function listen(s) {
   const go = () => {
     if (playing !== url) return;
     audio.src = url; audio.volume = 0;
+    if (at > 0) audio.addEventListener("loadedmetadata", () => { try { audio.currentTime = at; } catch (e) {} }, { once: true });
     audio.play().then(() => fadeTo(0.8, 700)).catch(() => {});
   };
   audio.paused ? go() : fadeTo(0, 250, go);
@@ -3517,6 +3519,24 @@ function step(d) {
   const vis = [...prints.querySelectorAll(".plate-tab")].filter(b => !b.hidden).map(b => +b.dataset.i), k = vis.indexOf(cur);
   show(vis[(k + d + vis.length) % vis.length]);
 }
+// where each preview reaches the poster's key line (seconds into the 30 s clip); the album covers open on the first 愛 of the song that sings it most
+const LINE_AT = {};
+const ALBUM_SONG = { soulboy: ["sb-album", 6], thislove: ["tl-album", 1] };
+const keyOf = (album, track) => (album === "This Love" || album === "tl" ? "tl:" : "sb:") + track;
+const tlSong = track => TL_CARDS.find(c => c.track === track);
+function plateSong(p) {
+  if (p.compare) return null;
+  if (p.album) { const [k, tr] = ALBUM_SONG[p.group]; return { s: p.group === "thislove" ? tlSong(tr) : songFor(tr), at: LINE_AT[k + ":" + tr] }; }
+  return { s: p.preview_url ? p : songFor(p.track), at: LINE_AT[keyOf(p.group === "thislove" ? "tl" : "sb", p.track)] };
+}
+// opening a poster plays its song; a tab, an arrow or a tap is the gesture the browser needs before sound
+let opened = false;
+function playPlate() {
+  if (typeof listen !== "function" || prints.closest("[hidden]")) return;
+  if (!soundOn) setSound(true);
+  const r = plateSong(PLATES[cur]);
+  r && r.s ? listen(r.s, r.at) : listen(null);
+}
 function show(i) {
   cur = (i + PLATES.length) % PLATES.length;
   text.innerHTML = card(PLATES[cur]) + `<p class="hint style-note">${esc(style.label)}: ${esc(style.note)}</p>`;
@@ -3524,6 +3544,7 @@ function show(i) {
   prints.querySelectorAll(".plate-tab").forEach((b, k) => { b.setAttribute("aria-pressed", String(k === cur)); b.hidden = !b.classList.contains("is-album") && b.dataset.group !== g; });
   hoverStation = -1;
   size();
+  if (opened) playPlate();
 }
 function size() {
   const p = PLATES[cur], boxW = plateBox.clientWidth;
@@ -3542,6 +3563,7 @@ function size() {
 }
 prints.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
+  opened = true;
   if (b.dataset.style) {
     style = STYLES.find(st => st.id === b.dataset.style);
     prints.querySelectorAll(".style-btn").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
@@ -3551,12 +3573,13 @@ prints.addEventListener("click", e => {
 });
 addEventListener("keydown", e => {
   if (prints.closest("[hidden]") || e.target.closest?.("input, select, textarea")) return;
+  if (e.key === "ArrowRight" || e.key === "ArrowLeft") opened = true;
   if (e.key === "ArrowRight") step(1); if (e.key === "ArrowLeft") step(-1);
 });
 // hover to listen: the whole song poster plays its song; on the album poster each station plays its own
 function hoverAt(e) {
   const r = cv.getBoundingClientRect(), x = e.clientX - r.left, p = PLATES[cur];
-  let s = null;
+  let s = null, at;
   const was = hoverStation;
   if (p.album && style.id === "flat" && p._hit) {
     // the blend album is his figure cut into blocks, so hover picks the block under the pointer; an open poster stays open under it
@@ -3565,16 +3588,23 @@ function hoverAt(e) {
     else best = p._hit(x, y);
     hoverStation = best; const st = best >= 0 ? p.stations[best] : null;
     s = !st ? null : st.album ? (typeof songs !== "undefined" && songs.find(x => x.album === st.album && x.track === st.track)) || st : songFor(st.track);
+    // between stations the album's own song keeps playing; each station opens on its key line
+    if (!s) { hoverPlate = true; if (was !== hoverStation) dirty = true; return; }
+    at = LINE_AT[keyOf(st.album || "sb", st.track)];
   }
   else if (p.album) { hoverStation = Math.max(0, Math.min(p.stations.length - 1, Math.round(((x / pw) - 0.06) / 0.88 * (p.stations.length - 1)))); s = songFor(p.stations[hoverStation].track); }
   else s = p.preview_url ? p : songFor(p.track);
   hoverPlate = true;
   if (was !== hoverStation) dirty = true;
-  if (typeof listen === "function") listen(s);
+  if (typeof listen === "function") listen(s, at);
 }
 cv.addEventListener("pointermove", hoverAt);
-cv.addEventListener("pointerleave", () => { hoverStation = -1; dirty = true; hoverPlate = false; if (typeof listen === "function") listen(null); });
-cv.addEventListener("click", e => { if (typeof setSound === "function" && !soundOn) { setSound(true); text.innerHTML = card(PLATES[cur]); } hoverAt(e); });
+cv.addEventListener("pointerleave", () => { hoverStation = -1; dirty = true; hoverPlate = false; if (opened) playPlate(); });
+cv.addEventListener("click", e => { opened = true; if (typeof setSound === "function" && !soundOn) { setSound(true); text.innerHTML = card(PLATES[cur]); } hoverAt(e); });
+// coming back to the posters, or turning sound on, picks the poster's song up again
+document.querySelectorAll('.seg button[data-view="posters"], #sound').forEach(b => b.addEventListener("click", () => setTimeout(() => {
+  if (b.id === "sound" ? soundOn : true) { opened = true; playPlate(); }
+}, 0)));
 
 function frame(ms) {
   requestAnimationFrame(frame);
