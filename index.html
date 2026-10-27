@@ -2523,6 +2523,8 @@ const LINES = [10, 21, 47, 49, 37, 59, 40, 49, 63, 42, 45, 28, 18, 82];
 // light sweeping up from the corner, home an open embrace it runs into, and the heart a glowing core held inside it.
 // Each is as big as the album uses it. Everything else he sings of is a soft field around them, as large as it is
 // common: spring wind (26), plants (20), light (16), the seasons (12), night (11), water (9), the universe (7).
+// On another album the same kinds keep the same forms, so the picture changes with what he sings: on This Love the
+// street almost disappears (7) and plants come third (19), so the path to home is a vine with leaves and flowers.
 // The fourteen songs travel the street toward home in track order. Each is the shape of its bar: a square for 4/4,
 // a triangle for 3/4 (哪怕), a square with wavy sides for 12/8 (每天每天, 南音); it takes its lyric-imagery colour, is
 // as large as its lyrics are long, and flashes and turns on its own beat. Prologue, with no imagery, is a grey outline.
@@ -2541,7 +2543,7 @@ function albumCounts(album) {
 function soulboyAlbum(S) {
   return { title: "Soulboy", year: 2005, songs: S.map((st, i) => {
     const d = SOULBOY.find(x => x.track === st.track) || { imagery: {}, terms: [] };
-    return { name: st.name, track: st.track, imagery: d.imagery, terms: d.terms, tempo: TEMPO[i], bar: SOULBOY_BAR[i], rh: rhythmOf(st.track), lines: LINES[i], color: (imageryOf(st.track) || [[0, null]])[0][1] };
+    return { name: st.name, track: st.track, imagery: d.imagery, terms: d.terms, tempo: TEMPO[i], bar: SOULBOY_BAR[i], rh: rhythmOf(st.track), lines: LINES[i], love: d.love || 0, color: (imageryOf(st.track) || [[0, null]])[0][1] };
   }) };
 }
 function bez(p0, p1, p2, p3, u) { const v = 1 - u; return [0, 1].map(i => v * v * v * p0[i] + 3 * v * v * u * p1[i] + 3 * v * u * u * p2[i] + u * u * u * p3[i]); }
@@ -2559,7 +2561,7 @@ function drawAlbumPoster(c, w, h, t, card, D, hs = -1) {
   const hx = w * 0.64, hy = h * 0.36, homeR = w * 0.3 * k(tot[K2]);
   const heartR = homeR * 0.62 * k(tot[K1]) / k(tot[K2]) * (1 + 0.06 * beatAll);
   const A = [-w * 0.15, h * 1.02], B = [w * 0.32, h * 0.9], C = [w * 0.18, h * 0.42], E = [hx - homeR * 0.5, hy + homeR * 0.35];
-  const street = u => bez(A, B, C, E, u), streetW = w * 0.2 * k(tot[K3]);
+  const street = u => bez(A, B, C, E, u), streetW = w * (K3 === "nature_plants" ? 0.16 : 0.2) * k(tot[K3]);
   // 1. the soft field
   softPass(c, w, h, s => { s.fillStyle = lin(s, 0, 0, w * 0.4, h, "#231A35", "#120D16"); s.fillRect(0, 0, w, h); }, s => {
     // what he sings of besides: soft clouds, each as large as it is common
@@ -2569,17 +2571,44 @@ function drawAlbumPoster(c, w, h, t, card, D, hs = -1) {
     D.rank.slice(3).forEach((id, j) => { if (tot[id]) cloud(id, w * SLOTS[j][0], h * SLOTS[j][1], SLOTS[j][2], SLOTS[j][3]); });
     // spring wind: long pale bands across the sky
     for (let b = 0; b < Math.round((tot.sky_weather || 0) / 9); b++) ribbon(s, w, x => h * (0.06 + b * 0.07) + x * 0.28 + Math.sin(x / w * 3 + T * 0.25 + b) * h * 0.02, () => h * 0.025, col("sky_weather"));
-    // the street: a broad warm band, widest where it comes in, narrowing as it reaches home
-    for (let i = 0; i <= 60; i++) { const u = i / 60, [x, y] = street(u); disc(s, x, y, streetW * (1 - 0.6 * u)); s.fillStyle = col(K3); s.globalAlpha = 0.5; s.fill(); }
+    // the third kind is the path to home, drawn as what it is
+    if (K3 === "nature_plants") {
+      // plants: a vine growing up to home, thick with soft leaves and blossom
+      const rp = mulberry(19);
+      for (let i = 0; i < tot[K3] * 3; i++) {
+        const u = rp(), [x, y] = street(u), o = (rp() - 0.5) * streetW * 2.2 * (1 - 0.5 * u), r = w * (0.03 + 0.05 * rp()) * (1 - 0.5 * u);
+        blobPath(s, x + o, y + o * 0.3, r, { n: 5, a: 0.3, ph: rp() * 6 }, T); s.fillStyle = rp() > 0.75 ? "#F7C8DA" : col(K3); s.globalAlpha = 0.55; s.fill();
+      }
+    } else {
+      // a street: a broad warm band, widest where it comes in, narrowing as it reaches home
+      for (let i = 0; i <= 60; i++) { const u = i / 60, [x, y] = street(u); disc(s, x, y, streetW * (1 - 0.6 * u)); s.fillStyle = col(K3); s.globalAlpha = 0.5; s.fill(); }
+    }
     s.globalAlpha = 1;
     // home's warmth and the heart's glow
     s.fillStyle = rad(s, hx, hy, homeR * 1.9, col(K2), "rgba(0,0,0,0)"); s.fillRect(0, 0, w, h);
     s.beginPath(); s.arc(hx, hy, homeR, 0, Math.PI * 2); s.lineWidth = homeR * 0.6; s.strokeStyle = col(K2); s.stroke();
     s.fillStyle = rad(s, hx, hy, heartR * 2.2, col(K1), "rgba(0,0,0,0)"); s.fillRect(0, 0, w, h);
   }, 5);
-  // 2. sharp forms. The street's two edges, hairlines that curl in to home
+  // 2. sharp forms. The path's edges: a street's two hairlines, or a vine's stem with its leaves and flowers
   c.save(); c.lineCap = "round";
-  [-1, 1].forEach(sd => {
+  if (K3 === "nature_plants") {
+    c.beginPath(); for (let i = 0; i <= 80; i++) { const u = i / 80, [x, y] = street(u), sw = Math.sin(u * 9 + T * 0.4) * streetW * 0.25 * (1 - u); i ? c.lineTo(x + sw, y) : c.moveTo(x + sw, y); }
+    c.strokeStyle = "rgba(196,236,180,.7)"; c.lineWidth = Math.max(1.5, w * 0.005); c.stroke();
+    // a leaf for every two plant words, alternating sides, swaying
+    const nl = Math.round(tot[K3] / 2);
+    for (let i = 0; i < nl; i++) {
+      const u = 0.05 + (i / nl) * 0.85, [x, y] = street(u), [x2, y2] = street(u + 0.01), a = Math.atan2(y2 - y, x2 - x) + (i % 2 ? 1 : -1) * (1 + 0.15 * Math.sin(T + i)), L = w * 0.06 * (1 - 0.5 * u);
+      c.save(); c.translate(x, y); c.rotate(a); c.beginPath(); c.moveTo(0, 0); c.quadraticCurveTo(L * 0.5, -L * 0.32, L, 0); c.quadraticCurveTo(L * 0.5, L * 0.32, 0, 0);
+      c.fillStyle = "rgba(140,210,130,.75)"; c.fill(); c.restore();
+    }
+    // a five-petal flower for every five, opening where the vine reaches home
+    const nf = Math.max(1, Math.round(tot[K3] / 5));
+    for (let i = 0; i < nf; i++) {
+      const u = 0.2 + (i / nf) * 0.75, [x, y] = street(u), r = w * 0.035 * (1 - 0.3 * u) * (1 + 0.08 * beatAll);
+      for (let q = 0; q < 5; q++) { const a = q * Math.PI * 2 / 5 + T * 0.1 + i; c.beginPath(); c.ellipse(x + Math.cos(a) * r * 0.6, y + Math.sin(a) * r * 0.6, r * 0.55, r * 0.32, a, 0, Math.PI * 2); c.fillStyle = "rgba(250,214,228,.85)"; c.fill(); }
+      disc(c, x, y, r * 0.22); c.fillStyle = "#F5CF3E"; c.fill();
+    }
+  } else [-1, 1].forEach(sd => {
     c.beginPath();
     for (let i = 0; i <= 80; i++) { const u = i / 80, [x, y] = street(u), [x2, y2] = street(Math.min(1, u + 0.01)), a = Math.atan2(y2 - y, x2 - x) + Math.PI / 2, o = sd * streetW * (1 - 0.6 * u) * 0.9; i ? c.lineTo(x + Math.cos(a) * o, y + Math.sin(a) * o) : c.moveTo(x + Math.cos(a) * o, y + Math.sin(a) * o); }
     c.strokeStyle = "rgba(255,214,176,.45)"; c.lineWidth = Math.max(1, w * 0.0025); c.stroke();
@@ -2595,11 +2624,40 @@ function drawAlbumPoster(c, w, h, t, card, D, hs = -1) {
   blobPath(c, hx + homeR * 0.05, hy + homeR * 0.02, heartR, o, T); c.fillStyle = conic(c, hx, hy, T * 0.3, [col(K1), "#FFE2F2", col(K1), "#F2E2FF"]); c.fill();
   c.save(); blobPath(c, hx + homeR * 0.05, hy + homeR * 0.02, heartR, o, T); c.clip();
   c.fillStyle = rad(c, hx, hy, heartR * (0.8 + 0.15 * beatAll), "rgba(255,255,255,.95)", "rgba(255,255,255,0)"); c.fillRect(hx - heartR * 2, hy - heartR * 2, heartR * 4, heartR * 4); c.restore();
+  // water: a thin wave for every four water words, low on the right
+  c.save(); c.strokeStyle = "rgba(160,222,214,.5)"; c.lineWidth = Math.max(1, w * 0.0025);
+  for (let q = 0; q < Math.round((tot.water || 0) / 4); q++) { c.beginPath(); for (let x = w * 0.45; x <= w; x += 4) { const y = h * (0.66 + q * 0.025) + Math.sin(x / w * 18 + T * 0.8 + q) * h * 0.006; x > w * 0.45 ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke(); }
+  c.restore();
   // stars for the universe, a few
   const rs = mulberry(7);
   for (let i = 0; i < (tot.cosmos || 0); i++) { disc(c, w * (0.3 + rs() * 0.65), h * (0.02 + rs() * 0.16), w * 0.003 * (1.2 + Math.sin(T * 2 + i))); c.fillStyle = "rgba(255,250,240,.75)"; c.fill(); }
   // 3. the songs travelling the street toward home, in track order
   const marks = [];
+  // first where each song sits, so its love can rise from it
+  const at = S.map((s, i) => {
+    const u = 0.06 + (i / (n - 1)) * 0.86, [x0, y0] = street(u), [x1, y1] = street(Math.min(1, u + 0.01));
+    const a = Math.atan2(y1 - y0, x1 - x0) + Math.PI / 2, o = (i % 2 ? 1 : -1) * streetW * (1 - 0.6 * u) * (0.35 + 0.25 * ((i * 7) % 3) / 2);
+    return [x0 + Math.cos(a) * o, y0 + Math.sin(a) * o];
+  });
+  // love: every 愛 a song sings is one spark drifting from the song up into the heart, one after another on its beat,
+  // so the songs that sing it most send a stream and the album's total shows as the brightness gathered in the heart
+  const LOVE = "#FF6F91", loveAll = S.reduce((a, s) => a + (s.love || 0), 0);
+  c.save(); c.globalCompositeOperation = "screen";
+  S.forEach((s, i) => {
+    const m = s.love || 0; if (!m) return;
+    const [sx, sy] = at[i], period = 60 / (s.tempo || 90) * 8;
+    for (let q = 0; q < m; q++) {
+      const f = reduce ? q / m : ((T / period + q / m) % 1), e = f * f * (3 - 2 * f);
+      const mx = (sx + hx) / 2 + (i % 2 ? 1 : -1) * w * 0.08, my = Math.min(sy, hy) - h * 0.05;
+      const x = (1 - e) * (1 - e) * sx + 2 * (1 - e) * e * mx + e * e * hx, y = (1 - e) * (1 - e) * sy + 2 * (1 - e) * e * my + e * e * hy;
+      const r = w * 0.006 * (1 - 0.5 * f) + w * 0.002;
+      c.globalAlpha = (hs >= 0 && hs !== i ? 0.25 : 0.9) * Math.sin(f * Math.PI);
+      c.fillStyle = rad(c, x, y, r * 3, LOVE, "rgba(255,111,145,0)"); c.fillRect(x - r * 3, y - r * 3, r * 6, r * 6);
+      disc(c, x, y, r * 0.6); c.fillStyle = "#FFE3EA"; c.fill();
+    }
+  });
+  c.globalAlpha = 1; c.fillStyle = rad(c, hx, hy, heartR * 1.6, `rgba(255,111,145,${Math.min(0.5, loveAll / 150)})`, "rgba(255,111,145,0)"); c.fillRect(hx - heartR * 2, hy - heartR * 2, heartR * 4, heartR * 4);
+  c.restore();
   S.forEach((s, i) => {
     const u = 0.06 + (i / (n - 1)) * 0.86, [x0, y0] = street(u), [x1, y1] = street(Math.min(1, u + 0.01));
     const a = Math.atan2(y1 - y0, x1 - x0) + Math.PI / 2, o = (i % 2 ? 1 : -1) * streetW * (1 - 0.6 * u) * (0.35 + 0.25 * ((i * 7) % 3) / 2);
@@ -2632,9 +2690,10 @@ function drawAlbumPoster(c, w, h, t, card, D, hs = -1) {
   c.save(); c.font = `500 ${Math.max(8, w * 0.016)}px "IBM Plex Mono", "Noto Sans SC", monospace`; c.fillStyle = "rgba(255,246,238,.6)"; c.textBaseline = "middle";
   c.textAlign = "right"; c.fillText(`${KIND_WORD[K2]} ${tot[K2]}`, hx - homeR * 1.18, hy - homeR * 0.55);
   c.textAlign = "center"; c.fillText(`${KIND_WORD[K1]} ${tot[K1]}`, hx, hy + homeR * 1.28);
-  c.textAlign = "left"; const sp = street(0.55); c.fillText(`${KIND_WORD[K3]} ${tot[K3]}`, sp[0] - streetW * 1.25, sp[1]);
+  c.textAlign = "left"; c.fillStyle = "rgba(255,170,190,.85)"; c.fillText(`愛 ${loveAll}`, hx + homeR * 0.75, hy + homeR * 1.12); c.fillStyle = "rgba(255,246,238,.6)";
+  const sp = street(0.55); c.fillText(`${KIND_WORD[K3]} ${tot[K3]}`, sp[0] - streetW * 1.25, sp[1]);
   c.restore();
-  posterType(c, w, h, { name: D.title, line: `他唱的，多半是${KIND_WORD[K1]}、${KIND_WORD[K2]}和${KIND_WORD[K3]}`, track: 0 }, "#FFF6EE", "rgba(255,246,238,.75)",
+  posterType(c, w, h, { name: D.title, line: `唱了 ${loveAll} 次愛，多半是${KIND_WORD[K1]}、${KIND_WORD[K2]}和${KIND_WORD[K3]}`, track: 0 }, "#FFF6EE", "rgba(255,246,238,.75)",
     { size: w * Math.min(0.13, 0.9 / Math.max(6, D.title.length)), metaInk: "rgba(255,246,238,.6)", meta: `KHALIL FONG 方大同 · ${D.title.toUpperCase()} ${D.year} · ${n} SONGS` });
 }
 // ---- pixel posters: the main image built from a coarse grid of square cells, flat colour, the grid left showing ----
@@ -3101,12 +3160,12 @@ const PLATES = [{ ...ALBUM, album: true, draw: blendAlbum, drawPixel: pixAlbum, 
   geoAbout: "Fourteen columns, one per song in track order. Each is a stack of shapes: more of them the faster the song, circles for the quiet songs, half discs for the middle ones and triangles for the most energetic. A column stands taller the brighter the song is, and its two colours are the song's mood and its main image. Through them turns one ring of fourteen arcs, thicker where the song has more energy: the album as a whole." }, ...CARDS];
 // ---- the second album, This Love / 愛愛愛 (2006): the same counts as Soulboy's, from soul-garden-data/this-love/tracks.json ----
 // imagery hits per group, imagery words as word:group:count, measured tempo and bar. 春風吹之吹吹風Mix has no measured tempo, so it keeps 90.
-const THIS_LOVE = [{"track":1,"name":"愛愛愛","lines":18,"imagery":{"body_gesture":0,"time_memory":0,"people_relationships":4,"city_street":2,"cosmos":0,"sky_weather":0,"nature_plants":7,"light_fire":0,"night_moon":0,"water":5},"terms":["海:9:5","家:2:4","樹:6:3","花:6:3","桃花:6:1","街:3:1","電影:3:1"],"tempo":66,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b8/bd/7e/b8bd7ee8-0e9d-566f-4cca-8bfe6e18fa75/mzaf_1453766286012772639.plus.aac.p.m4a"},{"track":2,"name":"蘇麗珍","lines":30,"imagery":{"body_gesture":1,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":3,"light_fire":0,"night_moon":0,"water":0},"terms":["花:6:3","頭:0:1"],"tempo":88.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/86/61/b3/8661b3ef-4045-be5d-e73b-138a3827bf5b/mzaf_15124720786251433710.plus.aac.p.m4a"},{"track":3,"name":"歌手與模特兒","lines":46,"imagery":{"body_gesture":9,"time_memory":0,"people_relationships":1,"city_street":0,"cosmos":0,"sky_weather":3,"nature_plants":0,"light_fire":3,"night_moon":0,"water":0},"terms":["臉:0:5","光:7:3","風:5:3","眼:0:2","家:2:1","心:0:1","手:0:1"],"tempo":73.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/58/50/38/585038dd-f55b-c5ff-269d-d8267871397d/mzaf_16953057221375593774.plus.aac.p.m4a"},{"track":4,"name":"唉!","lines":34,"imagery":{"body_gesture":2,"time_memory":0,"people_relationships":10,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":["妹妹:2:4","墨鏡:0:2","媽媽:2:2","家:2:2","朋友:2:2"],"tempo":92,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3e/cd/9a/3ecd9a50-6c08-ec5c-9092-851b5ed9580f/mzaf_13613359387326311800.plus.aac.p.m4a"},{"track":5,"name":"四人遊","lines":45,"imagery":{"body_gesture":10,"time_memory":0,"people_relationships":5,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":1,"water":0},"terms":["頭:0:6","朋友:2:5","手:0:3","夜:8:1","眼淚:0:1"],"tempo":75.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/13/79/a4/1379a403-72aa-8049-10e5-7528f321744e/mzaf_15694587935441905750.plus.aac.p.m4a"},{"track":6,"name":"手拖手","lines":13,"imagery":{"body_gesture":6,"time_memory":0,"people_relationships":0,"city_street":1,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":1,"water":0},"terms":["心:0:3","手:0:2","月:8:1","舞:0:1","路:3:1"],"tempo":68.5,"beats_per_bar":12,"feel":"triplet (12/8)","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9e/1c/31/9e1c3126-84c5-fd75-5a32-9b1300203fdf/mzaf_11488019507183491661.plus.aac.p.m4a"},{"track":7,"name":"偷笑","lines":38,"imagery":{"body_gesture":6,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":2},"terms":["心:0:4","手:0:2","水:9:2"],"tempo":131,"beats_per_bar":3,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/20/c4/60/20c46010-0c00-6370-ed83-8b2af9fba1a9/mzaf_12061536084731180113.plus.aac.p.m4a"},{"track":8,"name":"Goodbye Melody Rose","lines":17,"imagery":{"body_gesture":3,"time_memory":0,"people_relationships":0,"city_street":1,"cosmos":0,"sky_weather":1,"nature_plants":0,"light_fire":0,"night_moon":0,"water":1},"terms":["頭:0:2","城:3:1","水:9:1","眼淚:0:1","雨:5:1"],"tempo":78,"beats_per_bar":12,"feel":"triplet (12/8)","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4b/67/28/4b6728ac-d2f3-642d-a208-5d3d297048b6/mzaf_13704215799642765582.plus.aac.p.m4a"},{"track":9,"name":"詩人的情人","lines":24,"imagery":{"body_gesture":5,"time_memory":0,"people_relationships":0,"city_street":1,"cosmos":0,"sky_weather":1,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":["手:0:4","北風:5:1","城:3:1","心:0:1"],"tempo":67,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/85/c9/3a/85c93aba-ab01-f759-c9cf-4c3375fd8148/mzaf_1510647169090981382.plus.aac.p.m4a"},{"track":10,"name":"拖男帶女","lines":54,"imagery":{"body_gesture":4,"time_memory":1,"people_relationships":1,"city_street":0,"cosmos":2,"sky_weather":1,"nature_plants":0,"light_fire":0,"night_moon":1,"water":1},"terms":["心:0:4","friend:2:1","sun:4:1","夏天:1:1","太陽:4:1","春風:5:1","月:8:1","海:9:1"],"tempo":97.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3e/98/92/3e989268-049c-4b61-0884-fd08e3c21130/mzaf_14914902021696607515.plus.aac.p.m4a"},{"track":11,"name":"Love Outrolude (Instrumental)","lines":0,"imagery":{"body_gesture":0,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":[],"tempo":63,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/35/d2/ba/35d2ba60-d223-0542-e7c4-f2bdc722d260/mzaf_13099010327550584627.plus.aac.p.m4a"},{"track":12,"name":"If You Leave Me Now","lines":33,"imagery":{"body_gesture":0,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":[],"tempo":96.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/48/2a/cd/482acda8-f100-7583-dc2e-fbab54ce2f1c/mzaf_8886205228524802294.plus.aac.p.m4a"},{"track":13,"name":"春風吹之吹吹風Mix","lines":32,"imagery":{"body_gesture":2,"time_memory":5,"people_relationships":0,"city_street":2,"cosmos":0,"sky_weather":8,"nature_plants":9,"light_fire":0,"night_moon":0,"water":1},"terms":["春風:5:6","冬日:1:2","原上草:6:2","夏天:1:2","流淚:0:2","蛇:6:2","三月:1:1","城裡:3:1","悶雷:5:1","柳樹:6:1","桃花:6:1","河水:9:1","燕子:6:1","玫瑰:6:1","路上:3:1","雲堆:5:1","青蛙:6:1"],"tempo":null,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d3/52/58/d3525893-f2df-aec6-b6b0-83ff02d5c493/mzaf_4334223756224608925.plus.aac.p.m4a"}];
+const THIS_LOVE = [{"track":1,"name":"愛愛愛","lines":18,"imagery":{"body_gesture":0,"time_memory":0,"people_relationships":4,"city_street":2,"cosmos":0,"sky_weather":0,"nature_plants":7,"light_fire":0,"night_moon":0,"water":5},"terms":["海:9:5","家:2:4","樹:6:3","花:6:3","桃花:6:1","街:3:1","電影:3:1"],"love":25,"tempo":66,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b8/bd/7e/b8bd7ee8-0e9d-566f-4cca-8bfe6e18fa75/mzaf_1453766286012772639.plus.aac.p.m4a"},{"track":2,"name":"蘇麗珍","lines":30,"imagery":{"body_gesture":1,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":3,"light_fire":0,"night_moon":0,"water":0},"terms":["花:6:3","頭:0:1"],"love":3,"tempo":88.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/86/61/b3/8661b3ef-4045-be5d-e73b-138a3827bf5b/mzaf_15124720786251433710.plus.aac.p.m4a"},{"track":3,"name":"歌手與模特兒","lines":46,"imagery":{"body_gesture":9,"time_memory":0,"people_relationships":1,"city_street":0,"cosmos":0,"sky_weather":3,"nature_plants":0,"light_fire":3,"night_moon":0,"water":0},"terms":["臉:0:5","光:7:3","風:5:3","眼:0:2","家:2:1","心:0:1","手:0:1"],"love":2,"tempo":73.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/58/50/38/585038dd-f55b-c5ff-269d-d8267871397d/mzaf_16953057221375593774.plus.aac.p.m4a"},{"track":4,"name":"唉!","lines":34,"imagery":{"body_gesture":2,"time_memory":0,"people_relationships":10,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":["妹妹:2:4","墨鏡:0:2","媽媽:2:2","家:2:2","朋友:2:2"],"love":2,"tempo":92,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3e/cd/9a/3ecd9a50-6c08-ec5c-9092-851b5ed9580f/mzaf_13613359387326311800.plus.aac.p.m4a"},{"track":5,"name":"四人遊","lines":45,"imagery":{"body_gesture":10,"time_memory":0,"people_relationships":5,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":1,"water":0},"terms":["頭:0:6","朋友:2:5","手:0:3","夜:8:1","眼淚:0:1"],"love":3,"tempo":75.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/13/79/a4/1379a403-72aa-8049-10e5-7528f321744e/mzaf_15694587935441905750.plus.aac.p.m4a"},{"track":6,"name":"手拖手","lines":13,"imagery":{"body_gesture":6,"time_memory":0,"people_relationships":0,"city_street":1,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":1,"water":0},"terms":["心:0:3","手:0:2","月:8:1","舞:0:1","路:3:1"],"love":8,"tempo":68.5,"beats_per_bar":12,"feel":"triplet (12/8)","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9e/1c/31/9e1c3126-84c5-fd75-5a32-9b1300203fdf/mzaf_11488019507183491661.plus.aac.p.m4a"},{"track":7,"name":"偷笑","lines":38,"imagery":{"body_gesture":6,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":2},"terms":["心:0:4","手:0:2","水:9:2"],"love":2,"tempo":131,"beats_per_bar":3,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/20/c4/60/20c46010-0c00-6370-ed83-8b2af9fba1a9/mzaf_12061536084731180113.plus.aac.p.m4a"},{"track":8,"name":"Goodbye Melody Rose","lines":17,"imagery":{"body_gesture":3,"time_memory":0,"people_relationships":0,"city_street":1,"cosmos":0,"sky_weather":1,"nature_plants":0,"light_fire":0,"night_moon":0,"water":1},"terms":["頭:0:2","城:3:1","水:9:1","眼淚:0:1","雨:5:1"],"love":0,"tempo":78,"beats_per_bar":12,"feel":"triplet (12/8)","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4b/67/28/4b6728ac-d2f3-642d-a208-5d3d297048b6/mzaf_13704215799642765582.plus.aac.p.m4a"},{"track":9,"name":"詩人的情人","lines":24,"imagery":{"body_gesture":5,"time_memory":0,"people_relationships":0,"city_street":1,"cosmos":0,"sky_weather":1,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":["手:0:4","北風:5:1","城:3:1","心:0:1"],"love":2,"tempo":67,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/85/c9/3a/85c93aba-ab01-f759-c9cf-4c3375fd8148/mzaf_1510647169090981382.plus.aac.p.m4a"},{"track":10,"name":"拖男帶女","lines":54,"imagery":{"body_gesture":4,"time_memory":1,"people_relationships":1,"city_street":0,"cosmos":2,"sky_weather":1,"nature_plants":0,"light_fire":0,"night_moon":1,"water":1},"terms":["心:0:4","friend:2:1","sun:4:1","夏天:1:1","太陽:4:1","春風:5:1","月:8:1","海:9:1"],"love":22,"tempo":97.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3e/98/92/3e989268-049c-4b61-0884-fd08e3c21130/mzaf_14914902021696607515.plus.aac.p.m4a"},{"track":11,"name":"Love Outrolude (Instrumental)","lines":0,"imagery":{"body_gesture":0,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":[],"love":0,"tempo":63,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/35/d2/ba/35d2ba60-d223-0542-e7c4-f2bdc722d260/mzaf_13099010327550584627.plus.aac.p.m4a"},{"track":12,"name":"If You Leave Me Now","lines":33,"imagery":{"body_gesture":0,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":[],"love":4,"tempo":96.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/48/2a/cd/482acda8-f100-7583-dc2e-fbab54ce2f1c/mzaf_8886205228524802294.plus.aac.p.m4a"},{"track":13,"name":"春風吹之吹吹風Mix","lines":32,"imagery":{"body_gesture":2,"time_memory":5,"people_relationships":0,"city_street":2,"cosmos":0,"sky_weather":8,"nature_plants":9,"light_fire":0,"night_moon":0,"water":1},"terms":["春風:5:6","冬日:1:2","原上草:6:2","夏天:1:2","流淚:0:2","蛇:6:2","三月:1:1","城裡:3:1","悶雷:5:1","柳樹:6:1","桃花:6:1","河水:9:1","燕子:6:1","玫瑰:6:1","路上:3:1","雲堆:5:1","青蛙:6:1"],"love":0,"tempo":null,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d3/52/58/d3525893-f2df-aec6-b6b0-83ff02d5c493/mzaf_4334223756224608925.plus.aac.p.m4a"}];
 function thisLoveAlbum() {
   return albumCounts({ title: "This Love", year: 2006, songs: THIS_LOVE.map(d => {
     const top = HOME_KEYS.slice().sort((a, b) => (d.imagery[b] || 0) - (d.imagery[a] || 0))[0], n = d.beats_per_bar;
     return { name: d.name, track: d.track, imagery: d.imagery, terms: d.terms.map(x => { const [w, c, k] = x.split(":"); return [w, CAT_IDS[+c], +k]; }),
-      tempo: d.tempo || 90, bar: n > 3 && n % 3 === 0 ? n / 3 : n, rh: { beats_per_bar: n, feel: d.feel }, lines: d.lines,
+      tempo: d.tempo || 90, bar: n > 3 && n % 3 === 0 ? n / 3 : n, rh: { beats_per_bar: n, feel: d.feel }, lines: d.lines, love: d.love || 0,
       color: d.imagery[top] ? catColor(CATS.find(c => c.id === top)) : null, preview_url: d.preview_url };
   }) });
 }
