@@ -2049,16 +2049,33 @@ function shadowOf(c, o, dx, dy, blur, col) {
 function glow(c, x, y, r, col, mode = "screen") { c.save(); c.globalCompositeOperation = mode; disc.round = true; disc(c, x, y, r); disc.round = false; c.fillStyle = rad(c, x, y, r, col, "rgba(0,0,0,0)"); c.fill(); c.restore(); }
 function shade(c, w, h, x0, y0, x1, y1, a) { c.save(); c.globalCompositeOperation = "multiply"; c.fillStyle = lin(c, x0, y0, x1, y1, "rgba(255,255,255,0)", `rgba(20,20,30,${a})`); c.fillRect(0, 0, w, h); c.restore(); }
 function beatOf(t, bpm, bar = 4) { const b = (t * bpm) / 60, f = b - Math.floor(b); return reduce ? 0 : Math.exp(-f * 5) * (Math.floor(b) % bar === 0 ? 1 : 0.6); }
-// poster type: a big title, the lyric line, and a strip of small facts, like a gig print
+// poster type: the line we chose from the lyrics is the big type, and the song's name sits small beside it, like a caption to a picture
+function lineRows(text) {
+  const t = String(text || "").trim(), mid = t.length / 2;
+  if (t.length <= 6) return [t];
+  // break at a comma or space nearest the middle, else in the middle
+  let best = -1;
+  [...t].forEach((ch, i) => { if (/[，,、 　]/.test(ch) && (best < 0 || Math.abs(i - mid) < Math.abs(best - mid))) best = i; });
+  if (best > 0) return [t.slice(0, /[，,、]/.test(t[best]) ? best + 1 : best).trim(), t.slice(best + 1).trim()];
+  const k = Math.ceil(t.length / 2); return [t.slice(0, k), t.slice(k)];
+}
 function posterType(c, w, h, p, ink, sub, opts = {}) {
   if (posterType.off) return;
   if (posterType.queue) { posterType.queue.push([c, w, h, p, ink, sub, opts]); return; }
-  const size = opts.size || w * 0.15, x = opts.x ?? w * 0.07, y = opts.y ?? h * 0.9;
-  c.save(); c.fillStyle = ink; c.textBaseline = "alphabetic";
-  c.font = `900 ${size}px "Noto Sans SC", "Noto Serif SC", sans-serif`; c.fillText(p.name, x, y);
-  // the lyric line sits under the title, or above it when the title is already at the foot of the page
-  const lineY = y + w * 0.05 < h - w * 0.02 ? y + w * 0.05 : y - size * 0.92;
-  c.font = `500 ${Math.max(10, w * 0.026)}px "Noto Serif SC", serif`; c.fillStyle = sub; c.fillText(`「${p.line}」`, x, lineY);
+  const x = opts.x ?? w * 0.07, y = opts.y ?? h * 0.9, big = String(p.line || p.name).replace(/^（(.*)）$/, "$1"), rows = lineRows(big);
+  c.save(); c.textBaseline = "alphabetic"; c.fillStyle = ink;
+  const latin = !/[\u3400-\u9fff]/.test(big), face = latin ? `"Young Serif", "Noto Serif SC", serif` : `"Noto Sans SC", "Noto Serif SC", sans-serif`, wt = latin ? 400 : 900;
+  c.font = `${wt} 100px ${face}`;
+  const widest = Math.max(...rows.map(r => c.measureText(r).width)) / 100, size = Math.min(w * (!p.track ? 0.085 : rows.length > 1 ? 0.12 : 0.14), (w * 0.86) / widest);
+  c.font = `${wt} ${size}px ${face}`;
+  rows.forEach((r, i) => c.fillText(r, x, y - (rows.length - 1 - i) * size * 1.12));
+  const top = y - (rows.length - 1) * size * 1.12 - size;
+  // the song's name: under the line when there is room, otherwise above it
+  const nameY = y + w * 0.055 < h - w * 0.02 ? y + w * 0.055 : top - w * 0.025;
+  c.font = `500 ${Math.max(10, w * 0.03)}px "Noto Sans SC", "Manrope", sans-serif`; c.fillStyle = sub;
+  const label = p.track ? `${p.name}` : `${p.name}`;
+  c.fillText(label, x, nameY);
+  const lw = c.measureText(label).width; rule(c, x + lw + w * 0.02, nameY - w * 0.01, x + lw + w * 0.09, nameY - w * 0.01, Math.max(1, w * 0.002), sub);
   c.font = `500 ${Math.max(8, w * 0.017)}px "IBM Plex Mono", monospace`; if (opts.metaInk) c.fillStyle = opts.metaInk;
   const meta = opts.meta || `KHALIL FONG 方大同 · ${p.albumMeta || "SOULBOY 2005"} · ${p.track ? "TRACK " + String(p.track).padStart(2, "0") + " · " + Math.round(p.bpm) + " BPM" : "14 SONGS"}`;
   c.fillText(meta, x, opts.metaY ?? h * 0.055);
