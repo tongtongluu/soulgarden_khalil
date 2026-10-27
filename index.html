@@ -3812,32 +3812,89 @@ function compareAlbums(c, w, h, t, p, hs = -1) {
     if (!q || !q._hit) return -1; const i = q._hit(lx, y); return i >= 0 ? i + off : -1; };
   p._open = null;
 }
-// ---- 三張合一: the three albums blended into one poster, the way each album blends its songs' images ----
-// Each album's scene is painted whole and laid over the others through a soft mask: Soulboy rises from the lower left,
-// 未來 from the upper right, This Love lies beneath both. The masks drift slowly, so the three keep mixing.
-// The big type walks the images the albums share, in album order: Soulboy's wind and lane, This Love's rain on the city,
-// 未來's dusk snow, and the flowers, sea, rose and moon that more than one album sings.
+// ---- 三張合一: the three albums as one landscape, walked left to right like a hand scroll in the sentence's order ----
+// One horizon and one ground run across the whole poster: spring wind in the grass of a lane between two walls with
+// lanterns (Soulboy), rain over one city skyline (This Love), snow at dusk, a band of flowers along the shore, and the
+// sea, with a rose held up toward the moon and the moon's reflection in the water (未來). One sky lights all of it,
+// warm afternoon on the left through rainy dusk to blue night on the right, and every shape takes its colour from the
+// sky above where it stands, mixed with one of three hues borrowed from the albums (amber, dusty rose, slate). Shapes
+// are flat and soft, strokes are one weight. The 38 songs are tiny beads along the ground, each flashing on its beat.
 ALBUM_IMAGE.all = { sentence: "春風吹過小巷，燈籠照著雨裡的城，黃昏落雪，花開在海邊，玫瑰交給月亮。",
   stations: [[0, "春風"], [0, "小巷"], [0, "燈籠"], [0, "雨"], [0, "城"], [0, "黃昏"], [0, "雪花"], [0, "花"], [0, "海"], [0, "玫瑰"], [0, "月亮"]], emblems: {} };
 function mergeAlbums(c, w, h, t, p) {
-  const L = p._L || (p._L = { stations: PLATES[0].stations }), M = p._M || (p._M = {}), R = p._R || (p._R = {});
-  if (!M._album) M._album = thisLoveAlbum();
-  const d = c.getTransform().a, W = Math.round(w * d), H = Math.round(h * d), T = reduce ? 0 : t;
-  const layers = p._layers || (p._layers = [0, 1, 2].map(() => document.createElement("canvas")));
-  const paint = (k, fn) => {
-    const l = layers[k]; if (l.width !== W || l.height !== H) { l.width = W; l.height = H; }
-    const x = l.getContext("2d"); x.setTransform(d, 0, 0, d, 0, 0); x.clearRect(0, 0, w, h);
-    posterType.off = true; try { fn(x); } finally { posterType.off = false; }
-    return x;
-  };
-  const mask = (x, cx, cy, r) => { x.save(); x.globalCompositeOperation = "destination-in"; x.fillStyle = rad(x, cx, cy, r, "rgba(0,0,0,1)", "rgba(0,0,0,0)"); x.fillRect(0, 0, w, h); x.restore(); };
-  paint(1, x => drawAlbumPoster(x, w, h, t, M, M._album, -1));
-  mask(paint(0, x => blendAlbum(x, w, h, t, L, -1)), w * (0.12 + 0.08 * Math.sin(T * 0.07)), h * (0.9 + 0.05 * Math.cos(T * 0.05)), w * 1.05);
-  mask(paint(2, x => wonderScene(x, w, h, t, R, -1)), w * (0.88 + 0.08 * Math.cos(T * 0.06)), h * (0.1 + 0.05 * Math.sin(T * 0.08)), w * 1.05);
-  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); [1, 0, 2].forEach(k => c.drawImage(layers[k], 0, 0)); c.restore();
+  const T = reduce ? 0 : t, hz = h * 0.66, shore = w * 0.64;
+  // the one sky, sampled anywhere along the scroll
+  const SKY = [[0, [232, 168, 118]], [0.3, [206, 138, 120]], [0.55, [126, 112, 150]], [0.78, [58, 66, 110]], [1, [26, 32, 66]]];
+  const skyAt = u => { u = Math.max(0, Math.min(1, u)); let i = 0; while (i < SKY.length - 2 && u > SKY[i + 1][0]) i++;
+    const [u0, a] = SKY[i], [u1, b] = SKY[i + 1], f = (u - u0) / (u1 - u0); return a.map((v, k) => v + (b[k] - v) * f); };
+  const HUE = { amber: [226, 160, 106], rose: [196, 106, 122], slate: [74, 90, 130], ink: [24, 20, 34] };
+  const mix = (a, b, f) => a.map((v, k) => Math.round(v + (b[k] - v) * f));
+  const col = (x, hue, lit = 0.4, al = 1) => `rgba(${mix(HUE[hue], skyAt(x / w), lit).join(",")},${al})`;
+  const songs = p._songs || (p._songs = [
+    ...SOULBOY.map((d, i) => ({ tempo: d.tempo, bar: SOULBOY_BAR[i] || 4 })),
+    ...THIS_LOVE.map(d => ({ tempo: d.tempo || 90, bar: d.beats_per_bar > 3 && d.beats_per_bar % 3 === 0 ? d.beats_per_bar / 3 : d.beats_per_bar || 4 })),
+    ...WONDERLAND.map(d => ({ tempo: d.tempo || 90, bar: d.beats_per_bar > 3 && d.beats_per_bar % 3 === 0 ? d.beats_per_bar / 3 : d.beats_per_bar || 4 }))]);
+  // where each image of the sentence stands in the landscape, so hovering its word can light that spot
+  const SPOT = { 春風: [0.1, 0.86], 小巷: [0.14, 0.62], 燈籠: [0.2, 0.6], 雨: [0.4, 0.5], 城: [0.42, 0.6], 黃昏: [0.55, 0.62], 雪花: [0.6, 0.45], 花: [0.64, 0.7], 海: [0.8, 0.8], 玫瑰: [0.7, 0.6], 月亮: [0.84, 0.48] };
+  const hot = p._word && SPOT[p._word];
+
+  // 1. the sky: one gradient across the scroll, darkened toward the top so the words read
+  const g = c.createLinearGradient(0, 0, w, 0); SKY.forEach(([u, v]) => g.addColorStop(u, `rgb(${v.join(",")})`)); c.fillStyle = g; c.fillRect(0, 0, w, h);
+  c.fillStyle = lin(c, 0, 0, 0, hz, "rgba(18,14,30,.82)", "rgba(18,14,30,0)"); c.fillRect(0, 0, w, hz);
+  // dusk glow low on the horizon, and the moon's halo
+  glow(c, w * 0.55, hz, w * 0.35, "rgba(240,170,120,.35)");
+  const moon = [w * 0.84, h * 0.48], mr = w * 0.05;
+  glow(c, moon[0], moon[1], mr * 4, "rgba(236,230,214,.28)");
+  disc.round = true; disc(c, moon[0], moon[1], mr); c.fillStyle = "rgba(244,238,222,.95)"; c.fill(); disc.round = false;
+
+  // 2. the city: one skyline along the horizon in the middle of the scroll, lit windows taking the lantern amber
+  const rc = mulberry(31);
+  for (let i = 0; i < 12; i++) { const x = w * (0.27 + i * 0.026), bw = w * 0.024, bh = h * (0.03 + 0.08 * rc());
+    c.fillStyle = col(x, "slate", 0.35); c.fillRect(x, hz - bh, bw, bh);
+    for (let k = 0; k < 3; k++) if (rc() > 0.6) { c.fillStyle = col(x, "amber", 0.15, 0.7); c.fillRect(x + bw * 0.35, hz - bh + h * 0.01 * (k + 1), bw * 0.25, h * 0.004); } }
+
+  // 3. the ground: one band from the left edge to the shore, then the sea
+  const foot = shore - w * 0.2, shoreAt = y => shore + (foot - shore) * (y - hz) / (h - hz);
+  c.fillStyle = lin(c, 0, hz, 0, h, col(w * 0.85, "slate", 0.5), col(w * 0.85, "ink", 0.25)); c.fillRect(0, hz, w, h - hz);
+  const gg = c.createLinearGradient(0, 0, shore, 0); gg.addColorStop(0, col(0, "amber", 0.3)); gg.addColorStop(0.6, col(shore * 0.6, "rose", 0.3)); gg.addColorStop(1, col(shore, "slate", 0.35));
+  c.beginPath(); c.moveTo(0, hz); c.lineTo(shore, hz); c.quadraticCurveTo(shore - w * 0.04, hz + (h - hz) * 0.5, foot, h); c.lineTo(0, h); c.closePath(); c.fillStyle = gg; c.fill();
+  c.fillStyle = lin(c, 0, hz, 0, h, "rgba(14,10,22,.1)", "rgba(14,10,22,.6)"); c.fill();
+  // the moon's reflection, shimmering
+  for (let k = 0; k < 9; k++) { const y = hz + h * (0.015 + k * 0.025), half = mr * (1.1 - k * 0.08) * (0.8 + 0.2 * Math.sin(T * 1.5 + k * 1.3));
+    rule(c, moon[0] - half, y, moon[0] + half, y, Math.max(1, w * 0.003), `rgba(244,238,222,${0.55 - k * 0.05})`); }
+
+  // 4. the lane: two walls converging on the horizon at the left, lanterns as small warm glows along them
+  const vp = [w * 0.15, hz - h * 0.01];
+  c.fillStyle = col(w * 0.04, "ink", 0.28); c.beginPath(); c.moveTo(0, hz - h * 0.2); c.lineTo(vp[0] - w * 0.015, vp[1] - h * 0.04); c.lineTo(vp[0] - w * 0.015, vp[1] + h * 0.005); c.lineTo(0, h); c.closePath(); c.fill();
+  c.fillStyle = col(w * 0.24, "ink", 0.3); c.beginPath(); c.moveTo(w * 0.3, hz - h * 0.12); c.lineTo(vp[0] + w * 0.015, vp[1] - h * 0.04); c.lineTo(vp[0] + w * 0.015, vp[1] + h * 0.005); c.lineTo(w * 0.36, h); c.lineTo(w * 0.3, h); c.closePath(); c.fill();
+  [[0.04, 0.58], [0.09, 0.62], [0.12, 0.64], [0.21, 0.62], [0.26, 0.59]].forEach(([x, y], i) => { const a = 0.55 + 0.15 * Math.sin(T * 1.3 + i); glow(c, w * x, h * y, w * (0.03 + 0.012 * (i % 2)), `rgba(255,190,120,${a})`); disc.round = true; disc(c, w * x, h * y, w * 0.005); disc.round = false; c.fillStyle = "rgba(255,226,180,.95)"; c.fill(); });
+
+  // 5. the flowers: a band of soft colour along the shore line
+  for (let i = 0; i < 30; i++) { const u = i / 29, y = hz + u * (h - hz) * 0.96, x = shoreAt(y) - w * (0.015 + 0.02 * u) + Math.sin(u * 3) * w * 0.01;
+    disc.round = true; disc(c, x + Math.sin(i * 2.7) * w * 0.012, y, w * (0.006 + 0.008 * u + 0.003 * Math.sin(i * 1.9 + 1))); disc.round = false; c.fillStyle = col(x, "rose", 0.12, 0.85); c.fill(); }
+  // 6. the rose: a single small red mark held up toward the moon at the end of the shore
+  { const x = shore + w * 0.02, y = hz - h * 0.035; rule(c, x, y, x - w * 0.006, hz + h * 0.01, Math.max(1, w * 0.0025), col(x, "slate", 0.5, 0.9)); disc.round = true; disc(c, x, y, w * 0.009); disc.round = false; c.fillStyle = "#B83A4C"; c.fill(); }
+
+  // 7. weather, all in one stroke weight: wind in the grass of the lane, rain over the city, snow falling at dusk
+  c.save(); c.lineCap = "round"; const sw = Math.max(1, w * 0.002);
+  for (let i = 0; i < 46; i++) { const x = w * (0.02 + 0.5 * (i / 45)), base = h * (0.94 - 0.04 * Math.sin(i * 0.7)), lean = Math.sin(T * 1.1 + i * 0.4) * w * 0.012 + w * 0.008;
+    rule(c, x, base, x + lean, base - h * (0.03 + 0.02 * ((i * 7) % 3) / 2), sw, col(x, "amber", 0.4, 0.55)); }
+  const rr = mulberry(4);
+  for (let i = 0; i < 70; i++) { const x = w * (0.25 + 0.32 * rr()), y = h * (0.42 + ((rr() + T * (0.25 + 0.1 * rr())) % 1) * 0.24); rule(c, x, y, x - w * 0.005, y + h * 0.016, sw, "rgba(214,222,240,.4)"); }
+  const sr = mulberry(9);
+  for (let i = 0; i < 60; i++) { const x = w * (0.5 + 0.22 * sr()) + Math.sin(T * 0.5 + i) * w * 0.006, y = h * (0.4 + ((sr() + T * (0.012 + 0.012 * sr())) % 1) * 0.3);
+    disc.round = true; disc(c, x, y, w * (0.002 + 0.0018 * sr())); disc.round = false; c.fillStyle = "rgba(246,242,234,.75)"; c.fill(); }
+  c.restore();
+
+  // 8. the 38 songs: tiny beads along the ground, left to right in album order, each flashing on its own beat
+  songs.forEach((sg, i) => { const x = w * (0.03 + 0.58 * i / (songs.length - 1)), y = hz + h * 0.012, b = beatOf(t, sg.tempo || 90, sg.bar || 4);
+    disc.round = true; disc(c, x, y, w * 0.0035 * (1 + 0.6 * b)); disc.round = false; c.fillStyle = `rgba(255,240,220,${0.35 + 0.55 * b})`; c.fill(); });
+  // a hovered word lights its place in the landscape
+  if (hot) glow(c, w * hot[0], h * hot[1], w * 0.12, "rgba(255,236,210,.55)");
+
   p._hit = null; p._marks = [];
-  sentenceType(c, w, h, p, "all", { y0: h * 0.62, veil: true, noteAbove: true, title: "三張合一",
-    meta: "KHALIL FONG 方大同 · SOULBOY 2005 · THIS LOVE 2006 · 未來 2007 · 38 SONGS" });
+  sentenceType(c, w, h, p, "all", { y0: h * 0.11, title: "三張合一",
+    meta: "KHALIL FONG 方大同 · 2005–2007 · 3 ALBUMS · 38 SONGS" });
 }
 // ---- This Love's thirteen songs: a blend poster each, the same series as Soulboy's ----
 // each poster is built from its song's scene card (soul-garden-data/this-love/01–13.md): its key line, its main image,
