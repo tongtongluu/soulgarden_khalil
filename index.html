@@ -2050,8 +2050,11 @@ function glow(c, x, y, r, col, mode = "screen") { c.save(); c.globalCompositeOpe
 function shade(c, w, h, x0, y0, x1, y1, a) { c.save(); c.globalCompositeOperation = "multiply"; c.fillStyle = lin(c, x0, y0, x1, y1, "rgba(255,255,255,0)", `rgba(20,20,30,${a})`); c.fillRect(0, 0, w, h); c.restore(); }
 function beatOf(t, bpm, bar = 4) { const b = (t * bpm) / 60, f = b - Math.floor(b); return reduce ? 0 : Math.exp(-f * 5) * (Math.floor(b) % bar === 0 ? 1 : 0.6); }
 // poster type: the line we chose from the lyrics is the big type, and the song's name sits small beside it, like a caption to a picture
+// where a long line breaks so no word is cut in two
+const LINE_BREAKS = { "那就星期六看電影": ["那就", "星期六看電影"], "就像在舊電影裡的": ["就像在", "舊電影裡的"], "一道爬不完的斜坡": ["一道", "爬不完的斜坡"], "多看兩岸的風光": ["多看", "兩岸的風光"] };
 function lineRows(text) {
   const t = String(text || "").trim(), mid = t.length / 2;
+  if (LINE_BREAKS[t]) return LINE_BREAKS[t];
   if (t.length <= 6) return [t];
   // break at a comma or space nearest the middle, else in the middle
   let best = -1;
@@ -2064,7 +2067,7 @@ function posterType(c, w, h, p, ink, sub, opts = {}) {
   if (posterType.queue) { posterType.queue.push([c, w, h, p, ink, sub, opts]); return; }
   const x = opts.x ?? w * 0.07, y = opts.y ?? h * 0.9, big = String(p.line || p.name).replace(/^（(.*)）$/, "$1"), rows = lineRows(big);
   c.save(); c.textBaseline = "alphabetic"; c.fillStyle = ink;
-  const latin = !/[\u3400-\u9fff]/.test(big), face = latin ? `"Young Serif", "Noto Serif SC", serif` : `"Noto Sans SC", "Noto Serif SC", sans-serif`, wt = latin ? 400 : 900;
+  const latin = !/\p{Script=Han}/u.test(big), face = latin ? `"Young Serif", "Noto Serif SC", serif` : `"Noto Sans SC", "Noto Serif SC", sans-serif`, wt = latin ? 400 : 900;
   c.font = `${wt} 100px ${face}`;
   const widest = Math.max(...rows.map(r => c.measureText(r).width)) / 100, size = Math.min(w * (!p.track ? 0.085 : rows.length > 1 ? 0.12 : 0.14), (w * 0.86) / widest);
   c.font = `${wt} ${size}px ${face}`;
