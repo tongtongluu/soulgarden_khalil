@@ -132,15 +132,18 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 .posters .plate-nav button[aria-pressed="true"] { box-shadow: inset 0 -1px 0 var(--fg); border-radius: 0; }
 .posters .plate-nav button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 @media (max-width: 860px) { .posters .prints { display: grid; gap: 18px; } .posters .viewer { display: contents; } .posters .plate { order: -2; } .posters .album-nav, .posters .plate-nav, .posters .style-bar { order: -1; } }
-.posters .style-bar { display: flex; flex-wrap: wrap; gap: 4px 6px; justify-content: center; align-items: center; font-size: 11px; color: var(--muted); }
-/* the captions are hidden for now, so the poster and its two rows of toggles fit on one screen */
 .posters .plate-text { display: none; }
 .posters .viewer { margin-bottom: 8px; }
-.posters .style-bar span { font: 500 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; margin-right: 4px; }
-.posters .style-btn { border: 1px solid var(--shelf); background: transparent; color: var(--muted); font: 500 12px var(--body); padding: 5px 11px; border-radius: 999px; cursor: pointer; }
-.posters .style-btn:hover { color: var(--fg); }
-.posters .style-btn[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-.posters .style-btn:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.style-bar { display: flex; flex-wrap: nowrap; gap: 2px; align-items: center; min-width: 0; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+@media (max-width: 860px) { .style-bar { contain: inline-size; } }
+.style-bar::-webkit-scrollbar { display: none; }
+.style-bar[hidden] { display: none; }
+.style-btn { flex: none; border: 0; background: transparent; color: var(--muted); font: 500 11px var(--body); padding: 5px 8px; cursor: pointer; white-space: nowrap; }
+.style-btn:hover { color: var(--fg); }
+.style-btn[aria-pressed="true"] { color: var(--fg); box-shadow: inset 0 -1px 0 var(--fg); }
+.style-btn:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.controls .style-bar { margin-left: auto; }
+@media (max-width: 860px) { .controls { flex-wrap: wrap; width: 100%; min-width: 0; } .controls .style-bar { order: 3; flex: 1 1 100%; width: 100%; margin-left: 0; } }
 
 .tip {
   position: absolute; pointer-events: none; z-index: 5; width: 250px;
@@ -190,15 +193,13 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
       <button id="v-soul" data-view="soul" aria-pressed="false">Soul palette</button>
       <button id="v-scene" data-view="scene" aria-pressed="false">Dreamscape</button>
     </div>
-    <button class="sound" id="sound" aria-pressed="false" hidden>♪ Turn sound on</button>
+    <button class="sound" id="sound" aria-pressed="false" aria-label="Sound" title="Sound" hidden>♪</button>
     </div>
   </header>
 
   <div class="scene-ctl" id="scene-ctl" hidden>
-    <label for="scene-song">Draw from</label>
-    <select id="scene-song"><option value="all">Every tagged song</option></select>
+    <select id="scene-song" aria-label="Draw from"><option value="all">Every tagged song</option></select>
     <button id="scene-shuffle" type="button">↻ Recompose</button>
-    <span id="scene-cap"></span>
   </div>
   <section class="posters" id="posters">
     <div class="prints" id="prints"></div>
@@ -209,20 +210,7 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
   </div>
   <div class="chips" id="chips" role="group" aria-label="Filter by imagery" data-off="true"></div>
 
-    <p class="lede" id="intro">Every song is a vessel holding the images in its lyrics. Its color comes from the images that appear most, and its curves come from the song's tempo and mood. Hover over a vessel to see what it holds, and turn the sound on to hear it.</p>
-  <dl class="key">
-    <div><dt>Color</dt><dd>Every imagery word in the lyrics is counted into one of ten groups. Only things you can see count: abstract words such as 歲 (age) or 世界 (world), time words and verbs are left out. The group with the most hits sets the base color, the second sets the other end of the gradient.</dd></div>
-    <div><dt>Beat</dt><dd>The faster the tempo, the more curves in the outline. Hover a vase and it jumps on every beat at the song's real BPM, hardest on the first beat of each bar; with sound on it follows the kick drum in the music.</dd></div>
-    <div><dt>Height and width</dt><dd>Brighter, happier songs (valence) stand taller. Songs with more energy are fuller and wider.</dd></div>
-    <div><dt>Depth of curves</dt><dd>The stronger the emotion, the narrower the waist.</dd></div>
-    <div><dt>Flower</dt><dd>He sang about love all the time. Every song whose lyrics mention love 愛 gets flowers in its vase: one flower for every five mentions, and each petal is one mention, so you can count them.</dd></div>
-    <div><dt>Pebble shape</dt><dd>A slow ballad, under 78 BPM.</dd></div>
-    <div><dt>Background</dt><dd>The garden sits in the light of the places he lived: the ocean of Kauaʻi where he was born at the top, the harbor haze of Hong Kong where he grew up and made music across the middle, and the red earth of Yunnan where he went in his last years rising from below.</dd></div>
-    <div><dt>Song posters</dt><dd>One abstract poster per song, drawn from a scene card written from a close reading of its lyrics: its main image sits at the centre as one clear form, and the colours around it follow the mood and emotional arc. Each poster can be printed three ways: blend, pixel or geometric. Counts in the picture, such as lobes, rings, rainbow bands and jumping shapes, are how many times the lyrics sing them. The album poster comes first.</dd></div>
-    <div><dt>Dreamscape</dt><dd>Every imagery word, freed from its song and recombined into one picture of flat gradient shapes: moon, rainbow, lanterns, swallows, the sea. Each image is sized by how often he sings it; birds, butterflies, flowers, people, lanterns and stars repeat instead, so you can count them. Recompose shuffles the arrangement, and hovering an image plays the song that sings it most.</dd></div>
-    <div><dt>Blends</dt><dd>A group of songs averaged into one outline, with each image as a flowing patch of color sized by its share. Album blends show each album's character. Soul palette pours every song into one smiling bowl: the bowl holds his whole palette, the two fins carry the second and third images, and each leaf is one song. Hover a leaf to hear it.</dd></div>
-  </dl>
-  <p class="note" id="note"><strong>Prototype:</strong> the albums, tracks and imagery shares are randomly generated placeholders for testing the visual rules. They will be replaced once the real lyrics are collected and tagged.</p>
+  <p class="note" id="note" hidden></p>
 </div>
 
 <script>
@@ -1376,7 +1364,7 @@ function listen(s, at) {
 function setSound(on) {
   soundOn = on;
   soundBtn.setAttribute("aria-pressed", String(on));
-  soundBtn.textContent = on ? "♪ Sound on · hover a vase to listen" : "♪ Turn sound on";
+  soundBtn.textContent = "♪";
   if (on) { ensureAnalyser(); actx && actx.resume(); audio.play().catch(() => {}); audio.pause(); listen(hovered); }
   else { playing = null; fadeTo(0, 300, () => audio.pause()); }
 }
@@ -1418,6 +1406,7 @@ function setMode(m) {
   chips.dataset.off = String(m === "fuse" || m === "soul" || m === "scene");
   document.getElementById("scene-ctl").hidden = m !== "scene";
   document.getElementById("posters").hidden = m !== "posters";
+  const sb = document.getElementById("style-bar"); if (sb) sb.hidden = m !== "posters";
   stage.hidden = m === "posters";
   if (m === "posters") chips.dataset.off = "true";
   hovered = null; tip.hidden = true; listen(null);
@@ -1454,7 +1443,6 @@ async function load() {
   } catch (err) {}
   build(records);
   const tagged = songs.length;
-  note.innerHTML = `<strong>Data:</strong> ${tagged} of ${tagged + empties.length} songs tagged so far; blank vessels are still waiting for theirs. Imagery is counted from the full lyrics with a hand-built lexicon (hover a tag to see its top words); Soulboy tempos are measured from the audio itself; mood and other albums' tempos come from audio features of each 30-second preview.`;
   soundBtn.hidden = !songs.some(s => s.preview_url);
   songs.filter(s => s.terms && s.terms.length).forEach(s => sceneSelect.add(new Option(`${s.name} · ${s.album}`, s.name)));
   scene = null;
@@ -4222,11 +4210,13 @@ prints.innerHTML = `
     <button type="button" id="plate-prev" aria-label="Previous poster">←</button>
     ${PLATES.map((p, i) => p.merge ? "" : `<button type="button" class="plate-tab${p.album ? " is-album" : ""}" data-i="${i}" data-group="${p.group}" lang="zh">${p.album ? "the album" : esc(p.name)}</button>`).join("")}
     <button type="button" id="plate-next" aria-label="Next poster">→</button>
-  </nav>
-  <div class="style-bar" role="group" aria-label="Print style">
-    <span>Print it as</span>
-    ${STYLES.map(st => `<button type="button" class="style-btn" data-style="${st.id}" aria-pressed="${st.id === "flat"}">${esc(st.label)}</button>`).join("")}
-  </div>`;
+  </nav>`;
+// the print style is a quiet global control in the top bar, next to the sound toggle, not part of the navigation
+const styleBar = Object.assign(document.createElement("div"), { className: "style-bar", id: "style-bar" });
+styleBar.setAttribute("role", "group"); styleBar.setAttribute("aria-label", "Print style");
+styleBar.innerHTML = STYLES.map(st => `<button type="button" class="style-btn" data-style="${st.id}" aria-pressed="${st.id === "flat"}">${esc(st.label)}</button>`).join("");
+document.getElementById("sound").before(styleBar);
+styleBar.hidden = !!document.getElementById("posters").hidden;
 const cv = document.getElementById("plate-canvas"), plateBox = document.getElementById("plate"), text = document.getElementById("plate-text");
 let cur = 0, pw = 0, ph = 0, dpr = 1, hoverStation = -1, hoverPlate = false;
 let style = STYLES[0], lastStyled = 0, dirty = true;
@@ -4234,25 +4224,9 @@ const off = document.createElement("canvas");
 const songFor = track => (typeof songs !== "undefined" ? songs.find(s => /soulboy/i.test(s.album) && s.track === track) : null);
 
 function card(p) {
-  if (p.album) return `
-    <h2 lang="zh">${esc(p.name || "Soulboy")}<span>${p.merge ? "2005–2007" : { soulboy: "2005", thislove: "2006", wonderland: "2007" }[p.group] || "2005"} · ${p.stations.length} songs</span></h2>
-    <p class="about">${esc(style.id === "pixel" ? p.pixAbout : style.id === "flat" ? p.about : p.geoAbout)}</p>
-    ${p.group === "soulboy" ? `<p class="hint">Colour = each song's lyric imagery, in the garden's colour key. The spoken Prologue has none, so it is grey.</p>` : ""}
-    <p class="hint">Hover a station to hear its song${typeof soundOn !== "undefined" && soundOn ? "" : " (turn sound on first)"}.</p>
-    <ol class="stations">${p.stations.map(s => `<li><b>${String(s.track).padStart(2, "0")}</b><span lang="zh">${esc(s.name)}</span><em>${esc(s.note)}</em></li>`).join("")}</ol>`;
-  return `
-    <h2 lang="zh">${esc(p.name)}<span>${p.group === "thislove" ? "This Love" : p.group === "wonderland" ? "未來" : "Soulboy"} · track ${p.track} · ${Math.round(p.bpm)} BPM</span></h2>
-    <p class="line" lang="zh">「${esc(p.line)}」</p>
-    <p class="about">${esc(style.id === "illus" || !p.absNote ? p.motion + ". " + p.mood + "." : style.id === "pixel" ? p.pixNote || p.absNote : style.id === "flat" ? p.absNote : p.geoNote || p.absNote)}</p>
-    ${style.id === "flat" ? `<p class="hint swatches">Colour = the colours its lyrics name: ${(lyricPalette(p) || []).map(([val, col, zh]) => `<span><i style="background:${col}"></i>${esc(zh)} ${Math.round(val * 100)}%</span>`).join("") || "none named, so it stays grey"}</p>` : ""}
-    <p class="hint">Hover the poster to hear the song${typeof soundOn !== "undefined" && soundOn ? "" : " (turn sound on first)"}.</p>
-    <dl>
-      <dt>Main image</dt><dd>${esc(p.hero)} <span class="count">→ ${p.heroCount} ${esc(p.heroUnit)}</span></dd>
-      <dt>Setting</dt><dd>${esc(p.setting)}</dd>
-      <dt>Around it</dt><dd lang="zh">${esc(p.supporting)}</dd>
-      <dt>People</dt><dd>${esc(p.people)}</dd>
-      <dt>Arc</dt><dd lang="zh">${esc(p.arc)}</dd>
-    </dl>`;
+  // only the poetry: an album is the plain list of its songs, a song is its line and its name
+  if (p.album) return `<ol class="stations">${p.stations.map(s => `<li lang="zh">${esc(s.name)}</li>`).join("")}</ol>`;
+  return `<p class="line" lang="zh">「${esc(p.line)}」</p><h2 lang="zh">${esc(p.name)}</h2>`;
 }
 // the arrows walk through the posters the tabs are showing
 // on the blended poster there are no song tabs, so the arrows walk the albums instead
@@ -4284,7 +4258,7 @@ function playPlate() {
 }
 function show(i) {
   cur = (i + PLATES.length) % PLATES.length;
-  text.innerHTML = card(PLATES[cur]) + `<p class="hint style-note">${esc(style.label)}: ${esc(style.note)}</p>`;
+  text.innerHTML = card(PLATES[cur]);
   // the albums are the first row; an album's own posters (the album, then its songs) appear in the second only once it is chosen
   const g = PLATES[cur].group;
   prints.querySelectorAll(".album-tab").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.album === g)));
@@ -4299,7 +4273,7 @@ function size() {
   if (!boxW) return;
   const top = plateBox.getBoundingClientRect().top + window.scrollY;
   // leave room for the two rows of toggles under the poster, so nothing needs scrolling
-  const below = [".album-nav", ".plate-nav", ".style-bar"].reduce((a, q) => a + ((document.querySelector(".posters " + q) || {}).offsetHeight || 0), 0) + 28;
+  const below = [".album-nav", ".plate-nav"].reduce((a, q) => a + ((document.querySelector(".posters " + q) || {}).offsetHeight || 0), 0) + 28;
   const availH = Math.max(320, window.innerHeight - top - below);
   // the blend album is a poster like the songs; the other styles keep the wide plate
   if (p.album && style.id !== "flat" && !p.portrait) { pw = boxW; ph = Math.min(availH, boxW * 0.62); if (boxW < 700) ph = boxW * 1.05; }
@@ -4308,14 +4282,15 @@ function size() {
   cv.width = off.width = Math.round(pw * dpr); cv.height = off.height = Math.round(ph * dpr); cv.style.width = pw + "px"; cv.style.height = ph + "px";
   dirty = true;
 }
+styleBar.addEventListener("click", e => {
+  const b = e.target.closest("button[data-style]"); if (!b) return;
+  opened = true; style = STYLES.find(st => st.id === b.dataset.style);
+  styleBar.querySelectorAll(".style-btn").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  show(cur);
+});
 prints.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   opened = true;
-  if (b.dataset.style) {
-    style = STYLES.find(st => st.id === b.dataset.style);
-    prints.querySelectorAll(".style-btn").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
-    show(cur); return;
-  }
   if (b.id === "plate-prev") step(-1); else if (b.id === "plate-next") step(1); else if (b.dataset.album) showAlbum(b.dataset.album); else if (b.dataset.i) show(+b.dataset.i);
 });
 addEventListener("keydown", e => {
