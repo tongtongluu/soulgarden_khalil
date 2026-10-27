@@ -1500,7 +1500,27 @@ const CARDS = [
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 function lin(c, x0, y0, x1, y1, a, b) { const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, a); g.addColorStop(1, b); return g; }
 function rad(c, x, y, r, a, b) { const g = c.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, a); g.addColorStop(1, b); return g; }
-function disc(c, x, y, r) { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); }
+function disc(c, x, y, r) { if (disc.beat && !disc.round) return beatPath(c, x, y, r, disc.beat); c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); }
+// rhythm as shape: while a song poster draws, every round form takes the bar's shape, one corner per beat, so 3/4 is a triangle and 4/4 a square;
+// 12/8 is four beats each split in three, a square whose sides swell three times. The corners are softened, and the shapes turn one corner each bar.
+function beatPath(c, x, y, r, b) {
+  const n = b.n, k = n === 3 ? 1.3 : n === 4 ? 1.14 : 1.08, R = r * k, rot = -Math.PI / 2 + (n % 2 ? 0 : Math.PI / n) + (b.turn || 0);
+  const pts = Array.from({ length: n }, (_, i) => [x + Math.cos(rot + i * 2 * Math.PI / n) * R, y + Math.sin(rot + i * 2 * Math.PI / n) * R]);
+  c.beginPath();
+  if (b.compound) {
+    // three swells per side, one per eighth note
+    const S = 18;
+    pts.forEach((a, i) => { const z = pts[(i + 1) % n], nx = (a[0] + z[0]) / 2 - x, ny = (a[1] + z[1]) / 2 - y, L = Math.hypot(nx, ny) || 1;
+      for (let j = 0; j < S; j++) { const u = j / S, bulge = Math.abs(Math.sin(u * Math.PI * 3)) * R * 0.15;
+        const px = a[0] + (z[0] - a[0]) * u + (nx / L) * bulge, py = a[1] + (z[1] - a[1]) * u + (ny / L) * bulge;
+        i || j ? c.lineTo(px, py) : c.moveTo(px, py); } });
+  } else {
+    const cr = R * 0.14, mid = (a, z) => [(a[0] + z[0]) / 2, (a[1] + z[1]) / 2], m0 = mid(pts[n - 1], pts[0]);
+    c.moveTo(m0[0], m0[1]);
+    pts.forEach((a, i) => c.arcTo(a[0], a[1], pts[(i + 1) % n][0], pts[(i + 1) % n][1], cr));
+  }
+  c.closePath();
+}
 function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 const grain = document.createElement("canvas");
 grain.width = grain.height = 200;
@@ -2026,7 +2046,7 @@ function shadowOf(c, o, dx, dy, blur, col) {
   c.save(); c.shadowColor = col; c.shadowBlur = blur; c.shadowOffsetX = dx; c.shadowOffsetY = dy;
   ringShape(c, o); c.fillStyle = col; c.fill(); c.restore();
 }
-function glow(c, x, y, r, col, mode = "screen") { c.save(); c.globalCompositeOperation = mode; disc(c, x, y, r); c.fillStyle = rad(c, x, y, r, col, "rgba(0,0,0,0)"); c.fill(); c.restore(); }
+function glow(c, x, y, r, col, mode = "screen") { c.save(); c.globalCompositeOperation = mode; disc.round = true; disc(c, x, y, r); disc.round = false; c.fillStyle = rad(c, x, y, r, col, "rgba(0,0,0,0)"); c.fill(); c.restore(); }
 function shade(c, w, h, x0, y0, x1, y1, a) { c.save(); c.globalCompositeOperation = "multiply"; c.fillStyle = lin(c, x0, y0, x1, y1, "rgba(255,255,255,0)", `rgba(20,20,30,${a})`); c.fillRect(0, 0, w, h); c.restore(); }
 function beatOf(t, bpm, bar = 4) { const b = (t * bpm) / 60, f = b - Math.floor(b); return reduce ? 0 : Math.exp(-f * 5) * (Math.floor(b) % bar === 0 ? 1 : 0.6); }
 // poster type: a big title, the lyric line, and a strip of small facts, like a gig print
@@ -2469,7 +2489,7 @@ function imageryOf(track) {
   return s.weights.map((v, i) => [v, catColor(CATS[i]), CATS[i].zh]).filter(([v]) => v > 0.001).sort((a, b) => b[0] - a[0]);
 }
 function dataTint(c, w, h, track, p) {
-  const im = p && p.imageryFn ? p.imageryFn() : imageryOf(track);
+  const im = p && p.track ? lyricPalette(p) : p && p.imageryFn ? p.imageryFn() : imageryOf(track);
   c.save(); c.globalCompositeOperation = im ? "color" : "saturation";
   if (!im) c.fillStyle = "#808080";
   else {
@@ -2481,10 +2501,32 @@ function dataTint(c, w, h, track, p) {
 }
 function drawTinted(draw, c, w, h, t, p, hs) {
   posterType.queue = [];
-  draw(c, w, h, t, p, hs);
+  const rh = p.rh || rhythmOf(p.track) || { beats_per_bar: 4 }, bpb = rh.beats_per_bar || 4, compound = bpb > 3 && bpb % 3 === 0, n = compound ? bpb / 3 : bpb;
+  // one corner turns past on each downbeat, with a quick ease so the turn lands on the beat
+  const bars = reduce ? 0 : (t * (p.bpm || 90)) / 60 / n, f = bars - Math.floor(bars), ease = f < 0.25 ? 1 - Math.pow(1 - f / 0.25, 3) : 1;
+  disc.beat = { n, compound, turn: (Math.floor(bars) + ease) * (2 * Math.PI / n) * 0.25 };
+  try { draw(c, w, h, t, p, hs); } finally { disc.beat = null; }
   const q = posterType.queue; posterType.queue = null;
   dataTint(c, w, h, p.track, p);
-  q.forEach(args => posterType(...args));
+  const ink = inkFor(c, w, h, p), topInk = inkFor(c, w, h, p, true);
+  c.save(); c.fillStyle = lin(c, 0, h * 0.68, 0, h, `rgba(${ink.veil},0)`, `rgba(${ink.veil},.55)`); c.fillRect(0, h * 0.68, w, h * 0.32);
+  c.fillStyle = lin(c, 0, 0, 0, h * 0.14, `rgba(${topInk.veil},.45)`, `rgba(${topInk.veil},0)`); c.fillRect(0, 0, w, h * 0.14); c.restore();
+  q.forEach(([cc, ww, hh, pp, , , opts]) => posterType(cc, ww, hh, pp, ink.ink, ink.sub, { ...opts, metaInk: topInk.sub }));
+  beatMarks(c, w, h, t, p, rh, topInk);
+}
+// the bar, top right: one shape per beat in the song's own shape, the beat being played lit; 12/8 shows its three eighths under each beat
+function beatMarks(c, w, h, t, p, rh, ink) {
+  const bpb = rh.beats_per_bar || 4, compound = bpb > 3 && bpb % 3 === 0, n = compound ? bpb / 3 : bpb, r = w * 0.016, gap = r * 3.1;
+  const beats = reduce ? 0 : (t * (p.bpm || 90)) / 60, k = Math.floor(beats) % n, f = beats - Math.floor(beats), sub = Math.floor(f * 3);
+  const x0 = w * 0.93 - (n - 1) * gap, y = h * 0.1, b = { n, compound: false };
+  c.save();
+  for (let i = 0; i < n; i++) {
+    const x = x0 + i * gap, on = i === k, s = on ? 1 + 0.25 * Math.exp(-f * 4) : 1;
+    beatPath(c, x, y, r * s, b);
+    if (on) { c.fillStyle = ink.ink; c.fill(); } else { c.lineWidth = Math.max(1, w * 0.0025); c.strokeStyle = ink.sub; c.stroke(); }
+    if (compound) for (let j = 0; j < 3; j++) { c.beginPath(); c.arc(x + (j - 1) * r * 0.75, y + r * 2, r * 0.22, 0, Math.PI * 2); c.fillStyle = on && j <= sub ? ink.ink : ink.sub; c.globalAlpha = on && j <= sub ? 1 : 0.45; c.fill(); c.globalAlpha = 1; }
+  }
+  c.restore();
 }
 // rhythm as shape: a song's block is woven with a polygon with one corner per beat in the bar, so 4/4 is a square and 3/4 a triangle.
 // 12/8 is four beats each split in three, so it is a square whose sides each bend in three waves.
@@ -2519,6 +2561,44 @@ function beatShape(c, x, y, R, rh, rot) {
   c.closePath();
 }
 const LINES = [10, 21, 47, 49, 37, 59, 40, 49, 63, 42, 45, 28, 18, 82];
+// ---- colour from the lyrics: each song poster takes the colours its lyrics name ----
+// a colour word (紅, 藍, 灰 …) counts three times as much as a thing that carries a colour (海, 桃花, 月 …);
+// a song that names no colour and nothing coloured is printed in greys.
+const COLOUR_WORD = {
+  "紅": "#C8322C", "血紅": "#8A0F14", "綠": "#5CAE4A", "藍": "#2F7FB8", "蔚藍": "#2C7FC0", "黑": "#17151A", "漆黑": "#0C0B0E",
+  "灰": "#8A8A92", "紫": "#7A4A9A", "白": "#F2EFE8", "金": "#D4A62A", "黃": "#E8C33A", "粉": "#F2A7C0", "青": "#3E8E8A", "銀": "#C9CCD2",
+};
+const RAINBOW = ["#E8505B", "#F5B630", "#5CB35B", "#4F86C6", "#9A5FC4"];
+const COLOUR_THING = {
+  "海": "#2F6FA8", "地中海": "#1E6FB8", "河水": "#5FA3C8", "水": "#5FA3C8", "二泉": "#7FB3C8", "雨": "#8FA3B5", "暴雨天": "#5D6B7A",
+  "晴天": "#8EC5E8", "多雲天": "#B9C3CC", "雲堆": "#D5DCE3", "雲煙": "#C9CED4", "月": "#E6E1C8", "夜": "#1E2547", "夜夜": "#1E2547", "晚上": "#232A4F",
+  "太陽": "#F2B33D", "sun": "#F2B33D", "光": "#FFE08A", "春光": "#F6E39A", "燭光": "#F0A040", "燈籠": "#D9452B", "rays": "#FFD86A",
+  "花": "#F08FB0", "春花": "#F4A6C6", "桃花": "#F4A6B8", "玫瑰": "#C8283F", "薔薇": "#D9607A", "樹": "#5E9E4E", "柳樹": "#86B85A",
+  "原上草": "#7DB55A", "原野": "#8DB86A", "草": "#7DB55A", "春風": "#A7D49A", "北風": "#A9B4C2", "冬日": "#C9D6E3", "夏天": "#F2C14E",
+  "蝴蝶": "#E9A13B", "燕子": "#2B2F3A", "青蛙": "#6FA84A", "墨鏡": "#1A1A1A", "雲": "#D5DCE3", "河": "#5FA3C8", "酒": "#B8742E", "冰": "#CFE8F2", "墨": "#151318", "咖啡": "#6B4426", "cappuccino": "#B58A62",
+  "舊照片": "#B89B72", "電影": "#A88E6A", "宇宙": "#1C1E4A", "地球": "#3D7FB8",
+};
+// colour words and coloured things counted in the full lyrics of each song ("sb:3" is Soulboy track 3), false friends like 明白 and 萬念俱灰 removed
+const LYRIC_COLOURS = {"sb:1":{"colours":[],"things":[]},"sb:2":{"colours":[],"things":[["雲",1],["雨",1],["晴天",1]]},"sb:3":{"colours":[["紅",1],["綠",1]],"things":[["桃花",1],["柳樹",1],["燕子",1],["玫瑰",1],["草",3],["河",1],["雲",1]]},"sb:4":{"colours":[["藍",4]],"things":[["地中海",4]]},"sb:5":{"colours":[],"things":[]},"sb:6":{"colours":[],"things":[]},"sb:7":{"colours":[],"things":[]},"sb:8":{"colours":[["血紅",1],["漆黑",3],["彩虹",2]],"things":[["墨鏡",2],["燭光",3],["燈籠",3]]},"sb:9":{"colours":[],"things":[["太陽",1]]},"sb:10":{"colours":[["彩虹",6]],"things":[]},"sb:11":{"colours":[],"things":[["蝴蝶",3],["雲煙",3]]},"sb:12":{"colours":[],"things":[]},"sb:13":{"colours":[],"things":[["燕子",1],["花",1]]},"sb:14":{"colours":[],"things":[["cappuccino",1],["咖啡",1]]},"tl:1":{"colours":[["紫",1]],"things":[["桃花",1],["海",2],["花",3],["樹",3]]},"tl:2":{"colours":[],"things":[["花",1]]},"tl:3":{"colours":[],"things":[]},"tl:4":{"colours":[],"things":[["墨鏡",2]]},"tl:5":{"colours":[],"things":[["酒",4]]},"tl:6":{"colours":[],"things":[["冰",1]]},"tl:7":{"colours":[],"things":[]},"tl:8":{"colours":[["灰",3]],"things":[["薔薇",6],["雨",1]]},"tl:9":{"colours":[],"things":[]},"tl:10":{"colours":[],"things":[["太陽",1],["海",1]]},"tl:11":{"colours":[],"things":[]},"tl:12":{"colours":[],"things":[]},"tl:13":{"colours":[["紅",1],["綠",1]],"things":[["桃花",1],["柳樹",1],["燕子",1],["玫瑰",1],["草",2],["河",1],["雲",1]]}};
+function lyricPalette(p) {
+  if (p._palette !== undefined) return p._palette;
+  const key = (p.group === "thislove" ? "tl:" : "sb:") + p.track, extra = LYRIC_COLOURS[key] || {}, acc = new Map();
+  const add = (word, hex, v) => acc.set(hex, { v: (acc.get(hex)?.v || 0) + v, word });
+  (extra.colours || []).forEach(([wd, n]) => wd === "彩虹" ? RAINBOW.forEach(hex => add(wd, hex, n * 3 / RAINBOW.length * 2)) : COLOUR_WORD[wd] && add(wd, COLOUR_WORD[wd], n * 3));
+  (extra.things || []).forEach(([wd, n]) => COLOUR_THING[wd] && add(wd, COLOUR_THING[wd], n));
+  const list = [...acc.entries()].map(([hex, o]) => [o.v, hex, o.word]).sort((a, b) => b[0] - a[0]).slice(0, 5), sum = list.reduce((a, x) => a + x[0], 0);
+  return (p._palette = sum ? list.map(([v, hex, wd]) => [v / sum, hex, wd]) : null);
+}
+// the title reads on whatever is under it: measure the light there and pick dark or light ink, with a soft veil behind the words
+function inkFor(c, w, h, p, top) {
+  const slot = top ? "_inkTop" : "_ink";
+  if (p[slot] && performance.now() - p[slot].at < 1500 && p[slot].w === w) return p[slot];
+  const m = c.getTransform(), x0 = Math.round(w * 0.04 * m.a), y0 = Math.round(h * (top ? 0.01 : 0.72) * m.d), ww = Math.round(w * 0.9 * m.a), hh = Math.round(h * (top ? 0.13 : 0.24) * m.d);
+  let lum = 0.5;
+  try { const d = c.getImageData(x0, y0, ww, hh).data; let s = 0, n = 0; for (let i = 0; i < d.length; i += 64) { s += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]; n++; } lum = s / n / 255; } catch (e) {}
+  const light = lum > 0.52;
+  return (p[slot] = { at: performance.now(), w, light, ink: light ? "#17131C" : "#FBF7F0", sub: light ? "rgba(23,19,28,.78)" : "rgba(251,247,240,.85)", veil: light ? "255,250,244" : "14,11,18" });
+}
 const INK_BROWN = "74,60,40";
 const HOME_KEYS = ["body_gesture", "people_relationships", "city_street", "sky_weather", "nature_plants", "light_fire", "night_moon", "water", "cosmos", "time_memory"];
 // one word for each kind of imagery, for the poster's line and its key
@@ -3459,7 +3539,7 @@ function tlImagery(d) {
 }
 const TL_CARDS = THIS_LOVE.map(d => {
   const [draw, line, heroCount] = TL_DRAW[d.track];
-  return { track: d.track, name: d.name.replace(" (Instrumental)", ""), line, heroCount, bpm: d.tempo || 90, draw, group: "thislove", albumMeta: "THIS LOVE 2006", preview_url: d.preview_url,
+  return { track: d.track, name: d.name.replace(" (Instrumental)", ""), line, heroCount, bpm: d.tempo || 90, draw, group: "thislove", albumMeta: "THIS LOVE 2006", preview_url: d.preview_url, rh: { beats_per_bar: d.beats_per_bar, feel: d.feel },
     imageryFn: () => tlImagery(d), hero: "", heroUnit: "", setting: "", supporting: "", people: "", motion: "", mood: "", arc: "", absNote: "" };
 });
 
