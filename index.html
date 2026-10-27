@@ -69,6 +69,13 @@ h1 { font-family: var(--display); font-weight: 400; font-size: 20px; line-height
 .subtitle { font-family: var(--display); font-size: clamp(26px, 3.6vw, 40px); line-height: 1.1; margin: 0; }
 .lede { max-width: 52ch; font-size: 13px; line-height: 1.7; color: var(--muted); margin: 0; }
 .controls { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between; }
+.views { position: relative; flex: none; }
+.more { border: 0; background: transparent; color: var(--muted); font: 500 16px var(--body); line-height: 1; padding: 4px 8px; cursor: pointer; border-radius: 999px; }
+.more:hover, .more[aria-expanded="true"] { color: var(--fg); }
+.more:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.views .seg { position: absolute; top: calc(100% + 6px); right: 0; z-index: 20; display: grid; gap: 2px; padding: 6px; background: var(--bg); border: 1px solid var(--shelf); border-radius: 10px; box-shadow: 0 12px 30px -12px rgba(0,0,0,.5); white-space: nowrap; }
+.views .seg[hidden] { display: none; }
+.views .seg button { text-align: left; }
 .chips { display: flex; flex-wrap: wrap; gap: 2px 4px; min-width: 0; }
 .chip {
   display: inline-flex; align-items: center; gap: 7px; border: 1px solid transparent;
@@ -143,7 +150,7 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 .style-btn[aria-pressed="true"] { color: var(--fg); box-shadow: inset 0 -1px 0 var(--fg); }
 .style-btn:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 .controls .style-bar { margin-left: auto; }
-@media (max-width: 860px) { .controls { flex-wrap: wrap; width: 100%; min-width: 0; } .controls .style-bar { order: 3; flex: 1 1 100%; width: 100%; margin-left: 0; } }
+@media (max-width: 860px) { .controls { flex-wrap: wrap; width: 100%; min-width: 0; } .controls .style-bar { order: 3; flex: 1 1 100%; width: 100%; margin-left: 0; } .controls .views { margin-left: auto; } }
 
 .tip {
   position: absolute; pointer-events: none; z-index: 5; width: 250px;
@@ -185,13 +192,16 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
       </div>
     </div>
     <div class="controls">
-    <div class="seg" role="group" aria-label="View">
+    <div class="views">
+    <button class="more" id="more" type="button" aria-label="More views" title="More views" aria-expanded="false" aria-controls="view-menu">⋯</button>
+    <div class="seg" id="view-menu" role="group" aria-label="View" hidden>
       <button id="v-posters" data-view="posters" aria-pressed="true">Song posters</button>
       <button id="v-album" data-view="album" aria-pressed="false">By album</button>
       <button id="v-color" data-view="color" aria-pressed="false">By color</button>
       <button id="v-fuse" data-view="fuse" aria-pressed="false">Album blends</button>
       <button id="v-soul" data-view="soul" aria-pressed="false">Soul palette</button>
       <button id="v-scene" data-view="scene" aria-pressed="false">Dreamscape</button>
+    </div>
     </div>
     <button class="sound" id="sound" aria-pressed="false" aria-label="Sound" title="Sound" hidden>♪</button>
     </div>
@@ -1399,6 +1409,13 @@ CATS.forEach((c, i) => {
 });
 
 const viewButtons = document.querySelectorAll(".seg button");
+// the overflow menu: ⋯ opens it, choosing a view or clicking elsewhere closes it
+const moreBtn = document.getElementById("more"), viewMenu = document.getElementById("view-menu");
+const setMenu = open => { viewMenu.hidden = !open; moreBtn.setAttribute("aria-expanded", String(open)); };
+moreBtn.onclick = e => { e.stopPropagation(); setMenu(viewMenu.hidden); };
+viewMenu.addEventListener("click", () => setMenu(false));
+document.addEventListener("click", e => { if (!viewMenu.hidden && !e.target.closest(".views")) setMenu(false); });
+addEventListener("keydown", e => { if (e.key === "Escape") setMenu(false); });
 function setMode(m) {
   const wasFused = mode === "fuse" || mode === "soul";
   mode = m;
@@ -4215,7 +4232,7 @@ prints.innerHTML = `
 const styleBar = Object.assign(document.createElement("div"), { className: "style-bar", id: "style-bar" });
 styleBar.setAttribute("role", "group"); styleBar.setAttribute("aria-label", "Print style");
 styleBar.innerHTML = STYLES.map(st => `<button type="button" class="style-btn" data-style="${st.id}" aria-pressed="${st.id === "flat"}">${esc(st.label)}</button>`).join("");
-document.getElementById("sound").before(styleBar);
+document.querySelector(".views").before(styleBar);
 styleBar.hidden = !!document.getElementById("posters").hidden;
 const cv = document.getElementById("plate-canvas"), plateBox = document.getElementById("plate"), text = document.getElementById("plate-text");
 let cur = 0, pw = 0, ph = 0, dpr = 1, hoverStation = -1, hoverPlate = false;
