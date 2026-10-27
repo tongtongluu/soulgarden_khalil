@@ -1507,7 +1507,7 @@ const CARDS = [
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 function lin(c, x0, y0, x1, y1, a, b) { const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, a); g.addColorStop(1, b); return g; }
 function rad(c, x, y, r, a, b) { const g = c.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, a); g.addColorStop(1, b); return g; }
-function disc(c, x, y, r) { if (disc.beat && !disc.round) return beatPath(c, x, y, r, disc.beat); c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); }
+function disc(c, x, y, r) { if (disc.beat && !disc.round) return disc.beat.glyph ? glyphPath(c, x, y, r, disc.beat.glyph, disc.beat.turn, 0.45) : beatPath(c, x, y, r, disc.beat); c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); }
 // rhythm as shape: while a song poster draws, every round form takes the bar's shape, one corner per beat, so 3/4 is a triangle and 4/4 a square;
 // 12/8 is four beats each split in three, a square whose sides swell three times. The corners are softened, and the shapes turn one corner each bar.
 function beatPath(c, x, y, r, b) {
@@ -1528,6 +1528,46 @@ function beatPath(c, x, y, r, b) {
   }
   c.closePath();
 }
+// ---- each song's beat glyph: one shape built from all of its rhythm data, so no two songs share a mark ----
+// Points = beats in the bar (12/8: four points, each split into three sub-lobes). Tempo shapes the outline on a
+// continuous curve: slow songs have round, bulging lobes, fast ones sharp points. Feel sets the subdivision: swing
+// alternates long and short points, half-time shortens every other point. Energy and intensity set how deep the valleys
+// cut (low energy is nearly a circle, high a deep star), how far the downbeat point reaches and how big the pulse on the
+// beat is. Valence tilts the glyph and leans its points (brighter clockwise, darker the other way) and sets its centre
+// (open when bright, filled when dark). Data per song: [tempo, beats per bar, compound, valence, energy, intensity, swing, half-time].
+const SONG_RHYTHM = {"sb:1":[96.5,4,0,0.71,0.45,0.623,0,1],"sb:2":[100.5,4,0,0.76,0.49,0.717,0,0],"sb:3":[136,4,0,0.69,0.3,0.273,0,1],"sb:4":[58,12,1,0.49,0.25,0.152,0,0],"sb:5":[93.5,4,0,0.81,0.43,0.572,0,1],"sb:6":[95,4,0,0.79,0.3,0.25,0,0],"sb:7":[63.5,3,0,0.6,0.19,0.0,0,0],"sb:8":[72,12,1,0.53,0.25,0.131,0,0],"sb:9":[90,4,0,0.53,0.5,0.735,0,1],"sb:10":[101.5,4,0,0.72,0.52,0.786,0,0],"sb:11":[103,4,0,0.74,0.24,0.121,0,0],"sb:12":[133.5,4,0,0.57,0.26,0.174,0,0],"sb:13":[95,4,0,0.77,0.61,1.0,0,0],"sb:14":[79.5,4,0,0.61,0.25,0.136,0,0],"tl:1":[66,4,0,0.36,0.4,0.39,0,1],"tl:2":[88.5,4,0,0.62,0.48,0.53,0,0],"tl:3":[73.5,4,0,0.7,0.65,0.85,0,1],"tl:4":[92,4,0,0.73,0.74,1.0,1,0],"tl:5":[75.5,4,0,0.53,0.32,0.24,0,0],"tl:6":[68.5,12,1,0.43,0.43,0.45,0,1],"tl:7":[131,3,0,0.4,0.26,0.15,0.2,1],"tl:8":[78,12,1,0.4,0.36,0.32,0,0],"tl:9":[67,4,0,0.36,0.4,0.38,0,0],"tl:10":[97.5,4,0,0.65,0.58,0.72,0,0],"tl:11":[63,4,0,0.5,0.27,0.15,1,1],"tl:12":[96.5,4,0,0.54,0.33,0.26,0,0],"tl:13":[90,4,0,0.46,0.18,0.0,0,1],"wl:1":[57.5,4,0,0.4,0.3,0.462,0.01,1],"wl:2":[95,4,0,0.59,0.46,0.81,0.01,0],"wl:3":[95,4,0,0.71,0.43,0.738,0.21,0],"wl:4":[59,12,1,0.41,0.24,0.35,0,0],"wl:5":[98.5,4,0,0.72,0.46,0.803,0.01,0],"wl:6":[99.5,4,0,0.59,0.4,0.68,0.01,0],"wl:7":[62,4,0,0.47,0.33,0.525,0.01,0],"wl:8":[102.5,4,0,0.64,0.55,1.0,1,0],"wl:9":[124.5,3,0,0.23,0.27,0.396,0.84,0],"wl:10":[61.5,4,0,0.36,0.13,0.115,0,0],"wl:11":[98.5,4,0,0.39,0.08,0.0,0.42,0]};
+const GLYPHS = {};
+// valence, energy and intensity are read by their rank among all 38 songs, so songs with near-equal numbers still part
+const GLYPH_RANK = (() => { const ks = Object.keys(SONG_RHYTHM), rank = i => { const m = {}; ks.slice().sort((a, b) => SONG_RHYTHM[a][i] - SONG_RHYTHM[b][i]).forEach((k, j) => (m[k] = j / (ks.length - 1))); return m; };
+  return { val: rank(3), en: rank(4), int: rank(5) }; })();
+function glyphOf(key) {
+  if (GLYPHS[key]) return GLYPHS[key];
+  const d = SONG_RHYTHM[key]; if (!d) return null;
+  const [tempo, bpb, compound, val, energy, inten, swing, half] = d, n = compound ? bpb / 3 : bpb, sharp = Math.max(0, Math.min(1, (tempo - 60) / 72));
+  const rv = GLYPH_RANK.val[key], re = GLYPH_RANK.en[key], ri = GLYPH_RANK.int[key];
+  return (GLYPHS[key] = { n, compound: !!compound, k: 2.6 - 2.25 * sharp, depth: 0.12 + 0.46 * (0.6 * ri + 0.4 * re), swing, half: !!half,
+    tilt: (rv - 0.5) * 1.3, lean: (rv - 0.5) * 1.2, down: 1.05 + 0.32 * re, hole: 0.13 + 0.22 * re, open: val >= 0.55, pulse: 0.12 + 0.3 * inten });
+}
+const glyphKey = p => (p.group === "thislove" ? "tl:" : p.group === "wonderland" ? "wl:" : "sb:") + p.track;
+function glyphPath(c, x, y, r, g, turn = 0, soften = 1) {
+  const N = 220, dep = g.depth * soften, rot = -Math.PI / 2 + g.tilt + turn;
+  c.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const a = i / N, pos = a * g.n, j = Math.floor(pos) % g.n, ph = pos - Math.floor(pos);
+    // 0 at a point's tip, 1 in the valley; a low k keeps it high (sharp tips), a high k keeps it low (round lobes)
+    let f = Math.pow((1 - Math.cos(2 * Math.PI * ph)) / 2, g.k);
+    if (g.compound) f = Math.min(1, f + 0.4 * Math.pow((1 - Math.cos(6 * Math.PI * ph)) / 2, 1.3) * (1 - f) * (1 - 0.5 * f));
+    const near = ph < 0.5 ? j : (j + 1) % g.n, tip = ph < 0.5 ? 1 - ph * 2 : (ph - 0.5) * 2;
+    let len = near === 0 ? g.down : 1;
+    if (g.swing && near % 2) len *= 1 - 0.55 * g.swing;
+    if (g.half && near % 2) len *= 0.8;
+    const rr = r * (1 - dep * f) * (1 + (len - 1) * tip), ang = rot + a * Math.PI * 2 + g.lean * (Math.PI / g.n) * 0.3 * Math.sin(2 * Math.PI * ph);
+    i ? c.lineTo(x + Math.cos(ang) * rr, y + Math.sin(ang) * rr) : c.moveTo(x + Math.cos(ang) * rr, y + Math.sin(ang) * rr);
+  }
+  c.closePath();
+}
+// the tip of point i, for lighting the beat being played
+function glyphTip(x, y, r, g, i, turn = 0) { const a = -Math.PI / 2 + g.tilt + turn + i / g.n * Math.PI * 2; return [x + Math.cos(a) * r, y + Math.sin(a) * r]; }
 function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 const grain = document.createElement("canvas");
 grain.width = grain.height = 200;
@@ -2531,7 +2571,7 @@ function drawTinted(draw, c, w, h, t, p, hs) {
   const rh = p.rh || rhythmOf(p.track) || { beats_per_bar: 4 }, bpb = rh.beats_per_bar || 4, compound = bpb > 3 && bpb % 3 === 0, n = compound ? bpb / 3 : bpb;
   // one corner turns past on each downbeat, with a quick ease so the turn lands on the beat
   const bars = reduce ? 0 : (t * (p.bpm || 90)) / 60 / n, f = bars - Math.floor(bars), ease = f < 0.25 ? 1 - Math.pow(1 - f / 0.25, 3) : 1;
-  disc.beat = { n, compound, turn: (Math.floor(bars) + ease) * (2 * Math.PI / n) * 0.25 };
+  disc.beat = { n, compound, turn: (Math.floor(bars) + ease) * (2 * Math.PI / n) * 0.25, glyph: glyphOf(glyphKey(p)) };
   try { draw(c, w, h, t, p, hs); } finally { disc.beat = null; }
   const q = posterType.queue; posterType.queue = null;
   dataTint(c, w, h, p.track, p);
@@ -2543,6 +2583,15 @@ function drawTinted(draw, c, w, h, t, p, hs) {
 }
 // the bar, top right: one shape per beat in the song's own shape, the beat being played lit; 12/8 shows its three eighths under each beat
 function beatMarks(c, w, h, t, p, rh, ink) {
+  const gl = glyphOf(glyphKey(p));
+  if (gl) {
+    const r = w * 0.016, R = r * 2.2, x = w * 0.93 - r, y = h * 0.1 + r * 0.4, beats = reduce ? 0 : (t * (p.bpm || 90)) / 60, k = Math.floor(beats) % gl.n, f = beats - Math.floor(beats);
+    const pulse = 1 + gl.pulse * Math.exp(-f * 4) * (k === 0 ? 1.4 : 1);
+    c.save(); glyphPath(c, x, y, R * pulse, gl); c.fillStyle = ink.light ? "rgba(23,19,28,.12)" : "rgba(251,247,240,.14)"; c.fill(); c.lineWidth = Math.max(1, w * 0.0025); c.strokeStyle = ink.sub; c.stroke();
+    const [tx, ty] = glyphTip(x, y, R * pulse * 0.82, gl, k); c.beginPath(); c.arc(tx, ty, r * 0.32 * (1 + Math.exp(-f * 4)), 0, Math.PI * 2); c.fillStyle = ink.ink; c.fill();
+    c.beginPath(); c.arc(x, y, R * gl.hole, 0, Math.PI * 2); if (gl.open) { c.lineWidth = Math.max(1, w * 0.002); c.strokeStyle = ink.sub; c.stroke(); } else { c.fillStyle = ink.sub; c.fill(); }
+    c.restore(); return;
+  }
   const bpb = rh.beats_per_bar || 4, compound = bpb > 3 && bpb % 3 === 0, n = compound ? bpb / 3 : bpb, r = w * 0.016, gap = r * 3.1;
   const beats = reduce ? 0 : (t * (p.bpm || 90)) / 60, k = Math.floor(beats) % n, f = beats - Math.floor(beats), sub = Math.floor(f * 3);
   const x0 = w * 0.93 - (n - 1) * gap, y = h * 0.1, b = { n, compound: false };
@@ -2946,7 +2995,7 @@ function wonderScene(c, w, h, t, card, hs = -1) {
   meta.forEach((s, i) => {
     const u = i < 2 ? 0.02 + i * 0.04 : i <= 7 ? [U.cup, U.dusk, U.park, U.church, U.lamp, U.moon][i - 2] + 0.035 : 0.79 + (i - 8) * 0.075;
     const [x, y] = pathAt(P, u), b = beatOf(t, s.tempo, s.bar), on = i === hs, r = w * (0.011 + 0.006 * Math.sqrt((s.line_count || 20) / 40)) * (1 + 0.35 * b + (on ? 0.5 : 0));
-    beatPath(c, x, y, r, { n: s.bar, compound: s.compound, turn: 0 });
+    glyphPath(c, x, y, r * 1.15, glyphOf("wl:" + s.track));
     c.fillStyle = on ? "#FFFFFF" : `rgba(255,246,238,${0.55 + 0.4 * b})`; c.fill();
     marks.push([x, y, r]);
   });
@@ -3017,11 +3066,11 @@ function sentenceType(c, w, h, card, key, o = {}) {
 }
 
 // ---- Soulboy and This Love drawn the same way: each album's sentence walked as a scene ----
-function beadsAlong(c, w, t, P, S, us, hs) {
+function beadsAlong(c, w, t, P, S, us, hs, pre) {
   return S.map((s, i) => {
     const [x, y] = pathAt(P, us[i]), b = beatOf(t, s.tempo || 90, s.bar || 4), on = i === hs;
     const r = w * (0.011 + 0.006 * Math.sqrt((s.lines || s.line_count || 20) / 40)) * (1 + 0.35 * b + (on ? 0.5 : 0));
-    beatPath(c, x, y, r, { n: s.bar || 4, compound: false, turn: 0 }); c.fillStyle = on ? "#FFFFFF" : `rgba(255,246,238,${0.55 + 0.4 * b})`; c.fill();
+    const gl = pre && glyphOf(pre + ":" + s.track); if (gl) glyphPath(c, x, y, r * 1.15, gl); else beatPath(c, x, y, r, { n: s.bar || 4, compound: false, turn: 0 }); c.fillStyle = on ? "#FFFFFF" : `rgba(255,246,238,${0.55 + 0.4 * b})`; c.fill();
     return [x, y, r];
   });
 }
@@ -3068,7 +3117,7 @@ function soulboyScene(c, w, h, t, card, D, hs) {
   const P = [[0.02, 0.66], [0.25, 0.6], [0.45, 0.52], [0.52, 0.44], [0.52, 0.32], [0.58, 0.22], [0.7, 0.14], [0.86, 0.05]].map(([x, y]) => [x * w, y * h]);
   { const n = Math.round(30 + 8 * sz("趕場")); for (let i = 0; i < n; i++) { const u = 0.38 + ((i / n + T * 0.03) % 1) * 0.6, [x, y] = pathAt(P, u), j = Math.sin(i * 12.9) * w * 0.03;
       rule(c, x + j, y, x + j, y - h * 0.008, Math.max(1, w * 0.003), `rgba(255,236,214,${0.35 + 0.3 * lit("趕場")})`); } }
-  const us = S.map((s, i) => 0.03 + 0.95 * i / (S.length - 1)), marks = beadsAlong(c, w, t, P, S, us, hs);
+  const us = S.map((s, i) => 0.03 + 0.95 * i / (S.length - 1)), marks = beadsAlong(c, w, t, P, S, us, hs, "sb");
   albumHover(c, w, card, S, marks, hs);
   albumTitle(c, w, h, D, null, card, hs);
 }
@@ -3111,7 +3160,7 @@ function thisLoveScene(c, w, h, t, card, D, hs) {
       disc(c, x, y, r * 0.5); c.fillStyle = "#FFD86A"; c.fill(); } }
   // the walk: from the face, through the rain over the city, with the wind, down to the sun and the shore
   const P = [[0.1, 0.44], [0.24, 0.42], [0.42, 0.46], [0.62, 0.45], [0.8, 0.52], [0.86, 0.64], [0.68, 0.72], [0.45, 0.76], [0.2, 0.77]].map(([x, y]) => [x * w, y * h]);
-  const us = S.map((s, i) => 0.02 + 0.96 * i / (S.length - 1)), marks = beadsAlong(c, w, t, P, S, us, hs);
+  const us = S.map((s, i) => 0.02 + 0.96 * i / (S.length - 1)), marks = beadsAlong(c, w, t, P, S, us, hs, "tl");
   albumHover(c, w, card, S, marks, hs);
   albumTitle(c, w, h, D, null, card, hs);
 }
@@ -3831,9 +3880,9 @@ function mergeAlbums(c, w, h, t, p) {
   const mix = (a, b, f) => a.map((v, k) => Math.round(v + (b[k] - v) * f));
   const col = (x, hue, lit = 0.4, al = 1) => `rgba(${mix(HUE[hue], skyAt(x / w), lit).join(",")},${al})`;
   const songs = p._songs || (p._songs = [
-    ...SOULBOY.map((d, i) => ({ tempo: d.tempo, bar: SOULBOY_BAR[i] || 4 })),
-    ...THIS_LOVE.map(d => ({ tempo: d.tempo || 90, bar: d.beats_per_bar > 3 && d.beats_per_bar % 3 === 0 ? d.beats_per_bar / 3 : d.beats_per_bar || 4 })),
-    ...WONDERLAND.map(d => ({ tempo: d.tempo || 90, bar: d.beats_per_bar > 3 && d.beats_per_bar % 3 === 0 ? d.beats_per_bar / 3 : d.beats_per_bar || 4 }))]);
+    ...SOULBOY.map((d, i) => ({ key: "sb:" + d.track, tempo: d.tempo, bar: SOULBOY_BAR[i] || 4 })),
+    ...THIS_LOVE.map(d => ({ key: "tl:" + d.track, tempo: d.tempo || 90, bar: d.beats_per_bar > 3 && d.beats_per_bar % 3 === 0 ? d.beats_per_bar / 3 : d.beats_per_bar || 4 })),
+    ...WONDERLAND.map(d => ({ key: "wl:" + d.track, tempo: d.tempo || 90, bar: d.beats_per_bar > 3 && d.beats_per_bar % 3 === 0 ? d.beats_per_bar / 3 : d.beats_per_bar || 4 }))]);
   // where each image of the sentence stands in the landscape, so hovering its word can light that spot
   const SPOT = { 春風: [0.1, 0.86], 小巷: [0.14, 0.62], 燈籠: [0.2, 0.6], 雨: [0.4, 0.5], 城: [0.42, 0.6], 黃昏: [0.55, 0.62], 雪花: [0.6, 0.45], 花: [0.64, 0.7], 海: [0.8, 0.8], 玫瑰: [0.7, 0.6], 月亮: [0.84, 0.48] };
   const hot = p._word && SPOT[p._word];
@@ -3863,12 +3912,15 @@ function mergeAlbums(c, w, h, t, p) {
   for (let k = 0; k < 9; k++) { const y = hz + h * (0.015 + k * 0.025), half = mr * (1.1 - k * 0.08) * (0.8 + 0.2 * Math.sin(T * 1.5 + k * 1.3));
     rule(c, moon[0] - half, y, moon[0] + half, y, Math.max(1, w * 0.003), `rgba(244,238,222,${0.55 - k * 0.05})`); }
 
-  // 4. the lane: two walls converging on the horizon at the left, lanterns as small warm glows along them
-  const vp = [w * 0.15, hz - h * 0.01];
-  c.fillStyle = col(w * 0.04, "ink", 0.28); c.beginPath(); c.moveTo(0, hz - h * 0.2); c.lineTo(vp[0] - w * 0.015, vp[1] - h * 0.04); c.lineTo(vp[0] - w * 0.015, vp[1] + h * 0.005); c.lineTo(0, h); c.closePath(); c.fill();
-  c.fillStyle = col(w * 0.24, "ink", 0.3); c.beginPath(); c.moveTo(w * 0.3, hz - h * 0.12); c.lineTo(vp[0] + w * 0.015, vp[1] - h * 0.04); c.lineTo(vp[0] + w * 0.015, vp[1] + h * 0.005); c.lineTo(w * 0.36, h); c.lineTo(w * 0.3, h); c.closePath(); c.fill();
-  [[0.04, 0.58], [0.09, 0.62], [0.12, 0.64], [0.21, 0.62], [0.26, 0.59]].forEach(([x, y], i) => { const a = 0.55 + 0.15 * Math.sin(T * 1.3 + i); glow(c, w * x, h * y, w * (0.03 + 0.012 * (i % 2)), `rgba(255,190,120,${a})`); disc.round = true; disc(c, w * x, h * y, w * 0.005); disc.round = false; c.fillStyle = "rgba(255,226,180,.95)"; c.fill(); });
-
+  // 4. the lane: two rows of lanterns hung along its sides, drawing the eye down to one point on the horizon
+  const vp = [w * 0.15, hz - h * 0.02];
+  [-1, 1].forEach(sd => {
+    const pts = []; for (let i = 0; i < 8; i++) { const u = i / 7, e = Math.pow(1 - u, 1.25); pts.push([vp[0] + sd * e * w * (sd < 0 ? 0.17 : 0.2), vp[1] - e * h * 0.11 + Math.sin(T * 0.9 + i + sd) * h * 0.002 * e, u]); }
+    c.beginPath(); pts.forEach(([x, y], i) => i ? c.quadraticCurveTo((x + pts[i - 1][0]) / 2, (y + pts[i - 1][1]) / 2 + h * 0.012 * (1 - pts[i][2]), x, y) : c.moveTo(x, y));
+    c.strokeStyle = col(vp[0], "ink", 0.45, 0.55); c.lineWidth = Math.max(1, w * 0.0015); c.stroke();
+    pts.forEach(([x, y, u], i) => { const r = w * (0.004 + 0.012 * Math.pow(1 - u, 1.4)), a = 0.5 + 0.2 * Math.sin(T * 1.3 + i * 0.8 + sd);
+      glow(c, x, y + r, r * 3.2, `rgba(255,186,120,${a})`); c.beginPath(); c.ellipse(x, y + r, r * 0.75, r, 0, 0, Math.PI * 2); c.fillStyle = "rgba(255,214,160,.92)"; c.fill(); });
+  });
   // 5. the flowers: a band of soft colour along the shore line
   for (let i = 0; i < 30; i++) { const u = i / 29, y = hz + u * (h - hz) * 0.96, x = shoreAt(y) - w * (0.015 + 0.02 * u) + Math.sin(u * 3) * w * 0.01;
     disc.round = true; disc(c, x + Math.sin(i * 2.7) * w * 0.012, y, w * (0.006 + 0.008 * u + 0.003 * Math.sin(i * 1.9 + 1))); disc.round = false; c.fillStyle = col(x, "rose", 0.12, 0.85); c.fill(); }
@@ -3888,7 +3940,7 @@ function mergeAlbums(c, w, h, t, p) {
 
   // 8. the 38 songs: tiny beads along the ground, left to right in album order, each flashing on its own beat
   songs.forEach((sg, i) => { const x = w * (0.03 + 0.58 * i / (songs.length - 1)), y = hz + h * 0.012, b = beatOf(t, sg.tempo || 90, sg.bar || 4);
-    disc.round = true; disc(c, x, y, w * 0.0035 * (1 + 0.6 * b)); disc.round = false; c.fillStyle = `rgba(255,240,220,${0.35 + 0.55 * b})`; c.fill(); });
+    glyphPath(c, x, y, w * 0.0055 * (1 + 0.5 * b), glyphOf(sg.key)); c.fillStyle = `rgba(255,240,220,${0.4 + 0.5 * b})`; c.fill(); });
   // a hovered word lights its place in the landscape
   if (hot) glow(c, w * hot[0], h * hot[1], w * 0.12, "rgba(255,236,210,.55)");
 
