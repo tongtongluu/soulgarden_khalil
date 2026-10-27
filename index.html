@@ -3031,7 +3031,10 @@ function sentenceType(c, w, h, card, key, o = {}) {
   const words = IM.stations.map(([, wd]) => shown(wd)), stationOf = txt => (IM.stations.find(([, wd]) => shown(wd) === txt) || [])[1];
   const hovTrack = o.hovTrack, x = w * 0.07, y0 = o.y0 ?? h * 0.12;
   // a dark veil behind the words where they sit over the scene
-  if (o.veil) { c.save(); c.fillStyle = lin(c, 0, y0 - h * 0.12, 0, h, "rgba(12,9,16,0)", "rgba(12,9,16,.78)"); c.fillRect(0, y0 - h * 0.12, w, h - y0 + h * 0.12); c.restore(); }
+  const veil = o.light ? "239,232,216" : "12,9,16";
+  if (o.veil) { c.save(); c.fillStyle = lin(c, 0, y0 - h * 0.12, 0, h, `rgba(${veil},0)`, `rgba(${veil},.78)`); c.fillRect(0, y0 - h * 0.12, w, h - y0 + h * 0.12); c.restore(); }
+  // on a light ground (the paper styles) the plain words take ink and the image words are deepened to hold their colour
+  const deepen = col => { const m = String(col).match(/\d+/g) || [], v = col[0] === "#" ? [1, 3, 5].map(k => parseInt(col.slice(k, k + 2), 16)) : m.slice(0, 3).map(Number); return `rgb(${v.map(x => Math.round(x * 0.62)).join(",")})`; };
   c.save(); c.textBaseline = "alphabetic"; c.font = `900 100px "Noto Sans SC", sans-serif`;
   const widest = Math.max(...rows.map(r => c.measureText(r).width)) / 100, size = Math.min(w * (w < 440 ? 0.08 : 0.062), (w * 0.88) / widest);
   c.font = `900 ${size}px "Noto Sans SC", sans-serif`;
@@ -3041,9 +3044,9 @@ function sentenceType(c, w, h, card, key, o = {}) {
     while (rest.length) { const hit = words.map(wd => [wd, rest.indexOf(wd)]).filter(([, k]) => k >= 0).sort((a, b) => a[1] - b[1] || b[0].length - a[0].length)[0];
       if (!hit) { parts.push([rest, null]); break; } if (hit[1]) parts.push([rest.slice(0, hit[1]), null]); parts.push([hit[0], hit[0]]); rest = rest.slice(hit[1] + hit[0].length); }
     parts.forEach(([txt, sw]) => {
-      const wd = sw && stationOf(sw), tw = c.measureText(txt).width, col = wd ? wordColour(key, wd) : null;
+      const wd = sw && stationOf(sw), tw = c.measureText(txt).width, col = wd ? (o.light ? deepen(wordColour(key, wd)) : wordColour(key, wd)) : null;
       const on = wd && (card._word === wd || (hovTrack && IM.stations.some(([tr, x2]) => x2 === wd && tr === hovTrack)));
-      c.fillStyle = wd ? col : "rgba(255,246,238,.74)";
+      c.fillStyle = wd ? col : o.light ? "rgba(23,19,28,.82)" : "rgba(255,246,238,.74)";
       if (on) { c.shadowColor = col; c.shadowBlur = size * 0.6; }
       c.fillText(txt, cx, y); c.shadowBlur = 0;
       if (wd) card._words.push([wd, cx, y - size, cx + tw, y + size * 0.2]);
@@ -3056,7 +3059,7 @@ function sentenceType(c, w, h, card, key, o = {}) {
   if (card._word) {
     const named = k => { const rows = albumRows(k); return wordSongsIn(k, card._word).map(tr => (rows.find(r => r.track === tr) || {}).name).filter(Boolean); };
     const tracks = key === "all" ? [] : wordSongsIn(key, card._word), names = key === "all" ? ["soulboy", "thislove", "wonderland"].flatMap(named) : named(key);
-    c.font = `500 ${Math.max(9, w * 0.021)}px "Noto Sans SC", sans-serif`; c.fillStyle = "rgba(255,246,238,.92)";
+    c.font = `500 ${Math.max(9, w * 0.021)}px "Noto Sans SC", sans-serif`; c.fillStyle = o.light ? "rgba(23,19,28,.88)" : "rgba(255,246,238,.92)";
     const ty = o.noteAbove ? y0 - size * 1.2 : yEnd + w * 0.05;
     c.fillText(`「${card._word}」唱在 ${names.length} 首歌：${names.join("、")}`, x, ty);
     (card._marks || []).forEach((m, i) => { if (tracks.includes(i + 1)) glow(c, m[0], m[1], m[2] * 4, "rgba(255,236,200,.85)"); });
@@ -3352,13 +3355,17 @@ function stylise(style, src, dst, w, h, d, title) {
     }
   } else if (style.id === "ink") {
     const paper = hex("#EFE6D2"), ink = hex("#1E1C19"), red = hex("#B8312F");
+    // the picture's own darkest and lightest tones span the ink's range, so a night scene still has a light and a dark
+    const hist = new Uint32Array(256); for (let i = 0; i < px.length; i += 16) hist[(0.3 * px[i] + 0.55 * px[i + 1] + 0.15 * px[i + 2]) | 0]++;
+    const tot = hist.reduce((a, b) => a + b, 0), pct = q => { let a = 0; for (let v = 0; v < 256; v++) if ((a += hist[v]) >= tot * q) return v; return 255; };
+    const lo = pct(0.04), hi = Math.max(lo + 40, pct(0.97));
     for (let i = 0; i < px.length; i += 4) {
       const r = px[i], g = px[i + 1], b = px[i + 2];
       if (r > g + 55 && r > b + 45) { px[i] = red[0]; px[i + 1] = red[1]; px[i + 2] = red[2]; continue; }
-      let l = (0.3 * r + 0.55 * g + 0.15 * b) / 255;
-      l = Math.round(Math.pow(l, 1.6) * 4) / 4;           // five tones of ink, from scorched to clear water
+      let l = Math.max(0, Math.min(1, ((0.3 * r + 0.55 * g + 0.15 * b) - lo) / (hi - lo)));
+      l = Math.round(Math.pow(l, 0.8) * 4) / 4;           // five tones of ink, from scorched to clear water
       const u = 1 - l;
-      for (let k = 0; k < 3; k++) px[i + k] = paper[k] + (ink[k] - paper[k]) * u * 0.92;
+      for (let k = 0; k < 3; k++) px[i + k] = paper[k] + (ink[k] - paper[k]) * u * 0.85;
     }
     dst.putImageData(img, 0, 0);
     // soften it into the paper, as wet ink spreads
@@ -3368,12 +3375,15 @@ function stylise(style, src, dst, w, h, d, title) {
     paperGrain(dst, w, h, 0.18);
     // a red seal with the song's name, stamped bottom right
     const sz = Math.max(26, Math.min(w, h) * 0.075), sx = w - sz * 1.5, sy = h - sz * 1.5;
+    dst.save();
     dst.fillStyle = "#B8312F"; dst.beginPath(); dst.roundRect(sx, sy, sz, sz, sz * 0.08); dst.fill();
     dst.fillStyle = "#EFE6D2"; dst.font = `700 ${sz * 0.36}px "Noto Serif SC", serif`; dst.textAlign = "center"; dst.textBaseline = "middle";
     const chars = [..."方大同"].slice(0, 3);
-    dst.fillText(chars[0], sx + sz * 0.5, sy + sz * 0.3); dst.fillText(chars[1] + chars[2], sx + sz * 0.5, sy + sz * 0.68);
+    dst.fillText(chars[0], sx + sz * 0.5, sy + sz * 0.3); dst.fillText(chars[1] + chars[2], sx + sz * 0.5, sy + sz * 0.68); dst.restore();
   } else if (style.id === "seurat") {
+    // the ground is the picture itself, softened and paled, so gaps between dots don't read as white noise
     dst.fillStyle = "#F4EEDF"; dst.fillRect(0, 0, W, H);
+    dst.filter = `blur(${3 * d}px)`; dst.globalAlpha = 0.85; dst.drawImage(src, 0, 0); dst.filter = "none"; dst.globalAlpha = 1;
     const step = Math.max(3, Math.round(4.2 * d)), rnd = mulberry(1);
     for (let y = 0; y < H; y += step) for (let x = 0; x < W; x += step) {
       const jx = x + (rnd() - 0.5) * step, jy = y + (rnd() - 0.5) * step;
@@ -3382,7 +3392,7 @@ function stylise(style, src, dst, w, h, d, title) {
       const r = px[i], g = px[i + 1], b = px[i + 2], m = (r + g + b) / 3, k = 1.35;
       dst.fillStyle = `rgb(${m + (r - m) * k},${m + (g - m) * k},${m + (b - m) * k})`;
       dst.beginPath(); dst.arc(jx, jy, step * 0.62, 0, Math.PI * 2); dst.fill();
-      if (rnd() < 0.18) { dst.fillStyle = `rgba(${255 - r},${255 - g},${255 - b},.35)`; dst.beginPath(); dst.arc(jx + step * 0.3, jy + step * 0.3, step * 0.28, 0, Math.PI * 2); dst.fill(); }
+      if (rnd() < 0.06) { dst.fillStyle = `rgba(${255 - r},${255 - g},${255 - b},.18)`; dst.beginPath(); dst.arc(jx + step * 0.3, jy + step * 0.3, step * 0.28, 0, Math.PI * 2); dst.fill(); }
     }
     dst.setTransform(d, 0, 0, d, 0, 0);
   }
@@ -3984,6 +3994,70 @@ function mergeAlbums(c, w, h, t, p) {
   sentenceType(c, w, h, p, "all", { y0: h * 0.11, title: "三張合一",
     meta: "KHALIL FONG 方大同 · 2005–2007 · 3 ALBUMS · 38 SONGS" });
 }
+// 三張合一 in Bauhaus: the same landscape and the same order, built from circles, bars and triangles in the primaries.
+// Night is a black field holding the sentence; the moon a yellow disc; dusk a red half sun on the one horizon rule;
+// the city blue bars with yellow windows under black rain strokes; snow ringed dots; the lane two black rules running to
+// one point, hung with red lantern discs; the sea a blue wedge with the moon's reflection as yellow bars; flowers red
+// and yellow half discs on the shore; the rose a red disc on a stem. The 38 songs are black glyphs along the ground.
+function bauhausMerge(c, w, h, t, p) {
+  const T = reduce ? 0 : t, hz = h * 0.66, top = h * 0.42, shore = w * 0.64, foot = shore - w * 0.2;
+  const R = "#D22F27", Y = "#F2C230", B = "#1F4E9C", K = "#141414", G = "#BFB8A8", P = "#F1EADB", lw = Math.max(1, w * 0.003);
+  const SPOT = { 春風: [0.1, 0.86], 小巷: [0.14, 0.62], 燈籠: [0.2, 0.6], 雨: [0.4, 0.5], 城: [0.42, 0.6], 黃昏: [0.55, 0.62], 雪花: [0.6, 0.5], 花: [0.62, 0.76], 海: [0.82, 0.82], 玫瑰: [0.67, 0.6], 月亮: [0.82, 0.52] };
+  const hot = p._word && SPOT[p._word];
+  const dot = (x, y, r, fill) => { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fillStyle = fill; c.fill(); };
+  c.fillStyle = P; c.fillRect(0, 0, w, h);
+  // night: the black field that holds the sentence
+  c.fillStyle = K; c.fillRect(0, 0, w, top);
+  // the moon, a yellow disc on the night's edge, with a thin ring set off it
+  const mx = w * 0.82, my = h * 0.5, mr = w * 0.075;
+  dot(mx, my, mr, Y); c.beginPath(); c.arc(mx - mr * 0.25, my - mr * 0.2, mr * 1.25, 0, Math.PI * 2); c.strokeStyle = K; c.lineWidth = lw; c.stroke();
+  // dusk: a red half sun sitting on the horizon
+  c.beginPath(); c.arc(w * 0.57, hz, w * 0.075, Math.PI, 0); c.fillStyle = R; c.fill();
+  // the sea: a blue wedge from the shore to the right edge, the moon's reflection laid on it as yellow bars
+  c.beginPath(); c.moveTo(shore, hz); c.lineTo(w, hz); c.lineTo(w, h); c.lineTo(foot, h); c.closePath(); c.fillStyle = B; c.fill();
+  for (let k = 0; k < 6; k++) { const y = hz + h * (0.03 + k * 0.045), half = mr * (1 - k * 0.13) * (0.85 + 0.15 * Math.sin(T * 1.4 + k)); c.fillStyle = Y; c.fillRect(mx - half, y, half * 2, h * 0.012); }
+  // the city: blue bars along the horizon with yellow windows
+  const rc = mulberry(31);
+  for (let i = 0; i < 9; i++) { const x = w * (0.24 + i * 0.03), bw = w * 0.024, bh = h * (0.04 + 0.1 * rc());
+    c.fillStyle = i % 3 === 1 ? K : B; c.fillRect(x, hz - bh, bw, bh);
+    for (let k = 0; k < 3; k++) if (rc() > 0.45) { c.fillStyle = Y; c.fillRect(x + bw * 0.3, hz - bh + h * 0.014 * (k + 0.6), bw * 0.4, bw * 0.4); } }
+  // rain over the city: short black strokes on one slant
+  const rr = mulberry(4); c.lineCap = "butt";
+  for (let i = 0; i < 34; i++) { const x = w * (0.26 + 0.3 * rr()), y = h * (0.44 + ((rr() + T * 0.2) % 1) * 0.15); rule(c, x, y, x - w * 0.008, y + h * 0.028, lw, K); }
+  // snow at dusk: small ringed dots
+  const sr = mulberry(9);
+  for (let i = 0; i < 18; i++) { const x = w * (0.5 + 0.13 * sr()), y = h * (0.44 + ((sr() + T * 0.015) % 1) * 0.18), r = w * (0.005 + 0.004 * sr());
+    dot(x, y, r, P); c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.strokeStyle = K; c.lineWidth = lw * 0.7; c.stroke(); }
+  // the horizon: one black rule across the whole poster
+  rule(c, 0, hz, w, hz, lw * 1.4, K);
+  // the lane: two black rules running to one point on the horizon, hung with red lantern discs
+  const vp = [w * 0.15, hz];
+  // the lane's floor, a pale yellow triangle running back to the vanishing point
+  c.beginPath(); c.moveTo(vp[0], vp[1]); c.lineTo(-0.02 * w, h); c.lineTo(0.42 * w, h); c.closePath(); c.fillStyle = "rgba(242,194,48,.35)"; c.fill();
+  [[-0.02, h], [0.42, h]].forEach(([x1, y1], sd) => {
+    rule(c, vp[0], vp[1], x1 * w, y1, lw * 1.4, K);
+    for (let i = 1; i <= 5; i++) { const u = i / 5.5, x = vp[0] + (x1 * w - vp[0]) * u, y = vp[1] + (y1 - vp[1]) * u - h * 0.05 * u, r = w * (0.006 + 0.018 * u) * (1 + 0.06 * Math.sin(T * 1.3 + i + sd));
+      rule(c, x, y - r, x, vp[1] + (y1 - vp[1]) * u, lw * 0.6, K); dot(x, y - r, r, R); }
+  });
+  // spring wind: three thin black arcs low on the left
+  for (let k = 0; k < 3; k++) { c.beginPath(); c.arc(w * 0.1, h * 0.98, w * (0.06 + k * 0.035), Math.PI * 1.15, Math.PI * 1.55 + 0.05 * Math.sin(T + k)); c.strokeStyle = K; c.lineWidth = lw; c.stroke(); }
+  // flowers: red and yellow half discs along the shore
+  for (let i = 0; i < 8; i++) { const u = (i + 0.5) / 8, y = hz + u * (h - hz) * 0.95, x = shore + (foot - shore) * (y - hz) / (h - hz) - w * 0.025, r = w * (0.01 + 0.012 * u);
+    c.beginPath(); c.arc(x, y, r, Math.PI, 0); c.fillStyle = i % 2 ? Y : R; c.fill(); }
+  // the rose: a red disc on a black stem, held up toward the moon
+  { const x = shore + w * 0.03, y = hz - h * 0.06; rule(c, x, y, x, hz, lw, K); c.beginPath(); c.moveTo(x, y + h * 0.03); c.lineTo(x + w * 0.02, y + h * 0.015); c.lineTo(x, y + h * 0.04); c.fillStyle = K; c.fill(); dot(x, y, w * 0.016, R); }
+  // the 38 songs: black glyphs along the ground, each swelling on its own beat
+  const songs = p._songs || (p._songs = [
+    ...SOULBOY.map((d, i) => ({ key: "sb:" + d.track, tempo: d.tempo, bar: SOULBOY_BAR[i] || 4 })),
+    ...THIS_LOVE.map(d => ({ key: "tl:" + d.track, tempo: d.tempo || 90, bar: d.beats_per_bar > 3 && d.beats_per_bar % 3 === 0 ? d.beats_per_bar / 3 : d.beats_per_bar || 4 })),
+    ...WONDERLAND.map(d => ({ key: "wl:" + d.track, tempo: d.tempo || 90, bar: d.beats_per_bar > 3 && d.beats_per_bar % 3 === 0 ? d.beats_per_bar / 3 : d.beats_per_bar || 4 }))]);
+  songs.forEach((sg, i) => { const x = w * (0.03 + 0.58 * i / Math.max(1, songs.length - 1)), y = hz + h * 0.016, b = beatOf(t, sg.tempo || 90, sg.bar || 4);
+    glyphPath(c, x, y, w * 0.0058 * (1 + 0.4 * b), glyphOf(sg.key)); c.fillStyle = K; c.fill(); });
+  // a hovered word: a black ring drawn around its place in the landscape
+  if (hot) { c.beginPath(); c.arc(w * hot[0], h * hot[1], w * 0.07, 0, Math.PI * 2); c.strokeStyle = K; c.lineWidth = lw * 1.6; c.stroke(); }
+  p._hit = null; p._marks = [];
+  sentenceType(c, w, h, p, "all", { y0: h * 0.11, title: "三張合一" });
+}
 // ---- This Love's thirteen songs: a blend poster each, the same series as Soulboy's ----
 // each poster is built from its song's scene card (soul-garden-data/this-love/01–13.md): its key line, its main image,
 // and a count from the lyrics where one carries the picture. Colour is the same data tint as Soulboy's posters.
@@ -4394,6 +4468,11 @@ function frame(ms) {
     finish(c, pw, ph);
     return;
   }
+  if (style.id === "bauhaus" && p.merge) {
+    c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, pw, ph);
+    bauhausMerge(c, pw, ph, t, p); paperGrain(c, pw, ph, 0.12);
+    return;
+  }
   // the reprinted styles rework every pixel, so they redraw a few times a second rather than every frame
   if (!dirty && ms - lastStyled < 500) return;
   lastStyled = ms; dirty = false;
@@ -4407,7 +4486,16 @@ function frame(ms) {
   stylise(style, off, c, pw, ph, dpr, p.name);
   c.setTransform(dpr, 0, 0, dpr, 0, 0);
   if (pq.length) { delete p._ink; const ink = inkFor(c, pw, ph, p); pq.forEach(([, w, h, pp, , , opts]) => posterType(c, w, h, pp, ink.ink, ink.sub, opts)); }
-  sq.forEach(([, w, h, card, key, o]) => sentenceType(c, w, h, card, key, o));
+  sq.forEach(([, w, h, card, key, o]) => {
+    let lum = 0;
+    try { const y = (o.y0 ?? h * 0.12) - h * 0.04, d = c.getImageData(Math.round(w * 0.05 * dpr), Math.round(y * dpr), Math.round(w * 0.6 * dpr), Math.round(h * 0.22 * dpr)).data;
+      let sum = 0, n = 0; for (let i = 0; i < d.length; i += 64) { sum += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]; n++; } lum = sum / n / 255; } catch (e) {}
+    const light = lum > 0.45;
+    // a mid-tone ground holds neither ink nor light words: lay a soft wash of the ground's own polarity behind the sentence
+    if (lum > 0.3 && lum < 0.7) { const y = (o.y0 ?? h * 0.12) - h * 0.07, v = light ? "239,232,216" : "14,11,18";
+      c.save(); c.fillStyle = lin(c, 0, y, 0, y + h * 0.34, `rgba(${v},.7)`, `rgba(${v},0)`); c.fillRect(0, y, w, h * 0.34); c.restore(); }
+    sentenceType(c, w, h, card, key, { ...o, light });
+  });
 }
 new ResizeObserver(size).observe(plateBox);
 addEventListener("resize", size);
