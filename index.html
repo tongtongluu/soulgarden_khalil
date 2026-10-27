@@ -2652,9 +2652,10 @@ function blendAlbum(c, w, h, t, card, hs = -1) {
 // the sky. The songs are part of the scene: lamps along the street, or flowers in the garden. Each has the shape of
 // its bar (a lamp head with one corner per beat, a flower with one petal per beat: three for 3/4, wavy for 12/8),
 // its lyric-imagery colour, its size from its length, and it flashes or opens on its own beat at its measured tempo.
+// each album is now drawn from its sentence (album-images.json); the earlier count-based scenes stay below for reference
 function drawAlbumPoster(c, w, h, t, card, D, hs = -1) {
-  if (D.rank.slice(0, 3).includes("nature_plants")) return gardenScene(c, w, h, t, card, D, hs);
-  return streetScene(c, w, h, t, card, D, hs);
+  if (D.title === "This Love") return thisLoveScene(c, w, h, t, card, D, hs);
+  return soulboyScene(c, w, h, t, card, D, hs);
 }
 function albumCommon(c, w, h, t, D) {
   const S = D.recs, n = S.length, tot = D.tot, [K1, K2, K3] = D.rank;
@@ -2678,7 +2679,7 @@ function albumKey(c, w, items) {
 }
 function albumHover(c, w, card, S, marks, hs) {
   card._hit = (x, y) => { let best = -1, bd = Infinity; marks.forEach(([mx, my, r], i) => { const d = Math.hypot(x - mx, y - my) / Math.max(r * 1.8, w * 0.03); if (d < 1 && d < bd) { bd = d; best = i; } }); return best; };
-  card._open = null;
+  card._open = null; card._marks = marks;
   if (hs < 0 || !marks[hs]) return;
   const [x, y, r] = marks[hs], d = S[hs], right = x < w * 0.6;
   const words = (d.terms || []).slice().sort((a, b) => b[2] - a[2]).slice(0, 4).map(x => x[0]).join(" ");
@@ -2688,9 +2689,11 @@ function albumHover(c, w, card, S, marks, hs) {
   c.font = `500 ${Math.max(9, w * 0.019)}px "Noto Sans SC", sans-serif`; c.fillStyle = "rgba(255,246,238,.85)"; c.fillText((words || "沒有意象") + (d.love ? ` · 愛 ${d.love}` : ""), tx, y + w * 0.02);
   c.restore();
 }
-function albumTitle(c, w, h, D, K) {
-  posterType(c, w, h, { name: D.title, line: `唱了 ${K.loveAll} 次愛，多半是${KIND_WORD[K.K1]}、${KIND_WORD[K.K2]}和${KIND_WORD[K.K3]}`, track: 0 }, "#FFF6EE", "rgba(255,246,238,.78)",
-    { size: w * Math.min(0.13, 0.9 / Math.max(6, D.title.length)), metaInk: "rgba(255,246,238,.6)", meta: `KHALIL FONG 方大同 · ${D.title.toUpperCase()} ${D.year} · ${D.recs.length} SONGS` });
+// the big type is the album's image: one sentence walking its songs' emblems in track order (album-images.json), not a count
+function albumTitle(c, w, h, D, K, card, hs = -1) {
+  const key = ALBUM_KEY[D.title], hov = hs >= 0 && D.recs[hs];
+  const top = key === "thislove";
+  sentenceType(c, w, h, card, key, { y0: top ? h * 0.12 : h * 0.72, veil: !top, hovTrack: hov && hov.track, title: D.title, meta: `KHALIL FONG 方大同 · ${D.title.toUpperCase()} ${D.year} · ${D.recs.length} SONGS`, noteAbove: !top });
 }
 // rarer imagery as soft weather in the sky, each as large as it is common
 function skyWeather(s, w, h, K, keep, T) {
@@ -2755,7 +2758,7 @@ function streetScene(c, w, h, t, card, D, hs) {
   albumKey(c, w, [[`${KIND_WORD[K2]} ${tot[K2]}`, hx + aw * 0.7, ay - ah * 0.95, "left"], [`${KIND_WORD[K1]} ${tot[K1]}`, hx + aw * 0.7, ay - ah * 0.95 + w * 0.028, "left"],
     [`愛 ${loveAll}`, hx + aw * 0.7, ay - ah * 0.95 + w * 0.056, "left", "rgba(255,170,190,.85)"], [`${KIND_WORD[K3]} ${tot[K3]}`, w * 0.04, h * 0.62, "left"]]);
   albumHover(c, w, card, S, marks, hs);
-  albumTitle(c, w, h, D, K);
+  albumTitle(c, w, h, D, K, card, hs);
 }
 
 // This Love: a garden grown round a small home, the heart in its doorway, love as petals in the air
@@ -2823,7 +2826,286 @@ function gardenScene(c, w, h, t, card, D, hs) {
   albumKey(c, w, [[`${KIND_WORD[HM]} ${tot[HM]}`, hx + aw * 0.75, ay - ah * 1.02, "left"], [`${KIND_WORD[K1]} ${tot[K1]}`, hx + aw * 0.75, ay - ah * 1.02 + w * 0.028, "left"],
     [`愛 ${loveAll}`, hx + aw * 0.75, ay - ah * 1.02 + w * 0.056, "left", "rgba(255,170,190,.9)"], [`${KIND_WORD[PL]} ${tot[PL]}`, hx - aw * 0.75, ay - ah * 0.6, "right"]]);
   albumHover(c, w, card, S, marks, hs);
-  albumTitle(c, w, h, D, K);
+  albumTitle(c, w, h, D, K, card, hs);
+}
+// ---- the third album, 未來 Wonderland (2007): counts and single words from soul-garden-data/wonderland/tracks.json, judged line by line ----
+const WONDERLAND = [{"track":1,"name":"Love Song","line_count":52,"imagery":{"body_gesture":3,"time_memory":3,"people_relationships":2,"city_street":0,"cosmos":2,"sky_weather":3,"nature_plants":1,"light_fire":0,"night_moon":2,"water":0},"terms":["夏天:1:3","風:5:3","心:0:3","朋友:2:1","花:6:1","家:2:1","夜:8:1","月:8:1","星:4:1","流星:4:1"],"love":17,"colours":[],"objects":[["花",1],["星",2],["月亮",1]],"preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a2/dc/ef/a2dcef49-1e84-a3fe-2fa7-e64d4975a520/mzaf_13532011749310819147.plus.aac.p.m4a","duration":269.29},{"track":2,"name":"夠不夠","line_count":47,"imagery":{"body_gesture":4,"time_memory":0,"people_relationships":2,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":["媽媽:2:1","朋友:2:1","心:0:1","heart:0:3"],"love":8,"colours":[],"objects":[],"preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/38/63/5c/38635c45-ae7f-b423-cff3-6d19d39d3139/mzaf_18131850540218025986.plus.aac.p.m4a","duration":223.16},{"track":3,"name":"暖","line_count":32,"imagery":{"body_gesture":5,"time_memory":0,"people_relationships":1,"city_street":0,"cosmos":1,"sky_weather":2,"nature_plants":2,"light_fire":3,"night_moon":1,"water":1},"terms":["手襪:0:3","汗水:0:2","雪花:5:2","蝴蝶:6:1","晚上:8:1","家:2:1","太陽:4:1","臘梅花:6:1","熱茶:7:3","冰山:9:1"],"love":0,"colours":[],"objects":[["雪花",2],["茶",3],["冰",1],["蝴蝶",1],["太陽",1],["花",1]],"preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b5/de/d4/b5ded458-8645-a80f-635d-3acd3c439034/mzaf_953046185055787847.plus.aac.p.m4a","duration":224.0},{"track":4,"name":"愛在","line_count":49,"imagery":{"body_gesture":9,"time_memory":0,"people_relationships":1,"city_street":2,"cosmos":0,"sky_weather":5,"nature_plants":2,"light_fire":2,"night_moon":0,"water":0},"terms":["瀏海:0:4","家:2:1","街上:3:1","路上:3:1","流淚:0:1","雪花:5:1","桃花:6:1","陽光:7:1","燭光:7:1","微風:5:1","樹枝:6:1","領帶:0:4","黃昏:5:3"],"love":38,"colours":[["白",1]],"objects":[["黃昏",3],["雪花",1],["桃花",1],["陽光",1],["燭光",1],["樹",1],["酒",1],["泥",1]],"preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/f4/4f/58/f44f5842-3641-dfc9-bba6-99d118847f69/mzaf_17391950255632080790.plus.aac.p.m4a","duration":243.73},{"track":5,"name":"公園","line_count":57,"imagery":{"body_gesture":3,"time_memory":0,"people_relationships":2,"city_street":18,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":["小姐:2:2","手:0:2","心:0:1","公園:3:18"],"love":0,"colours":[],"objects":[],"preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ab/39/5a/ab395ad2-d342-6dd3-e4fd-9b5c84e05e08/mzaf_16800847772217666499.plus.aac.p.m4a","duration":241.33},{"track":6,"name":"簡單最浪漫","line_count":72,"imagery":{"body_gesture":1,"time_memory":0,"people_relationships":2,"city_street":4,"cosmos":0,"sky_weather":1,"nature_plants":0,"light_fire":1,"night_moon":0,"water":0},"terms":["雨:5:1","手:0:1","燭光:7:1","咖啡:3:1","老人家:2:1","媽媽:2:1","教堂:3:3"],"love":20,"colours":[["白",2]],"objects":[["雨",1],["燭光",1],["咖啡",1]],"preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ab/52/d2/ab52d269-679d-3364-f5d7-6ba2d5fbf59b/mzaf_11100329267109995697.plus.aac.p.m4a","duration":252.79},{"track":7,"name":"十九八七","line_count":49,"imagery":{"body_gesture":2,"time_memory":0,"people_relationships":0,"city_street":2,"cosmos":0,"sky_weather":0,"nature_plants":3,"light_fire":0,"night_moon":0,"water":0},"terms":["玫瑰:6:3","路燈:3:1","手腳:0:1","指頭:0:1","公車:3:1"],"love":9,"colours":[],"objects":[["玫瑰",3],["燈",1]],"preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/56/e9/8e/56e98ebc-1c0d-e301-49b9-cf4dd5b47a68/mzaf_12831708141467427871.plus.aac.p.m4a","duration":312.79},{"track":8,"name":"未來","line_count":48,"imagery":{"body_gesture":3,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":1,"nature_plants":3,"light_fire":3,"night_moon":3,"water":0},"terms":["花:6:3","淚:0:3","月亮:8:2","光:7:2","雲:5:1","陽光:7:1","月光:8:1"],"love":11,"colours":[],"objects":[["花",3],["月亮",2],["月光",1],["陽光",1],["雲",1]],"preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/aa/f7/fc/aaf7fcfa-dd8c-0ead-f645-a63b83c3aa7a/mzaf_8252191757331230420.plus.aac.p.m4a","duration":181.33},{"track":9,"name":"忘了美麗","line_count":49,"imagery":{"body_gesture":1,"time_memory":0,"people_relationships":4,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":["朋友:2:4","手:0:1"],"love":15,"colours":[],"objects":[],"preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c9/25/8e/c9258e23-8197-7d85-e1c8-f7d8fc01adb6/mzaf_10504302813507520623.plus.aac.p.m4a","duration":268.92},{"track":10,"name":"Sorry","line_count":27,"imagery":{"body_gesture":1,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":["流淚:0:1"],"love":17,"colours":[],"objects":[],"preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/44/68/69/446869d8-b71c-e2de-9373-dbcf3f38ffad/mzaf_16543578117994786707.plus.aac.p.m4a","duration":222.65},{"track":11,"name":"愛愛愛 (Acoustic Version)","line_count":18,"imagery":{"body_gesture":0,"time_memory":0,"people_relationships":0,"city_street":2,"cosmos":0,"sky_weather":0,"nature_plants":6,"light_fire":0,"night_moon":0,"water":2},"terms":["花:6:3","樹:6:3","海:9:2","電影:3:1","街:3:1"],"love":25,"colours":[["紫",1]],"objects":[["花",3],["樹",3],["海",2]],"preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a7/cd/ae/a7cdaee2-e6a3-1e15-bab8-62adceb7034d/mzaf_12056174162488263169.plus.aac.p.m4a","duration":225.24}];
+// each album's image, from soul-garden-data/album-image: an original sentence walking the songs' emblems in track order, and the stations [track, word] it passes
+const ALBUM_IMAGE = {"soulboy":{"sentence":"一陣春風穿過小巷，燈籠照著酒家，一群人在彩虹下趕場，趕到宇宙的另一頭。","stations":[[3,"春風"],[8,"小巷"],[8,"燈籠"],[8,"酒家"],[10,"彩虹"],[12,"趕場"],[9,"宇宙"]],"emblems":{"1":[],"2":["妹妹","表妹","媽媽"],"3":["春風","蛇","原上草"],"4":["搞笑片","地中海","friend"],"5":["女人","手"],"6":["街上","電影","情男情女"],"7":["舞","雙目","眼睛"],"8":["酒家","小巷","漆黑"],"9":["宇宙","地球","太陽"],"10":["彩虹","新聞","報紙"],"11":["蝴蝶","原野","祖先"],"12":["早場","尾場","路上"],"13":["春光","熱淚","燕子"],"14":["cappuccino","小姐","咖啡"]},"shared":{"sentence":"春風的路上，家的流淚，彩虹。","words":[["春風",1,10],["路上",3,4],["家",4,7],["流淚",2,4],["彩虹",2,8]],"note":"shared-image template: weight = songs singing it × log2(1+times sung); roles when的where，who的body，thing; words are [word, songs, times]"}},"thislove":{"sentence":"臉藏在墨鏡後面，雨落進城裡，北風過後，太陽和花一起回到海邊。","stations":[[3,"臉"],[4,"墨鏡"],[8,"雨"],[8,"城"],[9,"北風"],[10,"太陽"],[1,"花"],[1,"海"]],"emblems":{"1":["花","樹","海"],"2":[],"3":["臉","眼"],"4":["妹妹","媽媽","墨鏡"],"5":["夜","朋友","眼淚"],"6":["路","舞"],"7":["水","手"],"8":["城","雨","頭"],"9":["北風","手勢","城"],"10":["太陽","春風","六月"],"11":[],"12":["heart"],"13":["春風","蛇","冬日"]},"shared":{"sentence":"春風的海，朋友的眼淚，花。","words":[["春風",2,7],["海",2,3],["朋友",2,7],["眼淚",2,2],["花",1,3]],"note":"shared-image template: weight = songs singing it × log2(1+times sung); roles when的where，who的body，thing; words are [word, songs, times]"}},"wonderland":{"sentence":"黃昏落雪，戴手襪的人捧著熱茶，走過公園和教堂，在路燈下把玫瑰交給月亮。","stations":[[3,"手襪"],[3,"熱茶"],[4,"黃昏"],[3,"雪花"],[5,"公園"],[6,"教堂"],[7,"路燈"],[7,"玫瑰"],[8,"月亮"]],"emblems":{"1":["夏天","風","花"],"2":["媽媽","heart","朋友"],"3":["手襪","熱茶","汗水"],"4":["瀏海","領帶","黃昏"],"5":["公園","小姐","手"],"6":["教堂","雨","燭光"],"7":["玫瑰","路燈","手腳"],"8":["花","月亮","光"],"9":["朋友","手"],"10":["流淚"],"11":["花","樹","海"]},"shared":{"sentence":"雪花的公園，朋友的手，花。","words":[["雪花",2,3],["公園",1,18],["朋友",3,6],["手",3,4],["花",3,7]],"note":"shared-image template: weight = songs singing it × log2(1+times sung); roles when的where，who的body，thing; words are [word, songs, times]"}}};
+// ---- 未來's album poster: not a count, a sentence. Every song gives its strongest concrete images (its emblems);
+// read in track order they walk from the body and winter weather (暖's mittens and hot tea, 愛在's dusk and snow),
+// through the city (公園, sung 18 times, 簡單最浪漫's church, 十九八七's street lamp and rose) to 未來's flowers and moon.
+// The poster is that walk: steam from a cup of tea held in mittens rises into a path through dusk snow, past the park
+// and the church, under the lamp, and ends where a rose is handed up to the moon. Each image is as large as it is sung;
+// each song is a bead on the path, in track order, shaped by its bar and flashing on its beat; the songs after 未來
+// trail on into the sky. The sentence is the big type, and each of its image words lights the songs that sing it.
+function wordSongs(rows, word) {
+  return rows.filter(r => (r.terms || []).some(x => x.split(":")[0].includes(word)) || (r.objects || []).some(([o]) => o.includes(word)) ||
+    ((ALBUM_IMAGE.wonderland.emblems[r.track] || []).includes(word))).map(r => r.track);
+}
+function wonderTimes(word) {
+  let n = 0;
+  WONDERLAND.forEach(r => { (r.terms || []).forEach(x => { const [w, , k] = x.split(":"); if (w.includes(word)) n += +k; }); (r.objects || []).forEach(([o, k]) => { if (o === word) n = Math.max(n, k); }); });
+  return n || 1;
+}
+// catmull-rom through the path's control points; u runs 0..1 along it
+function pathAt(P, u) {
+  const n = P.length - 1, f = Math.min(n - 1e-6, Math.max(0, u * n)), i = Math.floor(f), t = f - i;
+  const p0 = P[Math.max(0, i - 1)], p1 = P[i], p2 = P[i + 1], p3 = P[Math.min(n, i + 2)];
+  const q = (a, b, c2, d) => 0.5 * (2 * b + (-a + c2) * t + (2 * a - 5 * b + 4 * c2 - d) * t * t + (-a + 3 * b - 3 * c2 + d) * t * t * t);
+  return [q(p0[0], p1[0], p2[0], p3[0]), q(p0[1], p1[1], p2[1], p3[1])];
+}
+function wonderScene(c, w, h, t, card, hs = -1) {
+  const T = reduce ? 0 : t, R = WONDERLAND, IM = ALBUM_IMAGE.wonderland;
+  const meta = card._meta || (card._meta = R.map(r => ({ ...r, tempo: (r.tempo || 90), bar: r.bar || 4 })));
+  const sz = word => Math.sqrt(wonderTimes(word));
+  // the walk: from the cup at the foot, up through the park and past the church, under the lamp, to the moon, then on into the sky
+  const P = [[0.2, 1.02], [0.24, 0.86], [0.17, 0.74], [0.3, 0.65], [0.5, 0.64], [0.64, 0.55], [0.72, 0.44], [0.79, 0.31], [0.89, 0.17], [0.95, 0.09], [1.02, 0.02]].map(([x, y]) => [x * w, y * h]);
+  const U = { cup: 0.1, dusk: 0.2, park: 0.33, church: 0.47, lamp: 0.56, rose: 0.64, moon: 0.7 };
+  const at = k => pathAt(P, U[k]);
+  const moon = [w * 0.83, h * 0.2], moonR = w * 0.045 * sz("月");
+  // which images a hovered song carries, so they glow
+  const hot = new Set(), hov = hs >= 0 ? meta[hs] : null;
+  if (hov) IM.stations.forEach(([tr, wd]) => { if (tr === hov.track) hot.add(wd); });
+  if (card._word) hot.add(card._word);
+  const lit = wd => hot.has(wd) ? 1 : 0;
+
+  softPass(c, w, h, s => { s.fillStyle = lin(s, 0, 0, 0, h, "#1C1838", "#3A2433"); s.fillRect(0, 0, w, h); }, s => {
+    // 黃昏, dusk: a warm band low in the sky, as wide as it is sung
+    s.fillStyle = rad(s, w * 0.45, h * 0.62, w * 0.55 * sz("黃昏") / 1.6, "rgba(232,140,88,.85)", "rgba(232,140,88,0)"); s.fillRect(0, 0, w, h);
+    s.fillStyle = rad(s, w * 0.7, h * 0.5, w * 0.4, "rgba(200,110,130,.5)", "rgba(0,0,0,0)"); s.fillRect(0, 0, w, h);
+    // the moon's halo
+    s.fillStyle = rad(s, moon[0], moon[1], moonR * 4, "rgba(243,235,210,.55)", "rgba(243,235,210,0)"); s.fillRect(0, 0, w, h);
+    // 公園: canopies of a park, covering as much ground as the word is sung
+    const [px, py] = at("park"), rp = mulberry(5), nP = Math.round(4 + sz("公園"));
+    for (let i = 0; i < nP; i++) { const a = rp(); blobPath(s, px + (a - 0.5) * w * 0.55, py + (rp() - 0.3) * h * 0.08, w * (0.05 + 0.04 * rp()), { n: 3, a: 0.12, wob: 0.05 }, T + i);
+      s.fillStyle = ["#3F6B57", "#557E5E", "#2F5446"][i % 3]; s.fill(); }
+    // the ground, dark under the snow
+    s.fillStyle = lin(s, 0, h * 0.66, 0, h, "rgba(30,22,34,.0)", "rgba(20,14,22,.95)"); s.fillRect(0, h * 0.66, w, h * 0.34);
+    // 熱茶: the warmth of the cup at the foot
+    const [cx, cy] = at("cup"); s.fillStyle = rad(s, cx, cy, w * 0.22, "rgba(255,190,120,.75)", "rgba(255,190,120,0)"); s.fillRect(0, 0, w, h);
+  }, 5);
+
+  // the path itself: steam rising from the tea, drifting along the walk
+  c.save(); c.lineCap = "round";
+  for (let k = 0; k < 3; k++) {
+    c.beginPath(); for (let i = 0; i <= 120; i++) { const u = i / 120, [x, y] = pathAt(P, u), wv = Math.sin(u * 22 + T * 0.8 + k * 2) * w * 0.006 * (1 + k); i ? c.lineTo(x + wv, y) : c.moveTo(x + wv, y); }
+    c.strokeStyle = `rgba(255,236,214,${0.16 - k * 0.04})`; c.lineWidth = w * (0.006 + k * 0.01); c.stroke();
+  }
+  // motes of steam moving up the path at the album's walking pace
+  for (let i = 0; i < 40; i++) { const u = ((i / 40) + T * 0.012) % 1, [x, y] = pathAt(P, u); glow(c, x + Math.sin(i * 7 + T) * w * 0.01, y, w * 0.012, "rgba(255,240,220,.5)"); }
+  c.restore();
+
+  // 公園: the park's trees, crisp against the dusk; as many as the word is sung allows (18 times, the album's most-sung image)
+  { const [px, py] = at("park"), rp = mulberry(9), n = Math.round(3 + sz("公園") * 1.2), g = lit("公園");
+    for (let i = 0; i < n; i++) { const x = px + (i / (n - 1) - 0.5) * w * 0.62 + (rp() - 0.5) * w * 0.03, base = py + h * (0.02 + 0.03 * rp()), r = w * (0.03 + 0.025 * rp());
+      rule(c, x, base, x, base - r * 1.1, Math.max(1.2, w * 0.004), "#1A1420");
+      blobPath(c, x, base - r * 1.6, r, { n: 3, a: 0.1, wob: 0.06, ph: i }, T * 0.6 + i); c.fillStyle = g ? ["#5F9A72", "#76AE82", "#4E8664"][i % 3] : ["#2C4A3C", "#365A47", "#24402F"][i % 3]; c.fill(); } }
+  // 教堂: a slim church, a pointed window lit by candle (燭光)
+  { const [x, y] = at("church"), H = h * 0.09 * sz("教堂"), W2 = H * 0.32, g = lit("教堂");
+    c.save(); c.fillStyle = g ? "#3A2E4A" : "#241C30"; c.beginPath(); c.moveTo(x - W2 / 2, y + H * 0.2); c.lineTo(x - W2 / 2, y - H * 0.55); c.lineTo(x, y - H); c.lineTo(x + W2 / 2, y - H * 0.55); c.lineTo(x + W2 / 2, y + H * 0.2); c.closePath(); c.fill();
+    c.beginPath(); c.moveTo(x - W2 * 0.18, y - H * 0.05); c.lineTo(x - W2 * 0.18, y - H * 0.38); c.quadraticCurveTo(x, y - H * 0.6, x + W2 * 0.18, y - H * 0.38); c.lineTo(x + W2 * 0.18, y - H * 0.05); c.closePath();
+    c.fillStyle = "#FFC37A"; c.fill(); glow(c, x, y - H * 0.25, W2 * (1.2 + g), "rgba(255,190,110,.6)"); c.restore(); }
+  // 路燈: the street lamp, its warm pool
+  { const [x0, y0] = at("lamp"), x = x0 - w * 0.07, base = y0 + h * 0.1, H = h * 0.13, g = lit("路燈"), top = base - H;
+    c.save(); c.globalCompositeOperation = "screen"; c.beginPath(); c.moveTo(x - w * 0.01, top); c.lineTo(x + w * 0.01, top); c.lineTo(x + w * 0.07, base); c.lineTo(x - w * 0.07, base); c.closePath();
+    c.fillStyle = lin(c, 0, top, 0, base, `rgba(255,210,130,${0.35 + 0.2 * g})`, "rgba(255,210,130,0)"); c.fill(); c.restore();
+    rule(c, x, base, x, top, Math.max(1.5, w * 0.004), "#1A1420"); rule(c, x, top, x + w * 0.02, top, Math.max(1.5, w * 0.004), "#1A1420");
+    glow(c, x + w * 0.02, top + h * 0.006, w * (0.05 + 0.04 * g), "rgba(255,210,130,.9)"); disc(c, x + w * 0.02, top + h * 0.006, w * 0.008); c.fillStyle = "#FFF2D0"; c.fill(); }
+  // 月亮: the moon at the walk's end
+  { const g = lit("月亮"); glow(c, moon[0], moon[1], moonR * (2.2 + g), "rgba(243,235,210,.5)"); disc(c, moon[0], moon[1], moonR); c.fillStyle = lin(c, moon[0], moon[1] - moonR, moon[0], moon[1] + moonR, "#FBF5E4", "#E3D6B4"); c.fill(); }
+  // 玫瑰: a rose held up toward the moon, a petal for each time it is sung
+  { const [x, y] = at("rose"), r = w * 0.028 * sz("玫瑰"), n = wonderTimes("玫瑰") + 2, g = lit("玫瑰");
+    c.save(); c.translate(x, y); c.rotate(-0.5);
+    rule(c, 0, r * 0.8, 0, r * 3.2, Math.max(1.2, w * 0.003), "#6E9A6A");
+    for (let i = n; i > 0; i--) { const rr = r * (i / n), a0 = i * 1.9 + T * 0.1; c.beginPath(); c.arc(0, 0, rr, a0, a0 + Math.PI * 1.4); c.fillStyle = i % 2 ? "#C8283F" : "#A51E36"; c.fill(); }
+    c.restore(); if (g) glow(c, x, y, r * 3, "rgba(255,80,110,.5)"); }
+  // 手襪 + 熱茶: two knitted mittens round a cup, steam leaving it
+  { const [x, y] = at("cup"), cw = w * 0.085 * Math.sqrt(sz("熱茶")), g = lit("熱茶") || lit("手襪");
+    disc.round = true;
+    c.fillStyle = lin(c, x, y - cw * 0.5, x, y + cw * 0.6, "#F6E7D2", "#C9A88A"); c.beginPath(); c.moveTo(x - cw * 0.55, y - cw * 0.35); c.lineTo(x + cw * 0.55, y - cw * 0.35); c.lineTo(x + cw * 0.42, y + cw * 0.5); c.lineTo(x - cw * 0.42, y + cw * 0.5); c.closePath(); c.fill();
+    c.fillStyle = "rgba(120,70,40,.9)"; c.beginPath(); c.ellipse(x, y - cw * 0.35, cw * 0.55, cw * 0.12, 0, 0, Math.PI * 2); c.fill();
+    [-1, 1].forEach(sd => { const mx = x + sd * cw * 0.62, my = y + cw * 0.12; c.save(); c.translate(mx, my); c.rotate(sd * 0.25);
+      blobPath(c, 0, 0, cw * 0.36, { n: 1, a: 0.12, sy: 1.3 }); c.fillStyle = "#B8443E"; c.fill();
+      c.save(); blobPath(c, 0, 0, cw * 0.36, { n: 1, a: 0.12, sy: 1.3 }); c.clip();
+      for (let k = -3; k <= 3; k++) rule(c, -cw, k * cw * 0.12, cw, k * cw * 0.12, cw * 0.035, k % 2 ? "rgba(255,240,230,.35)" : "rgba(80,20,20,.25)"); c.restore(); c.restore(); });
+    disc.round = false; if (g) glow(c, x, y, cw * 1.6, "rgba(255,200,140,.5)"); }
+  // 雪花, snow: white (白 is the album's only colour word), drifting down through the dusk
+  { const n = Math.round(24 * sz("雪花")), rs = mulberry(11), g = lit("雪花") || lit("黃昏");
+    for (let i = 0; i < n; i++) { const x0 = rs() * w, sp = 0.02 + 0.03 * rs(), y = ((rs() + T * sp) % 1) * h * 0.95, x = x0 + Math.sin(T * 0.5 + i) * w * 0.01, r = w * (0.002 + 0.004 * rs()) * (1 + g * 0.6);
+      disc(c, x, y, r); c.fillStyle = `rgba(242,239,232,${0.5 + 0.4 * rs()})`; c.fill(); } }
+
+  // the songs: a bead each on the path in track order, its shape the song's bar, flashing on its beat
+  const marks = [];
+  meta.forEach((s, i) => {
+    const u = i < 2 ? 0.02 + i * 0.04 : i <= 7 ? [U.cup, U.dusk, U.park, U.church, U.lamp, U.moon][i - 2] + 0.035 : 0.79 + (i - 8) * 0.075;
+    const [x, y] = pathAt(P, u), b = beatOf(t, s.tempo, s.bar), on = i === hs, r = w * (0.011 + 0.006 * Math.sqrt((s.line_count || 20) / 40)) * (1 + 0.35 * b + (on ? 0.5 : 0));
+    beatPath(c, x, y, r, { n: s.bar, compound: false, turn: 0 });
+    c.fillStyle = on ? "#FFFFFF" : `rgba(255,246,238,${0.55 + 0.4 * b})`; c.fill();
+    marks.push([x, y, r]);
+  });
+  albumHover(c, w, card, meta.map(s => ({ ...s, terms: (s.terms || []).map(x => { const [wd, cat, k] = x.split(":"); return [wd, cat, +k]; }) })), marks, hs);
+  sentenceType(c, w, h, card, "wonderland", { hovTrack: hov && hov.track, title: "未來 Wonderland", meta: `KHALIL FONG 方大同 · 未來 WONDERLAND 2007 · ${WONDERLAND.length} SONGS` });
+}
+// the big type is the sentence; each image word in it is drawn in its colour, and lights the songs that sing it
+const ALBUM_KEY = { "Soulboy": "soulboy", "This Love": "thislove", "未來": "wonderland" };
+function albumRows(key) {
+  if (key === "wonderland") return WONDERLAND;
+  if (key === "thislove") return THIS_LOVE.map(d => ({ track: d.track, name: d.name.replace(" (Instrumental)", ""), terms: d.terms, objects: [] }));
+  return SOULBOY.map(d => ({ track: d.track, name: d.name, terms: (d.terms || []).map(([wd, cat, n]) => `${wd}:${CAT_IDS.indexOf(cat)}:${n}`), objects: [] }));
+}
+function wordSongsIn(key, word) {
+  const em = ALBUM_IMAGE[key].emblems;
+  return albumRows(key).filter(r => (r.terms || []).some(x => x.split(":")[0].includes(word)) || (r.objects || []).some(([o]) => o.includes(word)) || (em[r.track] || []).includes(word)).map(r => r.track);
+}
+const WORD_COL = { 雪花: "#F2EFE8", 手襪: "#E07A6E", 熱茶: "#F2B98A", 黃昏: "#F29A62", 公園: "#8CC49A", 教堂: "#FFC37A", 路燈: "#FFD98A", 玫瑰: "#F0506A", 月亮: "#F6EED6" };
+function wordColour(key, word) {
+  if (WORD_COL[word]) return WORD_COL[word];
+  // the word's imagery-group colour, lifted toward white so it reads on the dark poster
+  const lift = hex => { const v = parseInt(hex.slice(1), 16), m = k => Math.round(((v >> k) & 255) * 0.55 + 255 * 0.45); return `rgb(${m(16)},${m(8)},${m(0)})`; };
+  for (const r of albumRows(key)) for (const x of r.terms || []) { const [wd, ci] = x.split(":"); if (wd.includes(word) || word.includes(wd)) return lift(catColor(CATS[+ci])); }
+  return "#FFE2B8";
+}
+function sentenceType(c, w, h, card, key, o = {}) {
+  if (posterType.off) return;
+  const IM = ALBUM_IMAGE[key], rows = IM.sentence.split(/(?<=，)/), shown = wd => IM.sentence.includes(wd) ? wd : wd[0];
+  const words = IM.stations.map(([, wd]) => shown(wd)), stationOf = txt => (IM.stations.find(([, wd]) => shown(wd) === txt) || [])[1];
+  const hovTrack = o.hovTrack, x = w * 0.07, y0 = o.y0 ?? h * 0.12;
+  // a dark veil behind the words where they sit over the scene
+  if (o.veil) { c.save(); c.fillStyle = lin(c, 0, y0 - h * 0.12, 0, h, "rgba(12,9,16,0)", "rgba(12,9,16,.78)"); c.fillRect(0, y0 - h * 0.12, w, h - y0 + h * 0.12); c.restore(); }
+  c.save(); c.textBaseline = "alphabetic"; c.font = `900 100px "Noto Sans SC", sans-serif`;
+  const widest = Math.max(...rows.map(r => c.measureText(r).width)) / 100, size = Math.min(w * 0.062, (w * 0.86) / widest);
+  c.font = `900 ${size}px "Noto Sans SC", sans-serif`;
+  card._words = [];
+  rows.forEach((row, ri) => {
+    let cx = x; const y = y0 + ri * size * 1.28, parts = []; let rest = row;
+    while (rest.length) { const hit = words.map(wd => [wd, rest.indexOf(wd)]).filter(([, k]) => k >= 0).sort((a, b) => a[1] - b[1] || b[0].length - a[0].length)[0];
+      if (!hit) { parts.push([rest, null]); break; } if (hit[1]) parts.push([rest.slice(0, hit[1]), null]); parts.push([hit[0], hit[0]]); rest = rest.slice(hit[1] + hit[0].length); }
+    parts.forEach(([txt, sw]) => {
+      const wd = sw && stationOf(sw), tw = c.measureText(txt).width, col = wd ? wordColour(key, wd) : null;
+      const on = wd && (card._word === wd || (hovTrack && IM.stations.some(([tr, x2]) => x2 === wd && tr === hovTrack)));
+      c.fillStyle = wd ? col : "rgba(255,246,238,.74)";
+      if (on) { c.shadowColor = col; c.shadowBlur = size * 0.6; }
+      c.fillText(txt, cx, y); c.shadowBlur = 0;
+      if (wd) card._words.push([wd, cx, y - size, cx + tw, y + size * 0.2]);
+      cx += tw;
+    });
+  });
+  const yEnd = y0 + (rows.length - 1) * size * 1.28 + w * 0.055;
+  c.font = `500 ${Math.max(10, w * 0.03)}px "Noto Sans SC", "Manrope", sans-serif`; c.fillStyle = "rgba(255,246,238,.78)"; c.fillText(o.title, x, yEnd);
+  const lw = c.measureText(o.title).width; rule(c, x + lw + w * 0.02, yEnd - w * 0.01, x + lw + w * 0.09, yEnd - w * 0.01, Math.max(1, w * 0.002), "rgba(255,246,238,.78)");
+  c.font = `500 ${Math.max(8, w * 0.017)}px "IBM Plex Mono", monospace`; c.fillStyle = "rgba(255,246,238,.6)"; c.fillText(o.meta, x, h * 0.055);
+  // an image word under the pointer: say which songs sing it, and light them
+  if (card._word) {
+    const tracks = wordSongsIn(key, card._word), rows2 = albumRows(key), names = tracks.map(tr => (rows2.find(r => r.track === tr) || {}).name).filter(Boolean);
+    c.font = `500 ${Math.max(9, w * 0.021)}px "Noto Sans SC", sans-serif`; c.fillStyle = "rgba(255,246,238,.92)";
+    const ty = o.noteAbove ? y0 - size * 1.2 : yEnd + w * 0.05;
+    c.fillText(`「${card._word}」唱在 ${names.length} 首歌：${names.join("、")}`, x, ty);
+    (card._marks || []).forEach((m, i) => { if (tracks.includes(i + 1)) glow(c, m[0], m[1], m[2] * 4, "rgba(255,236,200,.85)"); });
+  }
+  c.restore();
+  const beadHit = card._hit;
+  card._hit = (px, py) => { const wd = (card._words || []).find(([, a, b, c2, d]) => px >= a && px <= c2 && py >= b && py <= d); card._word = wd ? wd[0] : null; return wd ? -1 : beadHit ? beadHit(px, py) : -1; };
+}
+
+// ---- Soulboy and This Love drawn the same way: each album's sentence walked as a scene ----
+function beadsAlong(c, w, t, P, S, us, hs) {
+  return S.map((s, i) => {
+    const [x, y] = pathAt(P, us[i]), b = beatOf(t, s.tempo || 90, s.bar || 4), on = i === hs;
+    const r = w * (0.011 + 0.006 * Math.sqrt((s.lines || s.line_count || 20) / 40)) * (1 + 0.35 * b + (on ? 0.5 : 0));
+    beatPath(c, x, y, r, { n: s.bar || 4, compound: false, turn: 0 }); c.fillStyle = on ? "#FFFFFF" : `rgba(255,246,238,${0.55 + 0.4 * b})`; c.fill();
+    return [x, y, r];
+  });
+}
+const imgTimes = (S, word) => Math.max(1, S.reduce((a, s) => a + (s.terms || []).reduce((b, [wd, , k]) => b + (wd.includes(word) ? k : 0), 0), 0));
+// Soulboy: 一陣春風穿過小巷，燈籠照著酒家，一群人在彩虹下趕場，趕到宇宙的另一頭。 Read bottom to top: the spring wind
+// blows into a lane hung with lanterns, a tavern lit at its end; a crowd streams out under the rainbow and on up into space.
+function soulboyScene(c, w, h, t, card, D, hs) {
+  const T = reduce ? 0 : t, S = D.recs, sz = wd => Math.sqrt(imgTimes(S, wd)), hov = hs >= 0 && S[hs];
+  const hot = new Set(); if (hov) ALBUM_IMAGE.soulboy.stations.forEach(([tr, wd]) => { if (tr === hov.track) hot.add(wd); }); if (card._word) hot.add(card._word);
+  const lit = wd => hot.has(wd) ? 1 : 0, vx = w * 0.52, vy = h * 0.4;
+  softPass(c, w, h, s => { s.fillStyle = lin(s, 0, 0, 0, h, "#07081C", "#2A1626"); s.fillRect(0, 0, w, h); }, s => {
+    // 宇宙: deep space at the top, a small sun and earth
+    s.fillStyle = rad(s, w * 0.7, h * 0.08, w * 0.5, "rgba(70,60,160,.7)", "rgba(0,0,0,0)"); s.fillRect(0, 0, w, h);
+    // 彩虹: a rainbow over the lane's end, its bands as wide as it is sung
+    const rr = w * 0.3 * Math.sqrt(sz("彩虹")) / 1.5, bw = w * 0.018 * sz("彩虹") / 2.5;
+    RAINBOW.forEach((col, i) => { s.beginPath(); s.arc(vx, vy + h * 0.02, rr - i * bw, Math.PI, 0); s.lineWidth = bw * 1.1; s.strokeStyle = col; s.globalAlpha = 0.75; s.stroke(); s.globalAlpha = 1; });
+    // 春風: the spring wind, green and sweeping in from the left
+    for (let k = 0; k < Math.round(sz("春風") * 1.6); k++) ribbon(s, w, x => h * (0.6 + k * 0.025) - x * 0.12 + Math.sin(x / w * 4 + T * 0.4 + k) * h * 0.012, () => h * 0.012, "rgba(150,210,140,.55)");
+    // the tavern's warmth at the lane's end
+    s.fillStyle = rad(s, vx, vy + h * 0.06, w * 0.16 * sz("酒家") / 1.7, "rgba(255,170,90,.9)", "rgba(255,170,90,0)"); s.fillRect(0, 0, w, h);
+  }, 5);
+  // stars
+  { const rs = mulberry(3); for (let i = 0; i < 70; i++) { const x = rs() * w, y = rs() * h * 0.3, tw = 0.5 + 0.5 * Math.sin(T * 1.5 + i); disc(c, x, y, w * 0.0018 * (1 + rs())); c.fillStyle = `rgba(255,255,255,${0.3 + 0.5 * tw * rs()})`; c.fill(); } }
+  { const g = lit("宇宙"); glow(c, w * 0.78, h * 0.1, w * (0.05 + 0.03 * g), "rgba(255,210,120,.9)"); disc(c, w * 0.78, h * 0.1, w * 0.02); c.fillStyle = "#FFE7A8"; c.fill();
+    disc(c, w * 0.62, h * 0.16, w * 0.014); c.fillStyle = "#4F86C6"; c.fill(); }
+  // 小巷: two dark walls narrowing to the lane's end
+  { const g = lit("小巷");
+    [[0, 1], [1, -1]].forEach(([edge, sd]) => { c.beginPath(); c.moveTo(edge * w, h * 0.3); c.lineTo(vx - sd * w * 0.06, vy - h * 0.02); c.lineTo(vx - sd * w * 0.06, vy + h * 0.1); c.lineTo(edge * w, h * 0.76); c.closePath();
+      c.fillStyle = lin(c, edge * w, 0, vx, 0, g ? "rgba(70,50,76,.95)" : "rgba(28,20,32,.95)", "rgba(28,20,32,.55)"); c.fill(); });
+    // 酒家: the lit doorway at the end
+    c.fillStyle = "#FFC27A"; c.fillRect(vx - w * 0.03, vy + h * 0.02, w * 0.06, h * 0.08); glow(c, vx, vy + h * 0.06, w * (0.06 + 0.04 * lit("酒家")), "rgba(255,190,110,.6)"); }
+  // 彩虹, crisp over the lane's end; 春風, green strokes blowing in from the left
+  { const rr = w * 0.34 * Math.sqrt(sz("彩虹")) / 1.5, bw = w * 0.014 * sz("彩虹") / 2.5, g = lit("彩虹");
+    c.save(); c.globalCompositeOperation = "screen"; RAINBOW.forEach((col, i) => { c.beginPath(); c.arc(vx, vy - h * 0.01, rr - i * bw, Math.PI * 1.04, Math.PI * 1.96); c.lineWidth = bw; c.strokeStyle = col; c.globalAlpha = 0.5 + 0.35 * g; c.stroke(); }); c.restore();
+    const n = Math.round(2 + sz("春風") * 1.5), gw = lit("春風");
+    c.save(); c.lineCap = "round"; for (let k = 0; k < n; k++) { c.beginPath(); for (let i = 0; i <= 40; i++) { const u = i / 40, x = u * vx, y = h * (0.7 + k * 0.018) - u * (h * (0.7 + k * 0.018) - vy - h * 0.04) + Math.sin(u * 9 + T * 1.2 + k) * h * 0.008 * (1 - u); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+      c.strokeStyle = `rgba(160,220,150,${(0.25 + 0.3 * gw) * (1 - k / n * 0.5)})`; c.lineWidth = Math.max(1, w * 0.003); c.stroke(); } c.restore(); }
+  // 燈籠: red lanterns hung along both walls, swaying on the beat
+  { const n = Math.round(2 + sz("燈籠") * 1.4), g = lit("燈籠");
+    for (let i = 0; i < n; i++) { const u = (i + 0.5) / n, sd = i % 2 ? 1 : -1, x = vx + sd * (w * 0.06 + (1 - u) * w * 0.38), y = vy + h * 0.01 + (1 - u) * h * 0.12, r = w * (0.012 + 0.028 * (1 - u)), sw = Math.sin(T * 1.2 + i) * r * 0.15;
+      rule(c, x, y - r * 2, x + sw, y - r, Math.max(1, w * 0.002), "rgba(255,200,150,.5)");
+      glow(c, x + sw, y, r * (2.4 + g), "rgba(255,90,60,.55)"); blobPath(c, x + sw, y, r, { sy: 1.25 }); c.fillStyle = "#D9452B"; c.fill(); } }
+  // 趕場: the crowd hurrying out from under the rainbow and up into space, a stream of small dashes
+  const P = [[0.02, 0.66], [0.25, 0.6], [0.45, 0.52], [0.52, 0.44], [0.52, 0.32], [0.58, 0.22], [0.7, 0.14], [0.86, 0.05]].map(([x, y]) => [x * w, y * h]);
+  { const n = Math.round(30 + 8 * sz("趕場")); for (let i = 0; i < n; i++) { const u = 0.38 + ((i / n + T * 0.03) % 1) * 0.6, [x, y] = pathAt(P, u), j = Math.sin(i * 12.9) * w * 0.03;
+      rule(c, x + j, y, x + j, y - h * 0.008, Math.max(1, w * 0.003), `rgba(255,236,214,${0.35 + 0.3 * lit("趕場")})`); } }
+  const us = S.map((s, i) => 0.03 + 0.95 * i / (S.length - 1)), marks = beadsAlong(c, w, t, P, S, us, hs);
+  albumHover(c, w, card, S, marks, hs);
+  albumTitle(c, w, h, D, null, card, hs);
+}
+// This Love: 臉藏在墨鏡後面，雨落進城裡，北風過後，太陽和花一起回到海邊。 Read top left to bottom right: a face behind
+// dark glasses, rain falling into the city, the north wind blowing it away, and the sun coming up over the sea with flowers on the shore.
+function thisLoveScene(c, w, h, t, card, D, hs) {
+  const T = reduce ? 0 : t, S = D.recs, sz = wd => Math.sqrt(imgTimes(S, wd)), hov = hs >= 0 && S[hs];
+  const hot = new Set(); if (hov) ALBUM_IMAGE.thislove.stations.forEach(([tr, wd]) => { if (tr === hov.track) hot.add(wd); }); if (card._word) hot.add(card._word);
+  const lit = wd => hot.has(wd) ? 1 : 0, sea = h * 0.8, sun = [w * 0.68, sea];
+  softPass(c, w, h, s => { s.fillStyle = lin(s, 0, 0, 0, h, "#1E2436", "#3A3046"); s.fillRect(0, 0, w, h); }, s => {
+    // the sky clearing toward the sea: grey rain at the city, warm dawn at the horizon
+    s.fillStyle = rad(s, w * 0.75, h * 0.48, w * 0.45, "rgba(120,130,150,.6)", "rgba(0,0,0,0)"); s.fillRect(0, 0, w, h);
+    s.fillStyle = rad(s, sun[0], sun[1], w * 0.55 * sz("太陽") / 1.4, "rgba(255,170,90,.9)", "rgba(255,170,90,0)"); s.fillRect(0, 0, w, h);
+    // 北風: the north wind as pale streaks across the middle
+    for (let k = 0; k < Math.round(1 + sz("北風") * 1.5); k++) ribbon(s, w, x => h * (0.6 + k * 0.03) + Math.sin(x / w * 5 + T * 0.5 + k) * h * 0.01, () => h * 0.01, "rgba(200,215,235,.5)");
+    // 海: the sea
+    s.fillStyle = lin(s, 0, sea, 0, h, "rgba(60,110,150,.95)", "rgba(20,40,70,1)"); s.fillRect(0, sea, w, h - sea);
+  }, 5);
+  // 臉 + 墨鏡: a face in profile behind dark glasses
+  { const fx = w * 0.24, fy = h * 0.52, fr = w * 0.085 * Math.sqrt(sz("臉")) / 1.3, g = lit("臉") || lit("墨鏡");
+    glow(c, fx, fy, fr * 2.2, `rgba(233,201,180,${0.25 + 0.2 * g})`);
+    blobPath(c, fx, fy, fr, { n: 1, a: 0.06, sy: 1.3, wob: 0.02 }, T); c.fillStyle = rad(c, fx - fr * 0.3, fy - fr * 0.4, fr * 1.6, g ? "#F3DCCB" : "#D9B9A4", "rgba(140,110,120,.9)"); c.fill();
+    const ly = fy - fr * 0.12, lr = fr * 0.26 * Math.sqrt(sz("墨鏡"));
+    rule(c, fx - fr * 0.6, ly, fx + fr * 0.6, ly, Math.max(1.5, w * 0.004), "#111");
+    [-1, 1].forEach(sd => { disc(c, fx + sd * fr * 0.36, ly, lr); c.fillStyle = "#0E0C10"; c.fill(); disc(c, fx + sd * fr * 0.36 - lr * 0.3, ly - lr * 0.3, lr * 0.22); c.fillStyle = "rgba(255,255,255,.35)"; c.fill(); }); }
+  // 城: a city skyline, rain falling into it (雨)
+  { const base = h * 0.6, g = lit("城"), rs = mulberry(21);
+    for (let i = 0; i < 9; i++) { const x = w * (0.5 + i * 0.055), bh = h * (0.06 + 0.1 * rs()); c.fillStyle = g ? "#4A4A62" : "#2A2A3C"; c.fillRect(x, base - bh, w * 0.048, bh);
+      for (let k = 0; k < 4; k++) if (rs() > 0.55) { c.fillStyle = "rgba(255,220,150,.7)"; c.fillRect(x + w * 0.012, base - bh + h * 0.012 * (k + 1), w * 0.008, h * 0.006); } }
+    const n = Math.round(30 * sz("雨")), gr = lit("雨");
+    for (let i = 0; i < n; i++) { const x = w * (0.45 + 0.55 * rs()), y = ((rs() + T * (0.25 + 0.1 * rs())) % 1) * base; rule(c, x, y, x - w * 0.006, y + h * 0.02, Math.max(1, w * 0.002), `rgba(190,210,235,${0.35 + 0.35 * gr})`); } }
+  // 太陽: the sun half up over the sea
+  { const r = w * 0.07 * sz("太陽") / 1.2, g = lit("太陽"); c.save(); c.beginPath(); c.rect(0, 0, w, sea); c.clip(); glow(c, sun[0], sun[1], r * (2.2 + g), "rgba(255,200,120,.7)"); disc(c, sun[0], sun[1], r); c.fillStyle = "#FFC66E"; c.fill(); c.restore();
+    for (let k = 0; k < 5; k++) rule(c, sun[0] - r * (1 - k * 0.15), sea + h * 0.012 * (k + 1), sun[0] + r * (1 - k * 0.15), sea + h * 0.012 * (k + 1), Math.max(1, w * 0.003), `rgba(255,200,120,${0.5 - k * 0.08})`); }
+  // 花: flowers on the shore, one for each time the album sings 花, opening on the beat
+  { const n = Math.round(2 + imgTimes(S, "花")), g = lit("花"), rs = mulberry(8);
+    for (let i = 0; i < n; i++) { const x = w * (0.06 + 0.42 * (i / Math.max(1, n - 1))) + rs() * w * 0.02, y = sea - h * (0.01 + 0.03 * rs()), r = w * (0.012 + 0.01 * rs());
+      rule(c, x, y, x, y + h * 0.05, Math.max(1, w * 0.0025), "#6E9A6A");
+      for (let p = 0; p < 5; p++) { const a = p / 5 * Math.PI * 2 + T * 0.2; disc(c, x + Math.cos(a) * r, y + Math.sin(a) * r, r * 0.7); c.fillStyle = g ? "#FFB3C8" : "#E58FAA"; c.fill(); }
+      disc(c, x, y, r * 0.5); c.fillStyle = "#FFD86A"; c.fill(); } }
+  // the walk: from the face, through the rain over the city, with the wind, down to the sun and the shore
+  const P = [[0.1, 0.44], [0.24, 0.42], [0.42, 0.46], [0.62, 0.45], [0.8, 0.52], [0.86, 0.64], [0.68, 0.72], [0.45, 0.76], [0.2, 0.77]].map(([x, y]) => [x * w, y * h]);
+  const us = S.map((s, i) => 0.02 + 0.96 * i / (S.length - 1)), marks = beadsAlong(c, w, t, P, S, us, hs);
+  albumHover(c, w, card, S, marks, hs);
+  albumTitle(c, w, h, D, null, card, hs);
 }
 // ---- pixel posters: the main image built from a coarse grid of square cells, flat colour, the grid left showing ----
 function pixelGrid(c, w, h, cols, line, fn) {
@@ -3298,15 +3580,18 @@ function thisLoveAlbum() {
       color: d.imagery[top] ? catColor(CATS.find(c => c.id === top)) : null, preview_url: d.preview_url };
   }) });
 }
-// two albums side by side, each its own poster, drawn by the same rules so that only the data differs
+// the three albums side by side, each its own poster, drawn by the same rules so that only the data differs
 function compareAlbums(c, w, h, t, p, hs = -1) {
-  const gap = w * 0.03, pw = (w - gap) / 2, L = p._L || (p._L = { stations: PLATES[0].stations }), R = p._R || (p._R = {});
-  if (!R._album) R._album = thisLoveAlbum();
-  const nL = PLATES[0].stations.length;
+  const gap = w * 0.02, pw = (w - gap * 2) / 3, L = p._L || (p._L = { stations: PLATES[0].stations }), M = p._M || (p._M = {}), R = p._R || (p._R = {});
+  if (!M._album) M._album = thisLoveAlbum();
+  const nL = PLATES[0].stations.length, nM = THIS_LOVE.length;
   c.fillStyle = "#0F0C14"; c.fillRect(0, 0, w, h);
-  c.save(); c.beginPath(); c.rect(0, 0, pw, h); c.clip(); blendAlbum(c, pw, h, t, L, hs < nL ? hs : -1); c.restore();
-  c.save(); c.translate(pw + gap, 0); c.beginPath(); c.rect(0, 0, pw, h); c.clip(); drawAlbumPoster(c, pw, h, t, R, R._album, hs >= nL ? hs - nL : -1); c.restore();
-  p._hit = (x, y) => { if (x < pw) return L._hit ? L._hit(x, y) : -1; const k = R._hit ? R._hit(x - pw - gap, y) : -1; return k >= 0 ? k + nL : -1; };
+  const panel = (k, fn) => { c.save(); c.translate(k * (pw + gap), 0); c.beginPath(); c.rect(0, 0, pw, h); c.clip(); fn(); c.restore(); };
+  panel(0, () => blendAlbum(c, pw, h, t, L, hs >= 0 && hs < nL ? hs : -1));
+  panel(1, () => drawAlbumPoster(c, pw, h, t, M, M._album, hs >= nL && hs < nL + nM ? hs - nL : -1));
+  panel(2, () => wonderScene(c, pw, h, t, R, hs >= nL + nM ? hs - nL - nM : -1));
+  p._hit = (x, y) => { const k = Math.floor(x / (pw + gap)), lx = x - k * (pw + gap), q = [L, M, R][k], off = [0, nL, nL + nM][k];
+    if (!q || !q._hit) return -1; const i = q._hit(lx, y); return i >= 0 ? i + off : -1; };
   p._open = null;
 }
 // ---- This Love's thirteen songs: a blend poster each, the same series as Soulboy's ----
@@ -3568,7 +3853,9 @@ const THIS_LOVE_STATIONS = THIS_LOVE.map(d => ({ track: d.track, name: d.name, n
 PLATES.splice(1, 0,
   { album: true, portrait: true, tab: "This Love · the album", name: "This Love", stations: THIS_LOVE_STATIONS, about: "", pixAbout: "", geoAbout: "",
     draw(c, w, h, t, p, hs) { if (!p._album) p._album = thisLoveAlbum(); drawAlbumPoster(c, w, h, t, p, p._album, hs); } },
-  { album: true, compare: true, tab: "Soulboy × This Love", name: "Compare", stations: [...PLATES[0].stations, ...THIS_LOVE_STATIONS], about: "", pixAbout: "", geoAbout: "", draw: compareAlbums });
+  { album: true, portrait: true, tab: "未來 · the album", name: "未來", group: "wonderland", stations: WONDERLAND.map(r => ({ track: r.track, name: r.name, note: "", album: "未來", preview_url: r.preview_url })),
+    about: "", pixAbout: "", geoAbout: "", draw(c, w, h, t, p, hs) { wonderScene(c, w, h, t, p, hs); } },
+  { album: true, compare: true, tab: "三張並排", name: "Compare", stations: [...PLATES[0].stations, ...THIS_LOVE_STATIONS, ...WONDERLAND.map(r => ({ track: r.track, name: r.name, note: "", album: "未來", preview_url: r.preview_url }))], about: "", pixAbout: "", geoAbout: "", draw: compareAlbums });
 // This Love's songs follow Soulboy's; the tabs show the songs of whichever album is open
 PLATES.push(...TL_CARDS);
 PLATES.forEach((p, i) => { p.group = p.group || (i === 1 ? "thislove" : p.compare ? "compare" : "soulboy"); });
@@ -3623,12 +3910,12 @@ function step(d) {
 // where each preview reaches the poster's key line (seconds into the 30 s clip); the album covers open on the first 愛 of the song that sings it most
 // found by transcribing each preview with whisper and aligning it to the synced lyrics; when the key line falls outside the 30 s clip, the clip's first sung line
 const LINE_AT = {"sb:1":13.4,"sb:3":0.1,"sb:4":17.7,"sb:5":1.6,"sb:6":0.6,"sb:7":13.7,"sb:9":0.4,"sb:11":15.6,"tl:1":6.1,"tl:2":1.6,"tl:3":15.6,"tl:4":0.1,"tl:7":10.5,"tl:8":0.1,"tl:10":11.7,"tl:12":0.2,"tl:13":0.4,"sb-album:6":2.4,"tl-album:1":7.2};
-const ALBUM_SONG = { soulboy: ["sb-album", 6], thislove: ["tl-album", 1] };
-const keyOf = (album, track) => (album === "This Love" || album === "tl" ? "tl:" : "sb:") + track;
+const ALBUM_SONG = { soulboy: ["sb-album", 6], thislove: ["tl-album", 1], wonderland: ["wl-album", 8] };
+const keyOf = (album, track) => (album === "This Love" || album === "tl" ? "tl:" : album === "未來" || album === "wl" ? "wl:" : "sb:") + track;
 const tlSong = track => TL_CARDS.find(c => c.track === track);
 function plateSong(p) {
   if (p.compare) return null;
-  if (p.album) { const [k, tr] = ALBUM_SONG[p.group]; return { s: p.group === "thislove" ? tlSong(tr) : songFor(tr), at: LINE_AT[k + ":" + tr] }; }
+  if (p.album) { const [k, tr] = ALBUM_SONG[p.group]; return { s: p.group === "thislove" ? tlSong(tr) : p.group === "wonderland" ? p.stations.find(x => x.track === tr) : songFor(tr), at: LINE_AT[k + ":" + tr] }; }
   return { s: p.preview_url ? p : songFor(p.track), at: LINE_AT[keyOf(p.group === "thislove" ? "tl" : "sb", p.track)] };
 }
 // opening a poster plays its song; a tab, an arrow or a tap is the gesture the browser needs before sound
@@ -3656,7 +3943,7 @@ function size() {
   const below = [".plate-nav", ".style-bar"].reduce((a, q) => a + ((document.querySelector(".posters " + q) || {}).offsetHeight || 0), 0) + 28;
   const availH = Math.max(320, window.innerHeight - top - below);
   // the blend album is a poster like the songs; the other styles keep the wide plate
-  if (p.compare) { ph = Math.min(availH, ((boxW - boxW * 0.03) / 2) * 4 / 3); pw = Math.min(boxW, (ph * 3 / 4) * 2 / 0.97); }
+  if (p.compare) { ph = Math.min(availH, ((boxW - boxW * 0.04) / 3) * 4 / 3); pw = Math.min(boxW, (ph * 3 / 4) * 3 / 0.96); }
   else if (p.album && style.id !== "flat" && !p.portrait) { pw = boxW; ph = Math.min(availH, boxW * 0.62); if (boxW < 700) ph = boxW * 1.05; }
   else { ph = Math.min(availH, boxW * 4 / 3); pw = ph * 3 / 4; }
   dpr = Math.max(1, Math.min(2, devicePixelRatio || 1));
@@ -3701,7 +3988,7 @@ function hoverAt(e) {
   if (typeof listen === "function") listen(s, at);
 }
 cv.addEventListener("pointermove", hoverAt);
-cv.addEventListener("pointerleave", () => { hoverStation = -1; dirty = true; hoverPlate = false; if (opened) playPlate(); });
+cv.addEventListener("pointerleave", () => { hoverStation = -1; dirty = true; hoverPlate = false; PLATES[cur]._word = null; if (opened) playPlate(); });
 cv.addEventListener("click", e => { opened = true; if (typeof setSound === "function" && !soundOn) { setSound(true); text.innerHTML = card(PLATES[cur]); } hoverAt(e); });
 // coming back to the posters, or turning sound on, picks the poster's song up again
 document.querySelectorAll('.seg button[data-view="posters"], #sound').forEach(b => b.addEventListener("click", () => setTimeout(() => {
