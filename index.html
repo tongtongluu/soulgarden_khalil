@@ -98,30 +98,38 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 /* song posters: one poster at a time, filling the screen, with its card beside it */
 .posters { display: grid; gap: 18px; }
 .posters[hidden], .stage[hidden] { display: none; }
-.posters .viewer { display: grid; grid-template-columns: minmax(240px, 300px) 1fr; gap: 32px; align-items: start; }
+.posters .viewer { display: grid; grid-template-columns: 1fr; gap: 14px; align-items: start; }
+.posters .plate { order: -1; }
 .posters .plate { min-width: 0; display: flex; justify-content: center; }
 .posters canvas { max-width: 100%; border-radius: 4px; box-shadow: 0 1px 0 var(--shelf), 0 24px 50px -28px rgba(0, 0, 0, .5); cursor: pointer; }
-.posters .plate-text { display: grid; gap: 12px; align-content: start; min-width: 0; }
-.posters h2 { margin: 0; font: 500 22px var(--display); display: grid; gap: 4px; }
+/* the text is a small caption under the poster, in columns */
+.posters .plate-text { display: block; columns: 3 240px; column-gap: 28px; min-width: 0; font-size: 11px; color: var(--muted); }
+.posters .plate-text > * { break-inside: avoid; margin: 0 0 8px; }
+.posters .swatches span { display: inline-flex; align-items: center; gap: 4px; margin-right: 10px; }
+.posters .swatches i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.posters h2 { margin: 0; font: 500 15px var(--display); display: grid; gap: 2px; color: var(--fg); }
 .posters h2 span { font: 400 11px var(--mono); color: var(--muted); letter-spacing: .04em; }
-.posters .line { font: 500 16px "Noto Serif SC", var(--display); margin: 0; }
-.posters .about { font-size: 13px; line-height: 1.7; margin: 0; }
+.posters .line { font: 500 12px "Noto Serif SC", var(--display); margin: 0; color: var(--fg); }
+.posters .about { font-size: 11.5px; line-height: 1.6; margin: 0; color: var(--fg); }
 .posters .hint { font: 11px var(--mono); color: var(--muted); margin: 0; }
-.posters dl { margin: 0; display: grid; grid-template-columns: 84px 1fr; gap: 6px 10px; font-size: 12px; line-height: 1.55; border-top: 1px solid var(--shelf); padding-top: 12px; }
+.posters dl { margin: 0; display: grid; grid-template-columns: 84px 1fr; gap: 6px 10px; font-size: 11px; line-height: 1.5; border-top: 1px solid var(--shelf); padding-top: 12px; }
 .posters dt { font: 500 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
 .posters dd { margin: 0; min-width: 0; }
-.posters .stations { list-style: none; margin: 0; padding: 12px 0 0; border-top: 1px solid var(--shelf); display: grid; gap: 5px; font-size: 12px; }
+.posters .stations { list-style: none; margin: 0; padding: 12px 0 0; border-top: 1px solid var(--shelf); display: grid; gap: 3px; font-size: 11px; }
 .posters .stations li { display: grid; grid-template-columns: 22px auto 1fr; gap: 8px; align-items: baseline; }
 .posters .stations b { font: 500 10px var(--mono); color: var(--muted); }
-.posters .stations span { font: 500 13px "Noto Serif SC", var(--display); white-space: nowrap; }
+.posters .stations span { font: 500 11.5px "Noto Serif SC", var(--display); white-space: nowrap; }
 .posters .stations em { font-style: normal; color: var(--muted); font-size: 11px; min-width: 0; }
 .posters .plate-nav { display: flex; flex-wrap: wrap; gap: 4px 6px; justify-content: center; }
 .posters .plate-nav button { border: 0; background: transparent; color: var(--muted); font: 500 12px var(--body); padding: 6px 10px; border-radius: 999px; cursor: pointer; }
 .posters .plate-nav button:hover, .posters .plate-nav button[aria-pressed="true"] { color: var(--fg); }
 .posters .plate-nav button[aria-pressed="true"] { box-shadow: inset 0 -1px 0 var(--fg); border-radius: 0; }
 .posters .plate-nav button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
-@media (max-width: 860px) { .posters .viewer { grid-template-columns: 1fr; } .posters .plate { order: -1; } }
+@media (max-width: 860px) { .posters .prints { display: grid; gap: 18px; } .posters .viewer { display: contents; } .posters .plate { order: -2; } .posters .plate-nav, .posters .style-bar { order: -1; } }
 .posters .style-bar { display: flex; flex-wrap: wrap; gap: 4px 6px; justify-content: center; align-items: center; font-size: 11px; color: var(--muted); }
+/* the captions are hidden for now, so the poster and its two rows of toggles fit on one screen */
+.posters .plate-text { display: none; }
+.posters .viewer { margin-bottom: 8px; }
 .posters .style-bar span { font: 500 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; margin-right: 4px; }
 .posters .style-btn { border: 1px solid var(--shelf); background: transparent; color: var(--muted); font: 500 12px var(--body); padding: 5px 11px; border-radius: 999px; cursor: pointer; }
 .posters .style-btn:hover { color: var(--fg); }
@@ -204,7 +212,7 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
     <div><dt>Flower</dt><dd>He sang about love all the time. Every song whose lyrics mention love 愛 gets flowers in its vase: one flower for every five mentions, and each petal is one mention, so you can count them.</dd></div>
     <div><dt>Pebble shape</dt><dd>A slow ballad, under 78 BPM.</dd></div>
     <div><dt>Background</dt><dd>The garden sits in the light of the places he lived: the ocean of Kauaʻi where he was born at the top, the harbor haze of Hong Kong where he grew up and made music across the middle, and the red earth of Yunnan where he went in his last years rising from below.</dd></div>
-    <div><dt>Song posters</dt><dd>One abstract poster per song, drawn from a scene card written from a close reading of its lyrics: the main image becomes a warped ring, the ground of the song a warped checker field, and its light and shadow follow the mood and emotional arc. Counts in the geometry, such as ring segments, bands and jumping squares, are how many times the lyrics sing them. The album poster comes first.</dd></div>
+    <div><dt>Song posters</dt><dd>One abstract poster per song, drawn from a scene card written from a close reading of its lyrics: its main image sits at the centre as one clear form, and the colours around it follow the mood and emotional arc. Each poster can be printed three ways: blend, pixel or geometric. Counts in the picture, such as lobes, rings, rainbow bands and jumping shapes, are how many times the lyrics sing them. The album poster comes first.</dd></div>
     <div><dt>Dreamscape</dt><dd>Every imagery word, freed from its song and recombined into one picture of flat gradient shapes: moon, rainbow, lanterns, swallows, the sea. Each image is sized by how often he sings it; birds, butterflies, flowers, people, lanterns and stars repeat instead, so you can count them. Recompose shuffles the arrangement, and hovering an image plays the song that sings it most.</dd></div>
     <div><dt>Blends</dt><dd>A group of songs averaged into one outline, with each image as a flowing patch of color sized by its share. Album blends show each album's character. Soul palette pours every song into one smiling bowl: the bowl holds his whole palette, the two fins carry the second and third images, and each leaf is one song. Hover a leaf to hear it.</dd></div>
   </dl>
@@ -262,22 +270,28 @@ const SOULBOY_TERMS = {
   14: "晚上:8:1 cappuccino:3:1 咖啡:3:1 手機:3:1 電話:3:1 電影:3:1 小姐:2:1 朋友:2:1 家:2:1",
 };
 // Soulboy, built in so the page is never empty: imagery hit counts per song (order of CAT_IDS), times it sings of love (愛, 爱 or love),
-// tempo and intensity from the 30-second previews. data/songs.json, when present, adds previews and quotes.
+// tempo measured from the audio, intensity from the 30-second previews. data/songs.json, when present, adds previews and quotes.
+// beats in a bar at the measured tempo (rhythm.json): 哪怕 is in 3; the 12/8 songs count four dotted beats
+const SOULBOY_BAR = [4, 4, 4, 4, 4, 4, 3, 4, 4, 4, 4, 4, 4, 4];
+function barOf(s) {
+  const n = s.beats_per_bar || (s.album === "Soulboy" && SOULBOY_BAR[s.track - 1]) || 4;
+  return n > 3 && n % 3 === 0 ? n / 3 : n;
+}
 const SOULBOY = [
-  [1, "Prologue",   99.05, 0.623, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 1],
-  [2, "妹妹",       123.59, 0.717, [4, 0, 7, 0, 0, 3, 0, 0, 0, 0], 1],
-  [3, "春風吹",     114.59, 0.273, [3, 8, 0, 2, 0, 13, 12, 0, 0, 1], 0],
-  [4, "每天每天",   129.41, 0.152, [4, 0, 5, 6, 0, 0, 0, 0, 0, 4], 1],
-  [5, "女人",       102.52, 0.572, [6, 0, 8, 0, 0, 0, 0, 0, 0, 0], 9],
-  [6, "叫我怎麼說", 108.2,  0.25,  [0, 0, 3, 6, 0, 0, 0, 0, 0, 0], 12],
-  [7, "哪怕",       133.66, 0,     [17, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0],
-  [8, "南音",       105.02, 0.131, [8, 0, 6, 10, 0, 4, 0, 8, 7, 4], 1],
-  [9, "我們能不能", 153.6,  0.735, [12, 0, 6, 1, 5, 0, 0, 0, 0, 0], 0],
-  [10, "跳",        120.23, 0.786, [0, 0, 2, 4, 2, 0, 0, 7, 0, 0], 0],
-  [11, "總結",      107.24, 0.121, [8, 0, 1, 0, 0, 3, 6, 0, 0, 0], 3],
-  [12, "趕場",      125.7,  0.174, [0, 0, 10, 12, 0, 1, 0, 1, 3, 0], 0],
-  [13, "等著你回來", 118.63, 1,    [2, 4, 0, 0, 0, 2, 2, 0, 0, 0], 1],
-  [14, "認識你",    89.1,   0.136, [0, 0, 3, 5, 0, 0, 0, 0, 1, 0], 0],
+  [1, "Prologue",   96.5, 0.623, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 1],
+  [2, "妹妹",       100.5, 0.717, [4, 0, 7, 0, 0, 3, 0, 0, 0, 0], 1],
+  [3, "春風吹",     136, 0.273, [3, 8, 0, 2, 0, 13, 12, 0, 0, 1], 0],
+  [4, "每天每天",   58, 0.152, [4, 0, 5, 6, 0, 0, 0, 0, 0, 4], 1],
+  [5, "女人",       93.5, 0.572, [6, 0, 8, 0, 0, 0, 0, 0, 0, 0], 9],
+  [6, "叫我怎麼說", 95,  0.25,  [0, 0, 3, 6, 0, 0, 0, 0, 0, 0], 12],
+  [7, "哪怕",       63.5, 0,     [17, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0],
+  [8, "南音",       72, 0.131, [8, 0, 6, 10, 0, 4, 0, 8, 7, 4], 1],
+  [9, "我們能不能", 90,  0.735, [12, 0, 6, 1, 5, 0, 0, 0, 0, 0], 0],
+  [10, "跳",        101.5, 0.786, [0, 0, 2, 4, 2, 0, 0, 7, 0, 0], 0],
+  [11, "總結",      103, 0.121, [8, 0, 1, 0, 0, 3, 6, 0, 0, 0], 3],
+  [12, "趕場",      133.5,  0.174, [0, 0, 10, 12, 0, 1, 0, 1, 3, 0], 0],
+  [13, "等著你回來", 95, 1,    [2, 4, 0, 0, 0, 2, 2, 0, 0, 0], 1],
+  [14, "認識你",    79.5,   0.136, [0, 0, 3, 5, 0, 0, 0, 0, 1, 0], 0],
 ].map(([track, name, tempo, intensity, h, love]) => ({
   preview_url: PREVIEW + SOULBOY_PREVIEWS[track - 1] + ".plus.aac.p.m4a",
   terms: (SOULBOY_TERMS[track] || "").split(" ").filter(Boolean).map(x => { const [w, c, n] = x.split(":"); return [w, CAT_IDS[+c], +n]; }),
@@ -548,13 +562,13 @@ let vesselPath = function (s, x, y, w, h, t) {
 };
 
 // how hard the vase is hit right now, 0 to 1. While its preview plays this follows the kick drum
-// heard in the audio; otherwise it falls on the song's BPM, with the first beat of each bar hit hardest.
+// heard in the audio; otherwise it falls on the song's BPM, with the first beat of each bar hit hardest (every 3rd beat for a song in 3).
 function beatPulse(s, t) {
   if (reduce || s.hover < 0.01) return 0;
   if (playing && playing === s.preview_url && !audio.paused && analyser) return kick;
   const clock = playing && playing === s.preview_url && !audio.paused ? audio.currentTime : t;
   const beat = (clock * (s.tempo || 90)) / 60, n = Math.floor(beat);
-  return Math.exp(-(beat - n) * 6) * (n % 4 === 0 ? 1 : 0.65);
+  return Math.exp(-(beat - n) * 6) * (n % barOf(s) === 0 ? 1 : 0.65);
 }
 
 function drawVessel(s, t) {
@@ -1423,14 +1437,15 @@ async function load() {
       const e = extra.get(key(d));
       if (!e) return d;
       extra.delete(key(d));
-      return { ...d, ...e, imagery: e.imagery || d.imagery };
+      // Soulboy tempos are measured from the audio, so they win over the preview features
+      return { ...d, ...e, imagery: e.imagery || d.imagery, tempo: d.tempo };
     });
     records.push(...extra.values());
     realData = true;
   } catch (err) {}
   build(records);
   const tagged = songs.length;
-  note.innerHTML = `<strong>Data:</strong> ${tagged} of ${tagged + empties.length} songs tagged so far; blank vessels are still waiting for theirs. Imagery is counted from the full lyrics with a hand-built lexicon (hover a tag to see its top words); tempo and mood come from audio features of each 30-second preview.`;
+  note.innerHTML = `<strong>Data:</strong> ${tagged} of ${tagged + empties.length} songs tagged so far; blank vessels are still waiting for theirs. Imagery is counted from the full lyrics with a hand-built lexicon (hover a tag to see its top words); Soulboy tempos are measured from the audio itself; mood and other albums' tempos come from audio features of each 30-second preview.`;
   soundBtn.hidden = !songs.some(s => s.preview_url);
   songs.filter(s => s.terms && s.terms.length).forEach(s => sceneSelect.add(new Option(`${s.name} · ${s.album}`, s.name)));
   scene = null;
@@ -1445,7 +1460,7 @@ load();
 // ---- the scene cards: the data each poster is drawn from ----
 const CARDS = [
   {
-    track: 3, name: "春風吹", line: "吹紅了桃花", bpm: 114.6,
+    track: 3, name: "春風吹", line: "吹紅了桃花", bpm: 136,
     hero: "春風 spring wind, blowing through almost every line", heroCount: 11, heroUnit: "wind ribbons",
     setting: "Countryside in spring, pulling back to the far north (玉門關, a river valley); day, breezy",
     supporting: "桃花 red beside 柳樹 green · 青蛙 with 燕子 · 河水 ruffled, 雲堆 scattered · 悶雷 high, 烏龜 low · 蛇 winter → 原上草 spring → 夏天",
@@ -1456,7 +1471,7 @@ const CARDS = [
     draw: drawWind,
   },
   {
-    track: 8, name: "南音", line: "命運的燈籠", bpm: 105.0,
+    track: 8, name: "南音", line: "命運的燈籠", bpm: 72,
     hero: "墨鏡 a blind erhu player's dark glasses; inside them, the moon over the spring (二泉映月)", heroCount: 5, heroUnit: "rings of the moon over the spring",
     setting: "A noisy alley of restaurants at night, north wind; then the road home",
     supporting: "二胡 with blood-red strings · 漆黑 → 燭光 → 彩虹 → 燈籠 · 聽眾 along the route · 老婆 guiding him home",
@@ -1467,7 +1482,7 @@ const CARDS = [
     draw: drawLenses,
   },
   {
-    track: 10, name: "跳", line: "叫你跟我跳", bpm: 120.2,
+    track: 10, name: "跳", line: "叫你跟我跳", bpm: 101.5,
     hero: "彩虹 a rainbow world, six times in the chorus", heroCount: 6, heroUnit: "rainbow bands",
     setting: "A world at odds with itself: today's papers full of chaos, nights without sleep",
     supporting: "新聞 · 報紙 front pages · 暗箭 hidden arrows · 左看擁有一切 a whole world on the left, 右看只有分裂 the same world broken on the right · one sun with many rays · homies all over the world",
@@ -1841,7 +1856,7 @@ function drawAlbum(c, w, h, t, card, hs = -1) {
     // track number and name, small, on the ground
     c.fillStyle = i === 7 ? "#EDE3CC" : "rgba(40,48,44,.75)"; c.textAlign = "center";
     c.font = `500 ${Math.max(9, h * 0.015)}px "IBM Plex Mono", monospace`; c.fillText(String(s.track).padStart(2, "0"), x, pathY(x) + h * 0.07);
-    c.font = `500 ${Math.max(8, Math.min(h * 0.021, (w / n) * 0.95 / Math.max(2, [...s.name].length * 0.95)))}px "Noto Serif SC", serif`; c.fillText(s.name, x, pathY(x) + h * 0.1);
+    c.font = `500 ${Math.max(8, Math.min(h * 0.021, (w / n) * 0.95 / Math.max(2, [...s.name].length * 0.95)))}px "Noto Serif SC", serif`; if (w >= 500) c.fillText(s.name, x, pathY(x) + h * 0.1);
   });
   c.textAlign = "left"; c.fillStyle = "rgba(40,48,44,.8)"; c.font = `500 ${Math.max(10, h * 0.02)}px "IBM Plex Mono", monospace`;
   c.fillText("SOULBOY · 2005", w * 0.03, h * 0.06);
@@ -1980,8 +1995,8 @@ const HEROES = {
   },
 };
 // ---- abstract posters: the scene card turned into geometry, light and shadow ----
-// a warped checker field for the ground of the song, one warped ring for its main image,
-// light falling from where the song's light comes from, and a cast shadow so the forms sit in space
+// flat shapes for the images of the song, a few warped checks and rings among them,
+// light falling from where the song's light comes from, and cast shadows so the forms sit in space
 function poly(c, pts) { c.beginPath(); pts.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); c.closePath(); }
 function cell(c, pts, col) { poly(c, pts); c.fillStyle = col; c.strokeStyle = col; c.lineWidth = 0.8; c.fill(); c.stroke(); }
 // a checker field of cols × rows; warp(u, v) gives each corner its place on the poster
@@ -2011,150 +2026,720 @@ function shadowOf(c, o, dx, dy, blur, col) {
 }
 function glow(c, x, y, r, col, mode = "screen") { c.save(); c.globalCompositeOperation = mode; disc(c, x, y, r); c.fillStyle = rad(c, x, y, r, col, "rgba(0,0,0,0)"); c.fill(); c.restore(); }
 function shade(c, w, h, x0, y0, x1, y1, a) { c.save(); c.globalCompositeOperation = "multiply"; c.fillStyle = lin(c, x0, y0, x1, y1, "rgba(255,255,255,0)", `rgba(20,20,30,${a})`); c.fillRect(0, 0, w, h); c.restore(); }
-function beatOf(t, bpm) { const b = (t * bpm) / 60, f = b - Math.floor(b); return reduce ? 0 : Math.exp(-f * 5) * (Math.floor(b) % 4 === 0 ? 1 : 0.6); }
+function beatOf(t, bpm, bar = 4) { const b = (t * bpm) / 60, f = b - Math.floor(b); return reduce ? 0 : Math.exp(-f * 5) * (Math.floor(b) % bar === 0 ? 1 : 0.6); }
 // poster type: a big title, the lyric line, and a strip of small facts, like a gig print
 function posterType(c, w, h, p, ink, sub, opts = {}) {
+  if (posterType.off) return;
+  if (posterType.queue) { posterType.queue.push([c, w, h, p, ink, sub, opts]); return; }
   const size = opts.size || w * 0.15, x = opts.x ?? w * 0.07, y = opts.y ?? h * 0.9;
   c.save(); c.fillStyle = ink; c.textBaseline = "alphabetic";
   c.font = `900 ${size}px "Noto Sans SC", "Noto Serif SC", sans-serif`; c.fillText(p.name, x, y);
   // the lyric line sits under the title, or above it when the title is already at the foot of the page
   const lineY = y + w * 0.05 < h - w * 0.02 ? y + w * 0.05 : y - size * 0.92;
   c.font = `500 ${Math.max(10, w * 0.026)}px "Noto Serif SC", serif`; c.fillStyle = sub; c.fillText(`「${p.line}」`, x, lineY);
-  c.font = `500 ${Math.max(8, w * 0.017)}px "IBM Plex Mono", monospace`;
-  const meta = `KHALIL FONG 方大同 · SOULBOY 2005 · ${p.track ? "TRACK " + String(p.track).padStart(2, "0") + " · " + Math.round(p.bpm) + " BPM" : "14 SONGS"}`;
+  c.font = `500 ${Math.max(8, w * 0.017)}px "IBM Plex Mono", monospace`; if (opts.metaInk) c.fillStyle = opts.metaInk;
+  const meta = opts.meta || `KHALIL FONG 方大同 · SOULBOY 2005 · ${p.track ? "TRACK " + String(p.track).padStart(2, "0") + " · " + Math.round(p.bpm) + " BPM" : "14 SONGS"}`;
   c.fillText(meta, x, opts.metaY ?? h * 0.055);
   c.restore();
 }
 
-// 春風吹 — flow. Ground: a green and white field bent by the wind. Main image: a peach-red ring blown out of round,
-// 11 × 3 segments for the 11 times 春風 is sung. Light from the upper left, a long shadow downwind.
-function absWind(c, w, h, t, p) {
-  c.fillStyle = lin(c, 0, 0, 0, h, "#CFE2EC", "#EAF1EC"); c.fillRect(0, 0, w, h);
-  const T = reduce ? 0 : t;
-  field(c, 12, 9, (u, v) => {
-    const vv = Math.pow(v, 1.35);
-    return [u * w * 1.1 - w * 0.05 + Math.sin(vv * 3.2 + T * 0.7) * w * 0.06 * (1 - vv * 0.5), h * (0.5 + vv * 0.52) + Math.sin(u * 5.5 + T * 0.9) * h * 0.018 * (1 - vv)];
-  }, (i, j) => (i + j) % 2 ? "#4FA35E" : "#F4F1E6");
-  // eleven bars of wind across the sky
-  for (let i = 0; i < 11; i++) {
-    const y = h * (0.08 + i * 0.038), x0 = ((T * 30 * (1 + (i % 3) * 0.4) + i * 97) % (w * 1.6)) - w * 0.4;
-    c.fillStyle = i % 4 === 0 ? "rgba(255,255,255,.9)" : "rgba(255,255,255,.45)";
-    c.beginPath(); c.roundRect(x0, y, w * (0.25 + (i % 4) * 0.1), h * 0.007, h * 0.004); c.fill();
+// more flat elements: circles, half and quarter discs, triangles, rules, hatching and halftone dots
+function circle(c, x, y, r, col) { disc(c, x, y, r); c.fillStyle = col; c.fill(); }
+function semiPath(c, x, y, r, a0) { c.beginPath(); c.moveTo(x, y); c.arc(x, y, r, a0, a0 + Math.PI); c.closePath(); }
+function semi(c, x, y, r, a0, col) { semiPath(c, x, y, r, a0); c.fillStyle = col; c.fill(); }
+function quarter(c, x, y, r, a0, col) { c.beginPath(); c.moveTo(x, y); c.arc(x, y, r, a0, a0 + Math.PI / 2); c.closePath(); c.fillStyle = col; c.fill(); }
+function tri(c, a, b, d, col) { poly(c, [a, b, d]); c.fillStyle = col; c.fill(); }
+function sector(c, x, y, r0, r1, a0, a1) { c.beginPath(); c.arc(x, y, r1, a0, a1); c.arc(x, y, r0, a1, a0, true); c.closePath(); }
+function rule(c, x0, y0, x1, y1, lw, col) { c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.lineWidth = lw; c.strokeStyle = col; c.lineCap = "butt"; c.stroke(); }
+// parallel lines inside a shape; path(c) sets the clip and ang is the direction of the lines
+function hatch(c, path, ang, gap, lw, col, w, h, phase = 0) {
+  c.save(); path(c); c.clip();
+  const L = Math.hypot(w, h), ca = Math.cos(ang), sa = Math.sin(ang), ph = ((phase % gap) + gap) % gap;
+  for (let d = -L + ph; d < L; d += gap) { const x = w / 2 - sa * d, y = h / 2 + ca * d; rule(c, x - ca * L, y - sa * L, x + ca * L, y + sa * L, lw, col); }
+  c.restore();
+}
+// a halftone grid; size(u, v) from 0 to 1 sets each dot's size across the box
+function dots(c, x0, y0, x1, y1, gap, size, col) {
+  c.fillStyle = col;
+  for (let y = y0; y <= y1; y += gap) for (let x = x0; x <= x1; x += gap) {
+    const r = size((x - x0) / (x1 - x0 || 1), (y - y0) / (y1 - y0 || 1)) * gap * 0.5;
+    if (r > 0.3) { disc(c, x, y, r); c.fill(); }
   }
-  const o = { x: w * 0.47, y: h * 0.38, r0: w * 0.12, r1: w * 0.3, segs: p.heroCount * 3, bands: 4, squash: 0.86, rot: T * 0.08,
-    k: th => 1 + 0.2 * Math.sin(th * 2 + T * 0.6) + 0.06 * Math.sin(th * 5 - T),
-    color: (s, b) => (s + b) % 2 ? (b < 2 ? "#E8505B" : "#F4B6C2") : "#FBF7F0" };
-  shadowOf(c, o, w * 0.06, h * 0.06, w * 0.05, "rgba(30,50,40,.32)");
-  ring(c, o);
-  glow(c, w * 0.12, h * 0.06, w * 0.8, "rgba(255,250,235,.55)");
-  shade(c, w, h, w * 0.2, h * 0.2, w, h, 0.28);
-  posterType(c, w, h, p, "#1E2B3A", "#3E5566");
+}
+// a soft cast shadow and a spot of light, for any shape
+function castShadow(c, path, dx, dy, blur, col) { c.save(); c.shadowColor = col; c.shadowBlur = blur; c.shadowOffsetX = dx; c.shadowOffsetY = dy; path(c); c.fillStyle = col; c.fill(); c.restore(); }
+function lightIn(c, path, x, y, r, col) { c.save(); path(c); c.clip(); glow(c, x, y, r, col); c.restore(); }
+function wave(c, y, amp, len, phase, w, lw, col) {
+  c.beginPath();
+  for (let x = -10; x <= w + 10; x += 6) { const yy = y + Math.sin(x / len + phase) * amp; x < 0 ? c.moveTo(x, yy) : c.lineTo(x, yy); }
+  c.lineWidth = lw; c.strokeStyle = col; c.lineCap = "round"; c.stroke();
 }
 
-// 南音 — frame. Two dark rings for the glasses, five bands for the five times the moon over the spring returns.
-// Inside the left, the moon and its reflection; inside the right, the rainbow he plays. Red strings drop
-// to a gold point, and the sound spreads below in rings of gold. Light: one candle cone from above.
+// 春風吹 — flow. A big red disc for the peach blossom, eleven lines of wind for the eleven times 春風 is sung,
+// willow as green blades leaning downwind, a cloud as a hatched half disc, petals carried off the page,
+// a green half disc of 原上草 under a halftone, and the river as a strip of blue and white checks.
+function absWind(c, w, h, t, p) {
+  const T = reduce ? 0 : t;
+  c.fillStyle = lin(c, 0, 0, 0, h, "#D2E3EC", "#EDF1E9"); c.fillRect(0, 0, w, h);
+  // the blossom, lit from the upper left
+  const sx = w * 0.66, sy = h * 0.29, sr = w * 0.25, sun = c => disc(c, sx, sy, sr);
+  castShadow(c, sun, w * 0.04, h * 0.035, w * 0.07, "rgba(40,60,80,.28)");
+  sun(c); c.fillStyle = rad(c, sx - sr * 0.45, sy - sr * 0.45, sr * 1.7, "#F7A79D", "#C93A48"); c.fill();
+  quarter(c, sx, sy, sr * 0.55, Math.PI * 0.5 + Math.sin(T * 0.3) * 0.08, "rgba(255,226,214,.55)");
+  // a cloud: a pale half disc, flat side down, with blue hatching
+  const cl = c => semiPath(c, w * 0.36, h * 0.43, w * 0.17, Math.PI);
+  castShadow(c, cl, w * 0.02, h * 0.02, w * 0.04, "rgba(40,60,80,.2)");
+  cl(c); c.fillStyle = "#F5F2E9"; c.fill();
+  hatch(c, cl, 0, h * 0.012, Math.max(1, w * 0.003), "rgba(79,134,198,.5)", w, h, T * 6);
+  // a swallow: two navy triangles
+  const bx = w * 0.16 + Math.sin(T * 0.5) * w * 0.02, by = h * 0.15 + Math.sin(T * 1.3) * h * 0.01, bs = w * 0.06;
+  tri(c, [bx, by], [bx - bs, by - bs * 0.45], [bx - bs * 0.35, by + bs * 0.05], "#1E2B3A");
+  tri(c, [bx, by], [bx + bs * 0.8, by - bs * 0.6], [bx + bs * 0.3, by + bs * 0.08], "#1E2B3A");
+  // eleven lines of wind across the sky; three of them weighted, one red
+  for (let i = 0; i < p.heroCount; i++) {
+    const y = h * (0.12 + i * 0.045), heavy = i % 4 === 1;
+    wave(c, y, h * (0.008 + (i % 3) * 0.005), w * (0.09 + (i % 4) * 0.03), T * (0.8 + (i % 3) * 0.3) + i,
+      w, heavy ? Math.max(2, w * 0.008) : Math.max(1, w * 0.0025), i === 6 ? "#E8505B" : heavy ? "#1E2B3A" : "rgba(255,255,255,.85)");
+  }
+  // the grass hill, a green half disc under halftone light
+  const hill = c => semiPath(c, w * 0.76, h * 0.76, w * 0.34, Math.PI);
+  hill(c); c.fillStyle = lin(c, 0, h * 0.5, 0, h * 0.76, "#6DB873", "#2F7D4A"); c.fill();
+  c.save(); hill(c); c.clip(); dots(c, w * 0.42, h * 0.5, w * 1.1, h * 0.76, w * 0.022, (u, v) => 0.25 + 0.6 * (1 - v) * u, "rgba(244,241,230,.55)"); c.restore();
+  // willow: green blades leaning downwind
+  const greens = ["#4FA35E", "#2F7D4A", "#9FCB7A", "#3C8F55"];
+  for (let i = 0; i < 7; i++) {
+    const x = w * (0.03 + i * 0.045), bw = w * 0.04, top = h * (0.4 + (i % 3) * 0.06), lean = w * (0.08 + 0.03 * Math.sin(T * 0.9 + i * 0.6));
+    tri(c, [x, h * 0.76], [x + bw, h * 0.76], [x + bw / 2 + lean, top], greens[i % 4]);
+  }
+  // the river: a strip of checks rippling
+  field(c, 18, 2, (u, v) => [u * w, h * (0.76 + v * 0.045) + Math.sin(u * 9 + T * 1.6) * h * 0.006], (i, j) => (i + j) % 2 ? "#4F86C6" : "#F5F2E9");
+  // petals carried off to the right
+  for (let i = 0; i < 16; i++) {
+    const x = ((i * 0.173 + T * (0.03 + (i % 3) * 0.012)) % 1.2) * w * 1.1 - w * 0.1, y = h * (0.2 + (i % 7) * 0.065) + Math.sin(x / w * 7 + i) * h * 0.02;
+    const r = w * (0.008 + (i % 3) * 0.005);
+    i % 3 ? circle(c, x, y, r, i % 2 ? "#F4B6C2" : "#E8505B") : semi(c, x, y, r * 1.4, T + i, "#F4B6C2");
+  }
+  c.fillStyle = "#F4F1E6"; c.fillRect(0, h * 0.805, w, h * 0.2);
+  rule(c, w * 0.07, h * 0.83, w * 0.93, h * 0.83, 1, "rgba(30,43,58,.35)");
+  glow(c, w * 0.1, h * 0.04, w * 0.85, "rgba(255,250,235,.5)");
+  shade(c, w, h, w * 0.2, h * 0.1, w, h * 0.8, 0.22);
+  posterType(c, w, h, p, "#1E2B3A", "#3E5566", { y: h * 0.92 });
+}
+
+// 南音 — frame. Two black discs for the glasses with five fine rings for the five times the moon over the spring returns.
+// In the left lens a silver half moon above its reflection, in the right the rainbow he plays. Two red strings drop
+// to a gold triangle, and the sound spreads up from it in arcs. Candlelight falls in a cone; the listeners are dots.
 function absLenses(c, w, h, t, p) {
   c.fillStyle = lin(c, 0, 0, 0, h, "#121220", "#22182A"); c.fillRect(0, 0, w, h);
   const T = reduce ? 0 : t, cy = h * 0.34, r1 = w * 0.2, r0 = w * 0.1;
   // candlelight from above
   c.save(); c.globalCompositeOperation = "screen";
-  poly(c, [[w * 0.47, 0], [w * 0.53, 0], [w * 0.9, h], [w * 0.1, h]]); c.fillStyle = lin(c, 0, 0, 0, h, "rgba(242,179,61,.22)", "rgba(242,179,61,0)"); c.fill(); c.restore();
-  // the sound, a half ring of gold and indigo opening upward from the drum
-  const snd = { x: w * 0.5, y: h * 0.9, r0: w * 0.05, r1: w * 0.52, segs: 26, bands: 6, from: Math.PI, to: Math.PI * 2,
-    k: th => 1 + 0.03 * Math.sin(th * 8 + T * 2), color: (s, b) => ((s + b) % 2 ? ["#F2B33D", "#E08A3C", "#C8323A", "#6B5CA5", "#3E4C8A", "#2B2A4A"][b] : "#1A1726") };
-  ring(c, snd);
-  [[-1, "left"], [1, "right"]].forEach(([d]) => {
-    const o = { x: w * 0.5 + d * w * 0.215, y: cy, r0, r1, segs: 36, bands: p.heroCount, k: th => 1 + 0.025 * Math.sin(th * 3 + d), color: (s, b) => (s + b) % 2 ? "#2B2A4A" : "#0B0A12" };
-    shadowOf(c, o, 0, h * 0.03, w * 0.04, "rgba(0,0,0,.6)");
-    ring(c, o);
-    c.save(); disc(c, o.x, cy, r0 * 1.02); c.clip();
+  poly(c, [[w * 0.47, 0], [w * 0.53, 0], [w * 0.92, h], [w * 0.08, h]]); c.fillStyle = lin(c, 0, 0, 0, h, "rgba(242,179,61,.2)", "rgba(242,179,61,0)"); c.fill(); c.restore();
+  // the listeners he cannot see: a halftone that brightens toward the sound
+  dots(c, w * 0.04, h * 0.6, w * 0.96, h * 0.88, w * 0.026, (u, v) => 0.15 + 0.6 * v * (1 - Math.abs(u - 0.5) * 1.6), "rgba(185,174,201,.35)");
+  // the sound: arcs rising from the gold point and fading as they spread
+  const gx = w * 0.5, gy = h * 0.87, sc = ["#F2B33D", "#E08A3C", "#C8323A", "#9A89F4", "#4F86C6", "#6B5CA5"];
+  for (let k = 0; k < 6; k++) {
+    const f = ((k / 6) + T * 0.08) % 1, r = w * (0.06 + f * 0.5);
+    c.beginPath(); c.arc(gx, gy, r, Math.PI * 1.08, Math.PI * 1.92); c.lineWidth = Math.max(1, w * 0.012 * (1 - f)); c.strokeStyle = sc[k]; c.globalAlpha = 1 - f * 0.8; c.stroke(); c.globalAlpha = 1;
+  }
+  [-1, 1].forEach(d => {
+    const x = w * 0.5 + d * w * 0.215, lens = c => disc(c, x, cy, r1);
+    castShadow(c, lens, 0, h * 0.03, w * 0.05, "rgba(0,0,0,.65)");
+    lens(c); c.fillStyle = "#0B0A12"; c.fill();
+    for (let k = 0; k < p.heroCount; k++) { c.beginPath(); c.arc(x, cy, r0 + (r1 - r0) * ((k + 0.5) / p.heroCount), 0, Math.PI * 2); c.lineWidth = Math.max(1, w * 0.004); c.strokeStyle = k % 2 ? "#3A3760" : "#24223C"; c.stroke(); }
+    lightIn(c, lens, x - d * r1 * 0.2, cy - r1 * 0.9, r1 * 0.9, "rgba(242,179,61,.28)");
+    c.save(); disc(c, x, cy, r0); c.clip();
     if (d < 0) {
-      c.fillStyle = lin(c, 0, cy - r0, 0, cy, "#F4F1E6", "#B9B5D6"); c.fillRect(o.x - r0, cy - r0, r0 * 2, r0);
-      c.fillStyle = lin(c, 0, cy, 0, cy + r0, "#3E4C8A", "#1A2236"); c.fillRect(o.x - r0, cy, r0 * 2, r0);
-      for (let k = 0; k < 4; k++) { c.fillStyle = "rgba(232,230,240,.5)"; c.fillRect(o.x - r0 * (0.7 - k * 0.15), cy + r0 * (0.15 + k * 0.18) + Math.sin(T * 1.5 + k) * 1.5, r0 * (1.4 - k * 0.3), r0 * 0.05); }
+      c.fillStyle = "#1A2236"; c.fillRect(x - r0, cy - r0, r0 * 2, r0 * 2);
+      semi(c, x, cy, r0 * 0.82, Math.PI, lin(c, 0, cy - r0, 0, cy, "#F4F1E6", "#B9B5D6"));
+      for (let k = 0; k < 4; k++) rule(c, x - r0 * (0.75 - k * 0.15) + Math.sin(T * 1.4 + k) * r0 * 0.05, cy + r0 * (0.16 + k * 0.18), x + r0 * (0.75 - k * 0.15), cy + r0 * (0.16 + k * 0.18), Math.max(1, r0 * 0.05), "rgba(232,230,240,.5)");
     } else {
-      ["#F2A0A8", "#F2B07E", "#F5D84E", "#9FD08F", "#A9C9EC", "#9A89F4"].forEach((col, k) => { c.fillStyle = col; c.fillRect(o.x - r0 + k * (r0 * 2 / 6), cy - r0, r0 * 2 / 6 + 1, r0 * 2); });
-      c.fillStyle = lin(c, 0, cy - r0, 0, cy + r0, "rgba(18,18,32,0)", "rgba(18,18,32,.55)"); c.fillRect(o.x - r0, cy - r0, r0 * 2, r0 * 2);
+      ["#F2A0A8", "#F2B07E", "#F5D84E", "#9FD08F", "#A9C9EC", "#9A89F4"].forEach((col, k) => { c.fillStyle = col; c.fillRect(x - r0 + k * (r0 * 2 / 6), cy - r0, r0 * 2 / 6 + 1, r0 * 2); });
+      c.fillStyle = lin(c, 0, cy - r0, 0, cy + r0, "rgba(18,18,32,0)", "rgba(18,18,32,.6)"); c.fillRect(x - r0, cy - r0, r0 * 2, r0 * 2);
     }
     c.restore();
   });
   c.fillStyle = "#0B0A12"; c.fillRect(w * 0.47, cy - h * 0.008, w * 0.06, h * 0.016);
-  // two blood-red strings down to a gold point
-  c.fillStyle = "#C8323A"; [-0.006, 0.004].forEach(d => c.fillRect(w * (0.5 + d), cy + h * 0.06, Math.max(1.2, w * 0.003), h * 0.5));
-  c.fillStyle = "#F2B33D"; c.fillRect(w * 0.48, h * 0.86, w * 0.04, w * 0.04);
-  // three lanterns, just red light
-  [[0.1, 0.62], [0.9, 0.55], [0.84, 0.72]].forEach(([x, y], i) => { glow(c, w * x, h * y, w * 0.12, "rgba(232,80,60,.5)"); disc(c, w * x, h * y + Math.sin(T + i) * 2, w * 0.028); c.fillStyle = "#E8503C"; c.fill(); });
-  glow(c, w * 0.5, 0, w * 0.7, "rgba(242,179,61,.12)");
+  // two blood-red strings down to a gold triangle
+  [-0.007, 0.005].forEach(d => rule(c, w * (0.5 + d), cy + h * 0.07, w * (0.5 + d * 0.3), gy - w * 0.035, Math.max(1.2, w * 0.003), "#C8323A"));
+  tri(c, [gx, gy - w * 0.04], [gx - w * 0.035, gy + w * 0.01], [gx + w * 0.035, gy + w * 0.01], "#F2B33D");
+  // lanterns: red discs and one half disc, just red light
+  [[0.1, 0.6], [0.9, 0.53], [0.84, 0.7]].forEach(([x, y], i) => {
+    const yy = h * y + Math.sin(T + i) * 2; glow(c, w * x, yy, w * 0.13, "rgba(232,80,60,.45)");
+    rule(c, w * x, 0, w * x, yy - w * 0.03, 1, "rgba(232,80,60,.35)");
+    i === 1 ? semi(c, w * x, yy, w * 0.032, 0, "#E8503C") : circle(c, w * x, yy, w * 0.028, "#E8503C");
+  });
+  glow(c, w * 0.5, 0, w * 0.7, "rgba(242,179,61,.1)");
   posterType(c, w, h, p, "#EDE3CC", "#B9AEC9", { y: h * 0.965, size: w * 0.11, x: w * 0.06 });
 }
 
-// 跳 — split, then healed. Above: a grey checker world, whole on the left and shattered on the right of a crack.
-// Below: an arch of six rainbow bands rising out of the crack, warm light inside it, and eight squares jumping on the beat.
+// 跳 — split, then healed. Above: the world as one grey disc, whole on the left of a crack, its right half broken into shards,
+// with dark arrows flying across. Below: six rainbow half discs rising out of the crack, a sun whose rays cross them,
+// and eight shapes, one per call to jump, holding a line between them and landing together on the beat.
 function absJump(c, w, h, t, p) {
   const bg = c.createLinearGradient(0, 0, 0, h);
-  bg.addColorStop(0, "#22262E"); bg.addColorStop(0.45, "#4A4E58"); bg.addColorStop(0.7, "#D9BFA4"); bg.addColorStop(1, "#F6E2C6");
+  bg.addColorStop(0, "#1E2229"); bg.addColorStop(0.42, "#4A4E58"); bg.addColorStop(0.66, "#D9BFA4"); bg.addColorStop(1, "#F6E2C6");
   c.fillStyle = bg; c.fillRect(0, 0, w, h);
   const T = reduce ? 0 : t, rnd = mulberry(10), beat = beatOf(t, p.bpm);
-  // the divided world: left half whole, right half drifting apart
-  const cols = 10, rows = 7, cw = w / cols, chh = h * 0.46 / rows;
-  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
-    const right = i >= cols / 2, dx = right ? (rnd() - 0.3) * cw * 0.5 : 0, dy = right ? (rnd() - 0.5) * chh * 0.6 : 0, rot = right ? (rnd() - 0.5) * 0.5 : 0;
-    const x = i * cw + dx, y = j * chh + dy;
-    c.save(); c.translate(x + cw / 2, y + chh / 2); c.rotate(rot);
-    c.fillStyle = (i + j) % 2 ? (right ? "#5A5F69" : "#8E918F") : (right ? "#2E323B" : "#3A3E47"); c.fillRect(-cw / 2, -chh / 2, cw + 0.8, chh + 0.8); c.restore();
-  }
-  // the crack, with light leaking through it
-  const crack = [[w * 0.5, 0]]; for (let i = 1; i <= 8; i++) crack.push([w * 0.5 + (i % 2 ? 1 : -1) * w * (0.015 + rnd() * 0.02), h * i * 0.065]);
-  c.beginPath(); crack.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); for (let i = crack.length - 1; i >= 0; i--) c.lineTo(crack[i][0] + w * 0.01, crack[i][1]);
-  c.fillStyle = lin(c, 0, 0, 0, h * 0.52, "#0E1015", "#F5D84E"); c.fill();
-  // the rainbow arch: six bands, each its own checker, swelling on the beat
+  const wx = w * 0.5, wy = h * 0.22, wr = w * 0.3, base = h * 0.72;
+  // the rainbow first, so the broken world hangs in front of it
   const cols6 = ["#E8505B", "#F2934A", "#F5CF3E", "#4FA35E", "#4F86C6", "#8A6CC8"];
-  const o = { x: w * 0.5, y: h * 0.8, r0: w * 0.13, r1: w * (0.47 + 0.015 * beat), segs: 22, bands: p.heroCount, from: Math.PI, to: Math.PI * 2,
-    k: th => 1 + 0.02 * Math.sin(th * 6 + T), color: (s, b) => (s % 2 ? cols6[p.heroCount - 1 - b] : hexMix(cols6[p.heroCount - 1 - b], "#FFFFFF", 0.35)) };
-  shadowOf(c, o, 0, -h * 0.02, w * 0.06, "rgba(20,20,30,.35)");
-  ring(c, o);
-  disc(c, w * 0.5, h * 0.8, w * 0.12); c.fillStyle = rad(c, w * 0.5, h * 0.8, w * 0.12, "#FFF1B8", "#F5A23E"); c.fill();
-  glow(c, w * 0.5, h * 0.8, w * 0.9, "rgba(255,214,140,.35)");
-  c.fillStyle = lin(c, 0, h * 0.8, 0, h, "#F2CFA8", "#F7E2C8"); c.fillRect(0, h * 0.8, w, h * 0.2);
-  // eight squares, one for each call to jump, landing together on the beat
+  const R1 = w * (0.47 + 0.012 * beat), R0 = w * 0.13;
+  castShadow(c, c => semiPath(c, wx, base, R1, Math.PI), 0, -h * 0.015, w * 0.06, "rgba(20,20,30,.35)");
+  for (let b = 0; b < p.heroCount; b++) {
+    const r = R1 - (R1 - R0) * (b / p.heroCount), band = c => semiPath(c, wx, base, r, Math.PI);
+    band(c); c.fillStyle = cols6[b]; c.fill();
+    lightIn(c, band, wx - r * 0.5, base - r, r * 0.9, "rgba(255,255,255,.18)");
+  }
+  // the sun and its many rays, crossing the bands
+  c.save(); semiPath(c, wx, base, R1, Math.PI); c.clip(); c.globalCompositeOperation = "soft-light";
+  for (let i = 0; i < 18; i++) { const a = Math.PI + (i + 0.5) / 18 * Math.PI + Math.sin(T * 0.2) * 0.03, a2 = a + 0.035;
+    tri(c, [wx, base], [wx + Math.cos(a) * R1 * 1.1, base + Math.sin(a) * R1 * 1.1], [wx + Math.cos(a2) * R1 * 1.1, base + Math.sin(a2) * R1 * 1.1], "rgba(255,255,255,.9)"); }
+  c.restore();
+  semi(c, wx, base, R0 * 0.92, Math.PI, rad(c, wx, base, R0, "#FFF1B8", "#F5A23E"));
+  glow(c, wx, base, w * 0.9, "rgba(255,214,140,.3)");
+  // the world: whole on the left, newspaper columns hatched across it
+  const left = c => semiPath(c, wx, wy, wr, Math.PI / 2);
+  castShadow(c, left, -w * 0.02, h * 0.025, w * 0.05, "rgba(0,0,0,.5)");
+  left(c); c.fillStyle = lin(c, wx - wr, wy - wr, wx, wy + wr, "#A3A6A3", "#6E716F"); c.fill();
+  hatch(c, left, 0, h * 0.011, Math.max(1, w * 0.003), "rgba(40,44,52,.45)", w, h);
+  // ...and broken into drifting shards on the right
+  const n = 7;
+  for (let i = 0; i < n; i++) {
+    const a0 = -Math.PI / 2 + (i / n) * Math.PI, a1 = a0 + Math.PI / n, mid = (a0 + a1) / 2, off = w * (0.015 + rnd() * 0.05) + (reduce ? 0 : Math.sin(T * 0.6 + i) * w * 0.006), rot = (rnd() - 0.5) * 0.35;
+    c.save(); c.translate(wx + Math.cos(mid) * off, wy + Math.sin(mid) * off); c.rotate(rot);
+    const r = wr * (0.82 + rnd() * 0.18);
+    tri(c, [0, 0], [Math.cos(a0) * r, Math.sin(a0) * r], [Math.cos(a1) * r, Math.sin(a1) * r], ["#5A5F69", "#3A3E47", "#2E323B", "#4A4F59"][i % 4]);
+    c.restore();
+  }
+  // the crack, light leaking down through it to the rainbow
+  const crack = [[wx, 0]]; for (let i = 1; i <= 10; i++) crack.push([wx + (i % 2 ? 1 : -1) * w * (0.008 + rnd() * 0.016), base * i / 10]);
+  c.beginPath(); crack.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); for (let i = crack.length - 1; i >= 0; i--) c.lineTo(crack[i][0] + w * 0.008, crack[i][1]);
+  c.fillStyle = lin(c, 0, 0, 0, base, "#0E1015", "#FFE58A"); c.fill();
+  // hidden arrows: thin dark lines with triangle heads, flying in from the right
+  for (let i = 0; i < 3; i++) {
+    const y = h * (0.1 + i * 0.12), x = w * (1.1 - ((T * 0.05 + i * 0.37) % 1.3)), L = w * 0.22, a = 0.18 + i * 0.05;
+    const hx = x - Math.cos(a) * L, hy = y + Math.sin(a) * L;
+    rule(c, x, y, hx, hy, Math.max(1, w * 0.003), "#0E1015");
+    const ah = w * 0.025; tri(c, [hx - Math.cos(a) * ah, hy + Math.sin(a) * ah], [hx + Math.sin(a) * ah * 0.4, hy + Math.cos(a) * ah * 0.4], [hx - Math.sin(a) * ah * 0.4, hy - Math.cos(a) * ah * 0.4], "#0E1015");
+  }
+  c.fillStyle = lin(c, 0, base, 0, h, "#F2CFA8", "#F7E2C8"); c.fillRect(0, base, w, h - base);
+  // eight jumpers: circle, triangle, square, half disc, joined by one line
+  const pts = [];
   for (let i = 0; i < p.jumpers; i++) {
     const hop = reduce ? 0 : Math.max(0, Math.sin((((t * p.bpm) / 60 + (i % 2) * 0.5) % 1) * Math.PI));
-    const s = w * 0.05, x = w * (0.08 + i * 0.12) - s / 2, y = h * 0.86 - hop * h * 0.05;
-    c.fillStyle = "rgba(90,60,40,.18)"; c.fillRect(x + s * 0.1, h * 0.86 + s * 1.05, s * (0.8 - hop * 0.3), s * 0.12);
-    c.fillStyle = cols6[i % 6]; c.fillRect(x, y, s, s);
+    const s = w * 0.055, x = w * (0.08 + i * 0.12), y = base + h * 0.06 - hop * h * 0.045;
+    c.fillStyle = "rgba(90,60,40,.18)"; c.fillRect(x - s * 0.4 * (1 - hop * 0.3), base + h * 0.06 + s * 0.55, s * 0.8 * (1 - hop * 0.3), s * 0.1);
+    pts.push([x, y]);
+    const col = cols6[i % 6];
+    [() => circle(c, x, y, s / 2, col), () => tri(c, [x, y - s / 2], [x + s / 2, y + s / 2], [x - s / 2, y + s / 2], col),
+     () => { c.fillStyle = col; c.fillRect(x - s / 2, y - s / 2, s, s); }, () => semi(c, x, y + s * 0.25, s / 2, Math.PI, col)][i % 4]();
   }
-  shade(c, w, h, 0, h * 0.6, 0, 0, 0.35);
-  posterType(c, w, h, p, "#F4E9D8", "#D9C7B0", { y: h * 0.4, size: w * 0.2, x: w * 0.06 });
+  c.beginPath(); pts.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); c.lineWidth = Math.max(1, w * 0.003); c.strokeStyle = "rgba(30,43,58,.55)"; c.stroke();
+  shade(c, w, h, 0, h * 0.6, 0, 0, 0.3);
+  posterType(c, w, h, p, "#1E2B3A", "#6B4F3A", { y: h * 0.965, size: w * 0.17, x: w * 0.06, metaInk: "rgba(220,224,232,.75)" });
 }
 
-// the album — fourteen checker columns, one per song in track order. Cell size follows tempo, colour follows mood,
-// height follows how bright the song is. Through them, one ring made of all fourteen colours: the album as a whole.
+// the album — fourteen columns, one per song in track order. Each column is a stack of shapes: more of them the faster the song,
+// circles for the quiet songs, half discs for the middle and triangles for the most energetic; it stands taller the brighter
+// the song is, in the song's two colours. Through them turns one ring of fourteen arcs: the album as a whole.
 function absAlbum(c, w, h, t, card, hs = -1) {
   const S = card.stations, n = S.length, T = reduce ? 0 : t;
   c.fillStyle = "#F3EFE6"; c.fillRect(0, 0, w, h);
   const xs = S.map((_, i) => w * (0.06 + (i / (n - 1)) * 0.88)), sw = (xs[1] - xs[0]) * 0.92;
   S.forEach((s, i) => {
-    const top = h * (0.12 + (1 - s.valence) * 0.5), rows = Math.round(s.bpm / 9), dark = s.accent;
-    const ch = (h * 0.86 - top) / rows, lift = i === hs ? -h * 0.03 : 0;
-    for (let j = 0; j < rows; j++) for (let k = 0; k < 2; k++) {
-      const wob = Math.sin(j * 0.9 + T * (s.bpm / 60) * 0.5 + i) * sw * 0.08 * s.energy;
-      c.fillStyle = (j + k) % 2 ? s.sky : dark;
-      c.fillRect(xs[i] - sw / 2 + k * sw / 2 + wob, top + j * ch + lift, sw / 2 + 0.8, ch + 0.8);
+    const top = h * (0.12 + (1 - s.valence) * 0.5), bottom = h * 0.86, rows = Math.round(s.bpm / 12), ch = (bottom - top) / rows;
+    const lift = i === hs ? -h * 0.03 : 0, sz = Math.min(sw, ch) * 0.96;
+    rule(c, xs[i], top + lift, xs[i], bottom + lift, Math.max(1, w * 0.0015), s.accent);
+    for (let j = 0; j < rows; j++) {
+      const x = xs[i] + Math.sin(j * 0.9 + T * (s.bpm / 60) * 0.5 + i) * sw * 0.1 * s.energy, y = top + (j + 0.5) * ch + lift, col = j % 2 ? s.sky : s.accent;
+      if (s.energy < 0.27) circle(c, x, y, sz / 2, col);
+      else if (s.energy < 0.45) semi(c, x, y + (j % 2 ? -sz : sz) * 0.22, sz / 2, j % 2 ? 0 : Math.PI, col);
+      else j % 2 ? tri(c, [x - sz / 2, y - sz / 2], [x + sz / 2, y - sz / 2], [x, y + sz / 2], col) : tri(c, [x, y - sz / 2], [x + sz / 2, y + sz / 2], [x - sz / 2, y + sz / 2], col);
     }
     c.fillStyle = i === hs ? "#1E2B3A" : "rgba(30,43,58,.7)"; c.textAlign = "center";
     c.font = `500 ${Math.max(9, h * 0.016)}px "IBM Plex Mono", monospace`; c.fillText(String(s.track).padStart(2, "0"), xs[i], h * 0.9);
     // long names shrink to fit their column so neighbours never touch
-    c.font = `500 ${Math.max(8, Math.min(h * 0.02, (sw * 1.02) / Math.max(2, [...s.name].length * 0.95)))}px "Noto Serif SC", serif`; c.fillText(s.name, xs[i], h * 0.935);
+    c.font = `500 ${Math.max(8, Math.min(h * 0.02, (sw * 1.02) / Math.max(2, [...s.name].length * 0.95)))}px "Noto Serif SC", serif`; if (w >= 500) c.fillText(s.name, xs[i], h * 0.935);
   });
   c.textAlign = "left";
-  const o = { x: w * 0.5, y: h * 0.44, r0: h * 0.12, r1: h * 0.3, segs: n * 3, bands: 3, rot: -Math.PI / 2 + T * 0.04, squash: 0.92,
-    k: th => 1 + 0.08 * Math.sin(th * 3 + T * 0.5),
-    color: (s, b) => { const st = S[Math.floor(s / 3) % n]; return (s + b) % 2 ? st.sky : st.accent; } };
-  shadowOf(c, o, w * 0.03, h * 0.05, h * 0.06, "rgba(30,43,58,.35)");
-  ring(c, o);
-  glow(c, w * 0.15, 0, w * 0.9, "rgba(255,250,235,.5)");
-  shade(c, w, h, w * 0.3, h * 0.2, w, h, 0.18);
+  // the ring: fourteen arcs, each the song's image colour outside and its mood colour inside; the hovered song steps out
+  const cx = w * 0.5, cy = h * 0.44, r0 = h * 0.13, r1 = h * 0.3, rot = -Math.PI / 2 + T * 0.04;
+  castShadow(c, c => sector(c, cx, cy, r0, r1, 0, Math.PI * 2), w * 0.03, h * 0.05, h * 0.07, "rgba(30,43,58,.3)");
+  S.forEach((s, i) => {
+    const a0 = rot + (i / n) * Math.PI * 2, a1 = a0 + Math.PI * 2 / n - 0.012, mid = (a0 + a1) / 2, out = i === hs ? h * 0.025 : 0;
+    const ox = cx + Math.cos(mid) * out, oy = cy + Math.sin(mid) * out, rm = r0 + (r1 - r0) * (0.45 + 0.25 * s.energy);
+    sector(c, ox, oy, rm, r1, a0, a1); c.fillStyle = s.accent; c.fill();
+    sector(c, ox, oy, r0, rm, a0, a1); c.fillStyle = s.sky; c.fill();
+  });
+  c.beginPath(); c.arc(cx, cy, r1 * 1.08, 0, Math.PI * 2); c.lineWidth = 1; c.strokeStyle = "rgba(30,43,58,.35)"; c.stroke();
+  const pa = rot + T * 0.25; circle(c, cx + Math.cos(pa) * r1 * 1.08, cy + Math.sin(pa) * r1 * 1.08, h * 0.008, "#1E2B3A");
+  circle(c, cx, cy, r0 * 0.35, "#1E2B3A");
+  lightIn(c, c => disc(c, cx, cy, r1), cx - r1 * 0.6, cy - r1 * 0.7, r1 * 1.4, "rgba(255,250,235,.35)");
+  glow(c, w * 0.15, 0, w * 0.9, "rgba(255,250,235,.45)");
+  shade(c, w, h, w * 0.3, h * 0.2, w, h, 0.16);
+  c.save(); c.fillStyle = "#1E2B3A"; c.font = `800 ${h * 0.1}px "Manrope", "Noto Sans SC", sans-serif`; c.fillText("Soulboy", w * 0.04, h * 0.13);
+  c.font = `500 ${Math.max(9, h * 0.017)}px "IBM Plex Mono", monospace`; c.fillText("KHALIL FONG 方大同 · 2005 · 14 SONGS", w * 0.045, h * 0.17); c.restore();
+}
+// ---- blend posters: soft colour fields melting into each other, with a few sharp forms laid over them ----
+// each layer is a lobed shape filled with a conic gradient; the outer layers are drawn small and scaled up so they blur,
+// the inner ones are drawn sharp on top, and the core is the song's main image as one white shape with light inside it
+const soft = document.createElement("canvas");
+function blobPath(c, x, y, R, o, T = 0) {
+  const N = 240, n = o.n || 0, a = o.a || 0;
+  c.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const th = (i / N) * Math.PI * 2;
+    let k = Math.cos(n * (th - (o.ph || 0)));
+    if (o.sharp) k = Math.sign(k) * Math.pow(Math.abs(k), o.sharp);
+    const r = R * (1 + a * k + (o.wob || 0) * Math.sin(3 * th + T * 0.7));
+    const px = x + Math.cos(th) * r * (o.sx || 1), py = y + Math.sin(th) * r * (o.sy || 1);
+    i ? c.lineTo(px, py) : c.moveTo(px, py);
+  }
+  c.closePath();
+}
+function conic(c, x, y, rot, stops) {
+  const g = c.createConicGradient(rot, x, y), all = [...stops, stops[0]];
+  all.forEach((col, i) => g.addColorStop(i / (all.length - 1), col));
+  return g;
+}
+function layer(c, L, T) {
+  blobPath(c, L.x, L.y, L.R, L, T);
+  c.fillStyle = conic(c, L.x, L.y, (L.rot || 0) + T * (L.spin || 0), L.stops); c.fill();
+}
+// layers run outer to inner; those before sharpFrom are only soft, the rest are soft and then sharp
+function blendLayers(c, w, h, T, bg, layers, sharpFrom, blur = 2.5) {
+  const q = 8; soft.width = Math.ceil(w / q); soft.height = Math.ceil(h / q);
+  const s = soft.getContext("2d");
+  s.setTransform(1 / q, 0, 0, 1 / q, 0, 0); s.fillStyle = bg; s.fillRect(0, 0, w, h);
+  s.filter = `blur(${blur}px)`; layers.forEach(L => layer(s, L, T)); s.filter = "none";
+  c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = "high"; c.drawImage(soft, 0, 0, soft.width * q, soft.height * q); c.restore();
+  layers.slice(sharpFrom).forEach(L => layer(c, L, T));
+}
+function core(c, x, y, R, o, T, fill, inner, innerR) {
+  blobPath(c, x, y, R, o, T); c.fillStyle = fill; c.fill();
+  c.save(); blobPath(c, x, y, R, o, T); c.clip();
+  c.fillStyle = rad(c, x, y, R * innerR, inner, "rgba(255,255,255,0)"); c.fillRect(x - R * 2, y - R * 2, R * 4, R * 4);
+  blobPath(c, x, y, R * 0.22, o, T); c.fillStyle = fill; c.fill(); c.restore();
+}
+
+// the series: every poster has a soft field drawn small and scaled up so it melts, a few sharp forms laid over it,
+// grain on top, and the same type. What the field and the forms are changes from song to song.
+function softPass(c, w, h, bg, draw, blur = 3) {
+  const q = 8; soft.width = Math.ceil(w / q); soft.height = Math.ceil(h / q);
+  const s = soft.getContext("2d");
+  s.setTransform(1 / q, 0, 0, 1 / q, 0, 0); s.filter = "none";
+  if (typeof bg === "function") bg(s); else { s.fillStyle = bg; s.fillRect(0, 0, w, h); }
+  s.filter = `blur(${blur}px)`; draw(s); s.filter = "none";
+  c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = "high"; c.drawImage(soft, 0, 0, soft.width * q, soft.height * q); c.restore();
+}
+// a band across the poster between top(x) and top(x) + thick(x)
+function ribbon(c, w, top, thick, fill) {
+  c.beginPath();
+  for (let x = -20; x <= w + 20; x += 8) c.lineTo(x, top(x));
+  for (let x = w + 20; x >= -20; x -= 8) c.lineTo(x, top(x) + thick(x));
+  c.closePath(); c.fillStyle = fill; c.fill();
+}
+function petal(c, x, y, r, rot, col) { blobPath(c, x, y, r, { n: 5, a: 0.28, ph: rot }); c.fillStyle = col; c.fill(); }
+
+// 春風吹 — flow. Eleven ribbons of wind, one for each time 春風 is sung, sweep up across the whole poster from lower left
+// to upper right, pink, willow green and sky melting together. The peach blossom rides them as one sharp red flower,
+// and its petals are carried off along the same lines.
+function blendWind(c, w, h, t, p) {
+  const T = reduce ? 0 : t, n = p.heroCount;
+  const cols = [["#F08FA6", "#FBE3D6"], ["#5DB46B", "#CFE8C4"], ["#8FC1E3", "#F4F8FA"], ["#2F7D4A", "#9FCB7A"], ["#F7A79D", "#E8505B"], ["#F4F8FA", "#8FC1E3"]];
+  const top = k => x => h * (0.02 + k * 0.078) + Math.sin(x / w * 2.6 + T * 0.45 + k * 0.5) * h * 0.05 - (x / w - 0.5) * h * 0.22;
+  const thick = k => x => h * (0.075 + 0.03 * Math.sin(x / w * 3 + k + T * 0.3));
+  softPass(c, w, h, "#E3ECEE", s => {
+    for (let k = 0; k < n; k++) { const [a, b] = cols[k % cols.length]; ribbon(s, w, top(k), thick(k), lin(s, 0, 0, w, 0, a, b)); }
+    disc(s, w * 0.66, h * 0.36, w * 0.2); s.fillStyle = "rgba(232,80,91,.6)"; s.fill();
+  }, 2);
+  // three of the ribbons come forward, sharp: the gusts you feel
+  [2, 5, 8].forEach((k, i) => ribbon(c, w, top(k + 0.3), x => thick(k)(x) * 0.35, lin(c, 0, 0, w, 0, ["rgba(255,255,255,.85)", "rgba(79,163,94,.85)", "rgba(244,182,194,.9)"][i], "rgba(255,255,255,0)")));
+  // the blossom, and its petals carried downwind
+  const bx = w * 0.64 + Math.sin(T * 0.4) * w * 0.02, by = h * 0.36 + Math.sin(T * 0.6) * h * 0.01;
+  petal(c, bx, by, w * 0.16, T * 0.05, "#E8505B");
+  c.save(); blobPath(c, bx, by, w * 0.16, { n: 5, a: 0.28, ph: T * 0.05 }); c.clip(); glow(c, bx - w * 0.05, by - w * 0.06, w * 0.18, "rgba(255,220,214,.8)"); c.restore();
+  disc(c, bx, by, w * 0.03); c.fillStyle = "#F5CF3E"; c.fill();
+  for (let i = 0; i < 9; i++) {
+    const u = ((i * 0.13 + T * 0.025) % 1), x = bx + u * w * 0.7, y = top(4 + (i % 4))(x) + h * 0.02;
+    petal(c, x, y, w * (0.018 + (i % 3) * 0.008) * (1 - u * 0.5), T + i, i % 2 ? "#F4B6C2" : "#E8505B");
+  }
+  posterType(c, w, h, p, "#1E2B3A", "#3E5566", { y: h * 0.93 });
+}
+
+// 南音 — frame. A dark alley lit by one candle. Two great lenses hang in it, black voids with a gold rim of light along their tops
+// and five faint rings within, for the five times the moon over the spring returns. In the left the moon and its reflection,
+// in the right the rainbow he plays. From the strings below, his sound falls as streaks of red, gold and violet light.
+function blendLenses(c, w, h, t, p) {
+  const T = reduce ? 0 : t, y = h * 0.33, R = w * 0.21, lx = w * 0.27, rx = w * 0.73;
+  softPass(c, w, h, "#0E0D18", s => {
+    s.fillStyle = lin(s, 0, 0, 0, h * 0.8, "rgba(242,179,61,.55)", "rgba(242,179,61,0)");
+    poly(s, [[w * 0.42, 0], [w * 0.58, 0], [w * 0.95, h * 0.8], [w * 0.05, h * 0.8]]); s.fill();
+    disc(s, w * 0.5, h * 1.05, w * 0.7); s.fillStyle = rad(s, w * 0.5, h * 1.05, w * 0.7, "rgba(232,80,60,.9)", "rgba(107,92,165,0)"); s.fill();
+    [[0.08, 0.6], [0.93, 0.52], [0.86, 0.72]].forEach(([x, yy], i) => { disc(s, w * x, h * yy + Math.sin(T + i) * 4, w * 0.08); s.fillStyle = "#E8503C"; s.fill(); });
+  }, 4);
+  // the sound: streaks of light falling from the strings, longer and brighter on the beat of the song
+  const streak = ["#F2B33D", "#E8503C", "#9A89F4", "#F2B33D", "#C8323A", "#6B5CA5"];
+  for (let i = 0; i < 26; i++) {
+    const x = w * (0.08 + (i / 25) * 0.84), len = h * (0.12 + 0.22 * Math.abs(Math.sin(i * 1.7 + T * 0.6))), y0 = h * 0.62 + Math.sin(i * 2.3) * h * 0.04;
+    c.fillStyle = lin(c, 0, y0, 0, y0 + len, streak[i % 6], "rgba(14,13,24,0)"); c.fillRect(x, y0, Math.max(1.5, w * (0.004 + (i % 3) * 0.003)), len);
+  }
+  [-0.006, 0.004].forEach(d => rule(c, w * (0.5 + d), y + R * 0.4, w * (0.5 + d), h * 0.66, Math.max(1.2, w * 0.003), "#C8323A"));
+  [[lx, -1], [rx, 1]].forEach(([x, d]) => {
+    disc(c, x, y, R); c.fillStyle = rad(c, x, y, R, "#05040A", "#14122A"); c.fill();
+    for (let k = 1; k <= p.heroCount; k++) { c.beginPath(); c.arc(x, y, R * (0.5 + k * 0.095), 0, Math.PI * 2); c.lineWidth = 1; c.strokeStyle = `rgba(154,137,244,${0.08 + k * 0.03})`; c.stroke(); }
+    c.beginPath(); c.arc(x, y, R, Math.PI * 1.05, Math.PI * 1.95); c.lineWidth = Math.max(2, w * 0.008); c.strokeStyle = lin(c, x - R, 0, x + R, 0, "rgba(242,179,61,0)", "rgba(255,217,138,.95)"); if (d < 0) c.strokeStyle = lin(c, x - R, 0, x + R, 0, "rgba(255,217,138,.95)", "rgba(242,179,61,0)"); c.stroke();
+    const r = R * 0.42;
+    if (d < 0) {
+      disc(c, x, y - r * 0.2, r); c.fillStyle = lin(c, 0, y - r, 0, y + r * 0.6, "#FFFFFF", "#9A96C4"); c.fill();
+      for (let k = 0; k < 4; k++) { c.fillStyle = `rgba(220,218,240,${0.5 - k * 0.1})`; c.fillRect(x - r * (0.9 - k * 0.2) + Math.sin(T * 1.4 + k) * r * 0.08, y + r * (1 + k * 0.22), r * (1.8 - k * 0.4), Math.max(1.5, r * 0.06)); }
+    } else {
+      disc(c, x, y, r); c.fillStyle = conic(c, x, y, T * 0.15, ["#F2A0A8", "#F2B07E", "#F5D84E", "#9FD08F", "#A9C9EC", "#9A89F4"]); c.fill();
+      c.save(); disc(c, x, y, r); c.clip(); c.fillStyle = rad(c, x, y, r, "rgba(255,255,255,.9)", "rgba(255,255,255,0)"); c.fillRect(x - r, y - r, r * 2, r * 2); c.restore();
+    }
+  });
+  c.fillStyle = "#05040A"; c.fillRect(lx + R * 0.98, y - h * 0.006, rx - lx - R * 1.96, h * 0.012);
+  posterType(c, w, h, p, "#EDE3CC", "#B9AEC9", { y: h * 0.965, size: w * 0.11, x: w * 0.06 });
+}
+
+// 跳 — split, then healed. The top of the poster is a grey world cut down the middle: smooth on the left, broken into tilted slabs
+// on the right that drift apart and slowly come back together. Out of the crack a rainbow of six bands rises from the warm ground,
+// and along the bottom eight bright forms, one for each call to jump, bounce together on the 102 BPM beat, joined by one line.
+function blendJump(c, w, h, t, p) {
+  const T = reduce ? 0 : t, beat = beatOf(t, p.bpm), cols6 = ["#E8505B", "#F2934A", "#F5CF3E", "#4FA35E", "#4F86C6", "#8A6CC8"];
+  const gap = reduce ? 0.6 : Math.pow(Math.max(0, Math.sin(T * 0.22)), 1.5), ax = w * 0.5, ay = h * 0.8;
+  const slabs = [[0.56, 0.04, 0.22, 0.14], [0.8, 0.02, 0.24, 0.12], [0.6, 0.2, 0.26, 0.12], [0.86, 0.17, 0.2, 0.15], [0.66, 0.34, 0.22, 0.1], [0.9, 0.32, 0.18, 0.12]];
+  softPass(c, w, h, s => { const g = s.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "#1E2229"); g.addColorStop(0.5, "#4A4E58"); g.addColorStop(0.75, "#D9BFA4"); g.addColorStop(1, "#F6E2C6"); s.fillStyle = g; s.fillRect(0, 0, w, h); }, s => {
+    // the rainbow, soft: six thick arcs from the ground
+    cols6.forEach((col, k) => { s.beginPath(); s.arc(ax, ay, w * (0.46 - k * 0.05) * (1 + 0.02 * beat), Math.PI, Math.PI * 2); s.lineWidth = w * 0.05; s.strokeStyle = col; s.stroke(); });
+    disc(s, ax, ay, w * 0.15); s.fillStyle = "#FFE7A8"; s.fill();
+    // the world: whole on the left
+    s.fillStyle = lin(s, 0, 0, w * 0.5, h * 0.45, "#8E918F", "#3A3E47"); s.beginPath(); s.roundRect(-w * 0.1, -h * 0.05, w * 0.6, h * 0.5, w * 0.08); s.fill();
+  }, 2);
+  // the broken half: sharp slabs, tilted, drifting with the split
+  slabs.forEach(([x, y, sw, sh], i) => {
+    c.save(); c.translate(w * x + gap * w * (0.02 + i * 0.012), h * y + gap * h * (i % 2 ? 0.02 : -0.01) + h * sh / 2); c.rotate(gap * (i % 2 ? 0.18 : -0.14));
+    c.fillStyle = lin(c, -w * sw / 2, -h * sh / 2, w * sw / 2, h * sh / 2, ["#6E716F", "#4A4E58", "#5A5F69"][i % 3], "#2E323B");
+    c.beginPath(); c.roundRect(-w * sw / 2, -h * sh / 2, w * sw, h * sh, w * 0.02); c.fill(); c.restore();
+  });
+  // the crack, with light coming through
+  c.beginPath(); c.moveTo(ax, 0); for (let i = 1; i <= 10; i++) c.lineTo(ax + (i % 2 ? 1 : -1) * w * 0.012, ay * i / 10 * 0.62);
+  c.lineWidth = Math.max(1.5, w * 0.005); c.strokeStyle = `rgba(255,229,138,${0.4 + 0.6 * gap})`; c.stroke();
+  // the outer rainbow band again, sharp, so the arch reads against the blur
+  c.beginPath(); c.arc(ax, ay, w * 0.46 * (1 + 0.02 * beat), Math.PI, Math.PI * 2); c.lineWidth = w * 0.012; c.strokeStyle = "rgba(255,255,255,.7)"; c.stroke();
+  const pts = [];
+  for (let i = 0; i < p.jumpers; i++) {
+    const hop = reduce ? 0 : Math.max(0, Math.sin((((t * p.bpm) / 60 + (i % 2) * 0.5) % 1) * Math.PI));
+    const x = w * (0.08 + i * 0.12), y = h * 0.775 - hop * h * 0.05; pts.push([x, y]);
+    blobPath(c, x, y, w * 0.028, { n: 3 + (i % 4), a: 0.18, ph: T + i }); c.fillStyle = cols6[i % 6]; c.fill();
+  }
+  c.beginPath(); pts.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); c.lineWidth = Math.max(1, w * 0.003); c.strokeStyle = "rgba(30,43,58,.5)"; c.stroke();
+  posterType(c, w, h, p, "#1E2B3A", "#6B4F3A", { y: h * 0.965, size: w * 0.17, x: w * 0.06, metaInk: "rgba(220,224,232,.75)" });
+}
+
+// the station row under an album poster: a colour dot, the track number and, on wider screens, the song's name
+function albumLabels(c, w, h, S, hs, ink = "30,43,58") {
+  const n = S.length;
+  S.forEach((s, i) => {
+    const x = w * (0.06 + (i / (n - 1)) * 0.88);
+    c.textAlign = "center"; c.fillStyle = i === hs ? `rgb(${ink})` : `rgba(${ink},.6)`;
+    c.font = `${i === hs ? 700 : 500} ${Math.max(9, h * 0.016)}px "IBM Plex Mono", monospace`; c.fillText(String(s.track).padStart(2, "0"), x, h * 0.92);
+    c.font = `500 ${Math.max(8, Math.min(h * 0.02, (w / n * 0.94) / Math.max(2, [...s.name].length * 0.95)))}px "Noto Serif SC", serif`;
+    if (w >= 500) c.fillText(s.name, x, h * 0.955);
+    circle(c, x, h * 0.885, i === hs ? h * 0.01 : h * 0.006, s.accent);
+  });
+  c.textAlign = "left";
+}
+// ---- colour is data: every blend poster is recoloured by its song's lyric imagery ----
+// the poster keeps its light and dark, so the shapes still read, and takes its hues from the imagery groups its lyrics use,
+// each group's colour from the garden's colour key in proportion to its share, the biggest first.
+// Prologue has no imagery, so it stays grey.
+function catColor(cat) {
+  if (!cat.color.startsWith("var(")) return cat.color;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(cat.color.slice(4, -1)).trim();
+  return v || "#3E4C8A";
+}
+function imageryOf(track) {
+  const s = songFor(track);
+  if (!s || s.sparse) return null;
+  return s.weights.map((v, i) => [v, catColor(CATS[i]), CATS[i].zh]).filter(([v]) => v > 0.001).sort((a, b) => b[0] - a[0]);
+}
+function dataTint(c, w, h, track) {
+  const im = imageryOf(track);
+  c.save(); c.globalCompositeOperation = im ? "color" : "saturation";
+  if (!im) c.fillStyle = "#808080";
+  else {
+    const g = c.createLinearGradient(0, 0, w * 0.25, h); let acc = 0;
+    im.forEach(([v, col]) => { g.addColorStop(Math.min(1, acc + v / 2), col); acc += v; });
+    c.fillStyle = g;
+  }
+  c.fillRect(0, 0, w, h); c.restore();
+}
+function drawTinted(draw, c, w, h, t, p, hs) {
+  posterType.queue = [];
+  draw(c, w, h, t, p, hs);
+  const q = posterType.queue; posterType.queue = null;
+  dataTint(c, w, h, p.track);
+  q.forEach(args => posterType(...args));
+}
+// rhythm as shape: a song's block is woven with a polygon with one corner per beat in the bar, so 4/4 is a square and 3/4 a triangle.
+// 12/8 is four beats each split in three, so it is a square whose sides each bend in three waves.
+// Measured from the same 30-second previews (rhythm.json); 哪怕's 3/4 and 南音's 12/8 are the least certain.
+const RHYTHM = [
+  {"track": 1, "meter": "4/4", "beats_per_bar": 4, "feel": "straight", "conf": 0.75},
+  {"track": 2, "meter": "4/4", "beats_per_bar": 4, "feel": "straight", "conf": 0.7},
+  {"track": 3, "meter": "4/4", "beats_per_bar": 4, "feel": "straight", "conf": 0.5},
+  {"track": 4, "meter": "12/8", "beats_per_bar": 12, "feel": "triplet (12/8)", "conf": 0.75},
+  {"track": 5, "meter": "4/4", "beats_per_bar": 4, "feel": "straight", "conf": 0.7},
+  {"track": 6, "meter": "4/4", "beats_per_bar": 4, "feel": "straight", "conf": 0.4},
+  {"track": 7, "meter": "3/4", "beats_per_bar": 3, "feel": "straight", "conf": 0.4},
+  {"track": 8, "meter": "12/8", "beats_per_bar": 12, "feel": "triplet (12/8)", "conf": 0.55},
+  {"track": 9, "meter": "4/4", "beats_per_bar": 4, "feel": "straight", "conf": 0.6},
+  {"track": 10, "meter": "4/4", "beats_per_bar": 4, "feel": "straight", "conf": 0.75},
+  {"track": 11, "meter": "4/4", "beats_per_bar": 4, "feel": "straight", "conf": 0.85},
+  {"track": 12, "meter": "4/4", "beats_per_bar": 4, "feel": "straight", "conf": 0.65},
+  {"track": 13, "meter": "4/4", "beats_per_bar": 4, "feel": "straight", "conf": 0.6},
+  {"track": 14, "meter": "4/4", "beats_per_bar": 4, "feel": "straight", "conf": 0.6}
+];
+function rhythmOf(track) { return RHYTHM ? RHYTHM.find(d => d.track === track) : null; }
+function beatShape(c, x, y, R, rh, rot) {
+  const compound = rh.beats_per_bar % 3 === 0 && rh.beats_per_bar > 3, n = compound ? rh.beats_per_bar / 3 : rh.beats_per_bar;
+  const swing = /swing|shuffle|triplet/i.test(rh.feel || ""), N = n * 24;
+  c.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const a = rot + (i / N) * Math.PI * 2, seg = Math.PI * 2 / n, local = ((a - rot) % seg + seg) % seg - seg / 2;
+    let r = R * Math.cos(Math.PI / n) / Math.cos(local);
+    if (swing) r *= 1 + 0.06 * Math.sin((local / seg) * Math.PI * 6);
+    i ? c.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r) : c.moveTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+  }
+  c.closePath();
+}
+const LINES = [10, 21, 47, 49, 37, 59, 40, 49, 63, 42, 45, 28, 18, 82];
+// ---- the album poster, in the same blend style as the songs: 心, 家 and 街 ----
+// Of the 262 imagery words on the album, three kinds lead by far: his heart and body (64, 心 alone 22), the people
+// at home (51, 家 alone 15) and the street (46). The poster is those three, abstracted: the street a long band of
+// light sweeping up from the corner, home an open embrace it runs into, and the heart a glowing core held inside it.
+// Each is as big as the album uses it. Everything else he sings of is a soft field around them, as large as it is
+// common: spring wind (26), plants (20), light (16), the seasons (12), night (11), water (9), the universe (7).
+// The fourteen songs travel the street toward home in track order. Each is the shape of its bar: a square for 4/4,
+// a triangle for 3/4 (哪怕), a square with wavy sides for 12/8 (每天每天, 南音); it takes its lyric-imagery colour, is
+// as large as its lyrics are long, and flashes and turns on its own beat. Prologue, with no imagery, is a grey outline.
+// The heart beats with all fourteen at once.
+const INK_BROWN = "74,60,40";
+const HOME_KEYS = ["body_gesture", "people_relationships", "city_street", "sky_weather", "nature_plants", "light_fire", "night_moon", "water", "cosmos", "time_memory"];
+// one word for each kind of imagery, for the poster's line and its key
+const KIND_WORD = { body_gesture: "心", people_relationships: "家", city_street: "街", sky_weather: "風", nature_plants: "花草", light_fire: "光", night_moon: "夜", water: "水", cosmos: "宇宙", time_memory: "四季" };
+// an album as the poster needs it: its songs' imagery, words, tempo, bar and length, and its kinds ranked by use
+function albumCounts(album) {
+  const recs = album.songs;
+  const tot = Object.fromEntries(HOME_KEYS.map(id => [id, recs.reduce((a, d) => a + ((d.imagery && d.imagery[id]) || 0), 0)]));
+  const rank = HOME_KEYS.slice().sort((a, b) => tot[b] - tot[a]);
+  return { ...album, recs, tot, rank };
+}
+function soulboyAlbum(S) {
+  return { title: "Soulboy", year: 2005, songs: S.map((st, i) => {
+    const d = SOULBOY.find(x => x.track === st.track) || { imagery: {}, terms: [] };
+    return { name: st.name, track: st.track, imagery: d.imagery, terms: d.terms, tempo: TEMPO[i], bar: SOULBOY_BAR[i], rh: rhythmOf(st.track), lines: LINES[i], color: (imageryOf(st.track) || [[0, null]])[0][1] };
+  }) };
+}
+function bez(p0, p1, p2, p3, u) { const v = 1 - u; return [0, 1].map(i => v * v * v * p0[i] + 3 * v * v * u * p1[i] + 3 * v * u * u * p2[i] + u * u * u * p3[i]); }
+function blendAlbum(c, w, h, t, card, hs = -1) {
+  if (!card._album || !card._album.recs[0].color) card._album = albumCounts(soulboyAlbum(card.stations));
+  drawAlbumPoster(c, w, h, t, card, card._album, hs);
+}
+// the same poster for any album: the most-sung kind of imagery is the glowing core, the second the embrace around it,
+// the third the band of light running into it, and the rest soft clouds around them
+function drawAlbumPoster(c, w, h, t, card, D, hs = -1) {
+  const S = D.recs, n = S.length, T = reduce ? 0 : t, tot = D.tot, [K1, K2, K3] = D.rank;
+  const col = id => catColor(CATS.find(cat => cat.id === id)), k = v => Math.sqrt(v / tot[K1]);
+  const pulse = S.map(s => beatOf(t, s.tempo || 90, s.bar || 4)), beatAll = pulse.reduce((a, b) => a + b, 0) / n;
+  // home sits up and to the right; the street comes in from the bottom-left corner and curls into it
+  const hx = w * 0.64, hy = h * 0.36, homeR = w * 0.3 * k(tot[K2]);
+  const heartR = homeR * 0.62 * k(tot[K1]) / k(tot[K2]) * (1 + 0.06 * beatAll);
+  const A = [-w * 0.15, h * 1.02], B = [w * 0.32, h * 0.9], C = [w * 0.18, h * 0.42], E = [hx - homeR * 0.5, hy + homeR * 0.35];
+  const street = u => bez(A, B, C, E, u), streetW = w * 0.2 * k(tot[K3]);
+  // 1. the soft field
+  softPass(c, w, h, s => { s.fillStyle = lin(s, 0, 0, w * 0.4, h, "#231A35", "#120D16"); s.fillRect(0, 0, w, h); }, s => {
+    // what he sings of besides: soft clouds, each as large as it is common
+    const cloud = (id, x, y, sx, sy) => { const r = w * 0.32 * k(tot[id]); s.save(); s.translate(x, y); s.scale(sx, sy); s.fillStyle = rad(s, 0, 0, r, col(id), "rgba(0,0,0,0)"); s.fillRect(-r, -r, r * 2, r * 2); s.restore(); };
+    // the rest, by rank, into the same places on every album's poster, so two albums can be compared
+    const SLOTS = [[0.2, 0.14, 1.6, 0.8], [0.9, 0.86, 1.3, 0.9], [0.86, 0.58, 1, 1], [0.04, 0.56, 1, 1.4], [0.92, 0.08, 1, 1], [0.5, 0.7, 1.8, 0.5], [0.5, 0.03, 1.4, 0.6]];
+    D.rank.slice(3).forEach((id, j) => { if (tot[id]) cloud(id, w * SLOTS[j][0], h * SLOTS[j][1], SLOTS[j][2], SLOTS[j][3]); });
+    // spring wind: long pale bands across the sky
+    for (let b = 0; b < Math.round((tot.sky_weather || 0) / 9); b++) ribbon(s, w, x => h * (0.06 + b * 0.07) + x * 0.28 + Math.sin(x / w * 3 + T * 0.25 + b) * h * 0.02, () => h * 0.025, col("sky_weather"));
+    // the street: a broad warm band, widest where it comes in, narrowing as it reaches home
+    for (let i = 0; i <= 60; i++) { const u = i / 60, [x, y] = street(u); disc(s, x, y, streetW * (1 - 0.6 * u)); s.fillStyle = col(K3); s.globalAlpha = 0.5; s.fill(); }
+    s.globalAlpha = 1;
+    // home's warmth and the heart's glow
+    s.fillStyle = rad(s, hx, hy, homeR * 1.9, col(K2), "rgba(0,0,0,0)"); s.fillRect(0, 0, w, h);
+    s.beginPath(); s.arc(hx, hy, homeR, 0, Math.PI * 2); s.lineWidth = homeR * 0.6; s.strokeStyle = col(K2); s.stroke();
+    s.fillStyle = rad(s, hx, hy, heartR * 2.2, col(K1), "rgba(0,0,0,0)"); s.fillRect(0, 0, w, h);
+  }, 5);
+  // 2. sharp forms. The street's two edges, hairlines that curl in to home
+  c.save(); c.lineCap = "round";
+  [-1, 1].forEach(sd => {
+    c.beginPath();
+    for (let i = 0; i <= 80; i++) { const u = i / 80, [x, y] = street(u), [x2, y2] = street(Math.min(1, u + 0.01)), a = Math.atan2(y2 - y, x2 - x) + Math.PI / 2, o = sd * streetW * (1 - 0.6 * u) * 0.9; i ? c.lineTo(x + Math.cos(a) * o, y + Math.sin(a) * o) : c.moveTo(x + Math.cos(a) * o, y + Math.sin(a) * o); }
+    c.strokeStyle = "rgba(255,214,176,.45)"; c.lineWidth = Math.max(1, w * 0.0025); c.stroke();
+  });
+  c.restore();
+  // home: an embrace, a thick ring left open where the street comes in, its colour turning slowly
+  const open = Math.atan2(E[1] - hy, E[0] - hx), gap = 0.9;
+  c.save(); c.beginPath(); c.arc(hx, hy, homeR, open + gap / 2, open + Math.PI * 2 - gap / 2);
+  c.strokeStyle = conic(c, hx, hy, T * 0.15, [col(K2), "#FFE6DA", col(K2), "#F7DDEB"]);
+  c.lineWidth = homeR * 0.24; c.lineCap = "butt"; c.globalAlpha = 0.85; c.stroke(); c.restore();
+  // the heart: a glowing core inside, swelling with every beat on the album
+  const o = { n: 2, a: 0.08, ph: Math.PI / 2, wob: 0.04 };
+  blobPath(c, hx + homeR * 0.05, hy + homeR * 0.02, heartR, o, T); c.fillStyle = conic(c, hx, hy, T * 0.3, [col(K1), "#FFE2F2", col(K1), "#F2E2FF"]); c.fill();
+  c.save(); blobPath(c, hx + homeR * 0.05, hy + homeR * 0.02, heartR, o, T); c.clip();
+  c.fillStyle = rad(c, hx, hy, heartR * (0.8 + 0.15 * beatAll), "rgba(255,255,255,.95)", "rgba(255,255,255,0)"); c.fillRect(hx - heartR * 2, hy - heartR * 2, heartR * 4, heartR * 4); c.restore();
+  // stars for the universe, a few
+  const rs = mulberry(7);
+  for (let i = 0; i < (tot.cosmos || 0); i++) { disc(c, w * (0.3 + rs() * 0.65), h * (0.02 + rs() * 0.16), w * 0.003 * (1.2 + Math.sin(T * 2 + i))); c.fillStyle = "rgba(255,250,240,.75)"; c.fill(); }
+  // 3. the songs travelling the street toward home, in track order
+  const marks = [];
+  S.forEach((s, i) => {
+    const u = 0.06 + (i / (n - 1)) * 0.86, [x0, y0] = street(u), [x1, y1] = street(Math.min(1, u + 0.01));
+    const a = Math.atan2(y1 - y0, x1 - x0) + Math.PI / 2, o = (i % 2 ? 1 : -1) * streetW * (1 - 0.6 * u) * (0.35 + 0.25 * ((i * 7) % 3) / 2);
+    const x = x0 + Math.cos(a) * o, y = y0 + Math.sin(a) * o;
+    const b = reduce ? 0 : (t * (s.tempo || 90)) / 60, bar = s.bar || 4, corners = bar;
+    const rot = -Math.PI / 2 + (Math.floor(b / bar) + Math.min(1, (b % bar) / 0.5)) * (Math.PI * 2 / corners) * (reduce ? 0 : 1);
+    const size = w * (0.016 + 0.03 * Math.min(1, (s.lines || 40) / 82)) * (1 - 0.35 * u) * (1 + 0.3 * pulse[i]);
+    marks.push([x, y, size]);
+    const im = s.color ? [[1, s.color]] : null, rh = s.rh || { beats_per_bar: s.bar || 4, feel: "straight" }, on = i === hs;
+    c.save(); c.globalAlpha = hs >= 0 && !on ? 0.4 : 1;
+    if (im) {
+      c.save(); c.globalCompositeOperation = "screen"; c.fillStyle = rad(c, x, y, size * 3, im[0][1], "rgba(0,0,0,0)"); c.globalAlpha *= 0.4 + 0.5 * pulse[i]; c.fillRect(x - size * 3, y - size * 3, size * 6, size * 6); c.restore();
+      beatShape(c, x, y, size, rh, rot); c.fillStyle = lin(c, x - size, y - size, x + size, y + size, "#FFFDF8", im[0][1]); c.fill();
+    } else { beatShape(c, x, y, size, rh, rot); c.strokeStyle = "rgba(200,192,200,.7)"; c.lineWidth = Math.max(1, w * 0.002); c.stroke(); }
+    if (on) { beatShape(c, x, y, size * 1.35, rh, rot); c.strokeStyle = "#FFFFFF"; c.lineWidth = Math.max(1.5, w * 0.003); c.stroke(); }
+    c.restore();
+  });
+  card._hit = (x, y) => { let best = -1, bd = Infinity; marks.forEach(([mx, my, r], i) => { const d = Math.hypot(x - mx, y - my) / Math.max(r * 1.8, w * 0.03); if (d < 1 && d < bd) { bd = d; best = i; } }); return best; };
+  card._open = null;
+  if (hs >= 0) {
+    const [x, y, r] = marks[hs], d = S[hs], right = x < w * 0.6;
+    const words = (d.terms || []).slice().sort((a, b) => b[2] - a[2]).slice(0, 4).map(x => x[0]).join(" ");
+    c.save(); c.textAlign = right ? "left" : "right"; c.textBaseline = "middle"; c.shadowColor = "rgba(0,0,0,.7)"; c.shadowBlur = 6;
+    const tx = x + (right ? 1 : -1) * (r * 1.8 + w * 0.012);
+    c.font = `700 ${Math.max(12, w * 0.032)}px "Noto Sans SC", sans-serif`; c.fillStyle = "#FFFFFF"; c.fillText(d.name, tx, y - w * 0.016);
+    c.font = `500 ${Math.max(9, w * 0.019)}px "Noto Sans SC", sans-serif`; c.fillStyle = "rgba(255,246,238,.85)"; c.fillText(words || "沒有意象", tx, y + w * 0.02);
+    c.restore();
+  }
+  // the key, tiny: the three words and their counts, beside what they name
+  c.save(); c.font = `500 ${Math.max(8, w * 0.016)}px "IBM Plex Mono", "Noto Sans SC", monospace`; c.fillStyle = "rgba(255,246,238,.6)"; c.textBaseline = "middle";
+  c.textAlign = "right"; c.fillText(`${KIND_WORD[K2]} ${tot[K2]}`, hx - homeR * 1.18, hy - homeR * 0.55);
+  c.textAlign = "center"; c.fillText(`${KIND_WORD[K1]} ${tot[K1]}`, hx, hy + homeR * 1.28);
+  c.textAlign = "left"; const sp = street(0.55); c.fillText(`${KIND_WORD[K3]} ${tot[K3]}`, sp[0] - streetW * 1.25, sp[1]);
+  c.restore();
+  posterType(c, w, h, { name: D.title, line: `他唱的，多半是${KIND_WORD[K1]}、${KIND_WORD[K2]}和${KIND_WORD[K3]}`, track: 0 }, "#FFF6EE", "rgba(255,246,238,.75)",
+    { size: w * Math.min(0.13, 0.9 / Math.max(6, D.title.length)), metaInk: "rgba(255,246,238,.6)", meta: `KHALIL FONG 方大同 · ${D.title.toUpperCase()} ${D.year} · ${n} SONGS` });
+}
+// ---- pixel posters: the main image built from a coarse grid of square cells, flat colour, the grid left showing ----
+function pixelGrid(c, w, h, cols, line, fn) {
+  const g = w / cols, rows = Math.ceil(h / g);
+  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+    const col = fn((i + 0.5) * g, (j + 0.5) * g, i, j);
+    if (col) { c.fillStyle = col; c.fillRect(i * g, j * g, g + 0.6, g + 0.6); }
+  }
+  c.strokeStyle = line; c.lineWidth = 1; c.beginPath();
+  for (let i = 0; i <= cols; i++) { c.moveTo(Math.round(i * g) + 0.5, 0); c.lineTo(Math.round(i * g) + 0.5, h); }
+  for (let j = 0; j <= rows; j++) { c.moveTo(0, Math.round(j * g) + 0.5); c.lineTo(w, Math.round(j * g) + 0.5); }
+  c.stroke();
+  return g;
+}
+const cellHash = (i, j, s = 0) => { const v = Math.sin(i * 127.1 + j * 311.7 + s * 74.7) * 43758.5453; return v - Math.floor(v); };
+
+// 春風吹 — a five-petalled peach blossom in red and pink, with eleven stepped bands of wind flowing past it and petals blowing off.
+function pixWind(c, w, h, t, p) {
+  const T = reduce ? 0 : t, bg = "#E6E8E4", cx = w * 0.5, cy = h * 0.4, R = w * 0.27, rot = -Math.PI / 2 + T * 0.04;
+  const bands = ["#9FCB7A", null, "#4FA35E", "#CFE2EC", null, "#4F86C6", null, "#F4B6C2", "#2F7D4A", null, "#CFE2EC"];
+  const petals = new Set(); for (let k = 0; k < 14; k++) { const u = (k * 0.137 + T * (0.04 + (k % 3) * 0.015)) % 1, v = 0.12 + (k % 7) * 0.09 + 0.03 * Math.sin(u * 8 + k); petals.add(Math.floor(u * 36) + "," + Math.floor(v * h / (w / 36))); }
+  c.fillStyle = bg; c.fillRect(0, 0, w, h);
+  pixelGrid(c, w, h, 36, "rgba(30,43,58,.07)", (x, y, i, j) => {
+    if (y > h * 0.82) return null;
+    const dx = x - cx, dy = y - cy, d = Math.hypot(dx, dy), th = Math.atan2(dy, dx), r = R * (0.62 + 0.38 * Math.pow(Math.abs(Math.cos(2.5 * (th - rot))), 0.7));
+    if (d < R * 0.16) return "#F5CF3E";
+    if (d < R * 0.3) return "#C93A48";
+    if (d < r) return d > r - w * 0.05 ? "#F4B6C2" : "#E8505B";
+    if (petals.has(i + "," + j)) return j % 2 ? "#E8505B" : "#F4B6C2";
+    if (d < r + w * 0.045) return null;
+    const ph = x / w * 1.1 - y / h * 0.8 + 0.07 * Math.sin(y / h * 7 + T * 0.8);
+    return bands[((Math.floor(ph * p.heroCount + T * 0.25) % bands.length) + bands.length) % bands.length];
+  });
+  posterType(c, w, h, p, "#1E2B3A", "#3E5566", { y: h * 0.93 });
+}
+
+// 南音 — a pair of pixel sunglasses: five rings in each rim, a moon over its reflection in the left lens, the rainbow he plays
+// in the right; red strings down to a gold bridge, and the sound spreading from it in stepped rings.
+function pixLenses(c, w, h, t, p) {
+  const T = reduce ? 0 : t, cy = h * 0.34, a = w * 0.2, b = w * 0.16, gx = w * 0.5, gy = h * 0.8;
+  const rain = ["#F2A0A8", "#F2B07E", "#F5D84E", "#9FD08F", "#A9C9EC", "#9A89F4"], snd = ["#F2B33D", "#C8323A", "#9A89F4", "#E08A3C", "#6B5CA5"];
+  c.fillStyle = "#141320"; c.fillRect(0, 0, w, h);
+  pixelGrid(c, w, h, 40, "rgba(255,255,255,.05)", (x, y, i, j) => {
+    for (const d of [-1, 1]) {
+      const lx = gx + d * w * 0.225, dx = x - lx, dy = y - cy, s = Math.pow(Math.abs(dx / a), 4) + Math.pow(Math.abs(dy / b), 4);
+      if (s < 1) {
+        if (s > 0.42) return Math.floor((s - 0.42) / (0.58 / p.heroCount)) % 2 ? "#3A3760" : "#24223C";
+        if (d < 0) {
+          if (dy < 0 && Math.hypot(dx, dy) < w * 0.1) return dy < -w * 0.05 ? "#FFFFFF" : "#CFCBE4";
+          if (dy > w * 0.02 && j % 2 && Math.abs(dx) < w * (0.11 - dy / w * 0.6) + Math.sin(T * 1.5 + j) * w * 0.01) return "#6B6890";
+          return "#0B0A12";
+        }
+        const k = Math.min(5, Math.max(0, Math.floor((dx / a + 0.62) / 1.24 * 6)));
+        return dy > 0 ? hexMix(rain[k], "#0B0A12", 0.45) : rain[k];
+      }
+    }
+    if (Math.abs(x - gx) < w * 0.05 && Math.abs(y - cy) < w * 0.025) return "#24223C";
+    if (Math.abs(x - gx) < w * 0.013 && y > cy + b && y < gy - w * 0.04) return "#C8323A";
+    const ty = y - (gy - w * 0.05); if (ty > 0 && ty < w * 0.07 && Math.abs(x - gx) < ty * 0.9 + w * 0.01) return "#F2B33D";
+    if (y < gy - w * 0.02 && y > cy + b * 1.8) for (let k = 0; k < 5; k++) { const r = (k * w * 0.09 + T * w * 0.04) % (w * 0.45) + w * 0.08; if (Math.abs(Math.hypot(x - gx, y - gy) - r) < w * 0.013) return snd[k]; }
+    for (const [lx, ly] of [[0.1, 0.62], [0.9, 0.56], [0.84, 0.7]]) if (Math.abs(x - w * lx) < w * 0.04 && Math.abs(y - h * ly - Math.sin(T + lx * 9) * 3) < w * 0.05) return "#E8503C";
+    return null;
+  });
+  posterType(c, w, h, p, "#EDE3CC", "#B9AEC9", { y: h * 0.965, size: w * 0.11, x: w * 0.06 });
+}
+
+// 跳 — the world as a pixel disc, whole on the left and scattered on the right; the scatter slowly fills back in until the
+// halves are one. A stepped rainbow of six bands rises out of the crack around a sun, and eight blocks jump on the beat.
+function pixJump(c, w, h, t, p) {
+  const T = reduce ? 0 : t, wx = w * 0.5, wy = h * 0.25, wr = w * 0.3, base = h * 0.72, cols6 = ["#E8505B", "#F2934A", "#F5CF3E", "#4FA35E", "#4F86C6", "#8A6CC8"];
+  const gap = reduce ? 0.6 : Math.pow(Math.max(0, Math.sin(T * 0.22)), 1.5), N = 32, g = w / N;
+  const jumpers = []; for (let k = 0; k < p.jumpers; k++) { const hop = reduce ? 0 : Math.max(0, Math.sin((((t * p.bpm) / 60 + (k % 2) * 0.5) % 1) * Math.PI)); jumpers.push([Math.round(N * (0.08 + k * 0.12)), Math.round((base + h * 0.11) / g) - Math.round(hop * 3)]); }
+  c.fillStyle = "#24272E"; c.fillRect(0, 0, w, base); c.fillStyle = "#F2E2CC"; c.fillRect(0, base, w, h - base);
+  pixelGrid(c, w, h, N, "rgba(255,255,255,.06)", (x, y, i, j) => {
+    for (let k = 0; k < jumpers.length; k++) { const [ji, jj] = jumpers[k]; if ((i === ji || i === ji + 1) && (j === jj || j === jj - 1)) return cols6[k % 6]; }
+    const d = Math.hypot(x - wx, y - wy);
+    if (x < wx && d < wr) return (i + j) % 2 ? "#8E918F" : "#6E716F";
+    if (x > wx && d < wr * (1 + 0.4 * gap)) { const hsh = cellHash(i, j); if (d < wr ? hsh > 0.55 * gap : hsh > 1 - 0.18 * gap) return hsh > 0.7 ? "#5A5F69" : "#3A3E47"; }
+    if (gap > 0.15 && Math.abs(x - wx) < g * 0.6 && y < base) return "#F5D84E";
+    const dr = Math.hypot(x - wx, y - base);
+    if (y < base && dr < w * 0.12) return dr < w * 0.06 ? "#FFF1B8" : "#F5CF3E";
+    if (y < base && dr < w * 0.47 && dr >= w * 0.12) return cols6[Math.min(5, Math.floor((w * 0.47 - dr) / (w * 0.35 / p.heroCount)))];
+    return null;
+  });
+  posterType(c, w, h, p, "#1E2B3A", "#6B4F3A", { y: h * 0.965, size: w * 0.17, x: w * 0.06, metaInk: "rgba(220,224,232,.75)" });
+}
+
+// the album — a stepped stacked chart across the fourteen songs: the image colour as tall as the song's energy, the mood colour
+// as tall as its brightness, a dark band for its tempo. Hover a song and its stretch of the chart lifts and lights up.
+function pixAlbum(c, w, h, t, card, hs = -1) {
+  const S = card.stations, n = S.length, T = reduce ? 0 : t, cols = 64, g = w / cols, baseY = h * 0.84;
+  c.fillStyle = "#E6E8E4"; c.fillRect(0, 0, w, h);
+  const at = x => { const f = Math.max(0, Math.min(n - 1, ((x / w) - 0.06) / 0.88 * (n - 1))), i0 = Math.floor(f), i1 = Math.min(n - 1, i0 + 1), u = f - i0, m = k => S[i0][k] * (1 - u) + S[i1][k] * u; return { s: S[Math.round(f)], k: Math.round(f), e: m("energy"), v: m("valence"), b: m("bpm") }; };
+  pixelGrid(c, w, h, cols, "rgba(30,43,58,.07)", (x, y, i, j) => {
+    if (x < w * 0.03 || x > w * 0.97 || y > baseY) return null;
+    const q = at(x), lift = q.k === hs ? h * 0.04 : 0, jit = Math.sin(i * 1.7 + T * (q.b / 60)) * h * 0.012 * q.e * 2;
+    const t1 = baseY - h * 0.55 * q.e - lift + jit, t2 = t1 - h * 0.32 * (q.v - 0.4) - lift * 0.5, t3 = t2 - h * 0.0006 * q.b * (1 + 0.4 * Math.sin(i + T));
+    if (y > t1) return q.s.accent;
+    if (y > t2) return q.s.sky;
+    if (y > t3) return q.k === hs ? "#1E2B3A" : "#3A3E47";
+    if (y > h * 0.25 && cellHash(i, j, Math.floor(T * 2)) > 0.996) return q.s.accent;
+    return null;
+  });
+  albumLabels(c, w, h, S, hs);
   c.save(); c.fillStyle = "#1E2B3A"; c.font = `800 ${h * 0.1}px "Manrope", "Noto Sans SC", sans-serif`; c.fillText("Soulboy", w * 0.04, h * 0.13);
   c.font = `500 ${Math.max(9, h * 0.017)}px "IBM Plex Mono", monospace`; c.fillText("KHALIL FONG 方大同 · 2005 · 14 SONGS", w * 0.045, h * 0.17); c.restore();
 }
@@ -2162,7 +2747,9 @@ function absAlbum(c, w, h, t, card, hs = -1) {
 // each style redraws the flat scene, then reworks its pixels: a palette of cut paper, carved woodblock lines, ink, or dots
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const STYLES = [
-  { id: "flat", label: "Abstract", note: "Geometry, light and shadow: a warped checker field for the ground of the song, one warped ring for its main image, light falling from where the song's light comes from." },
+  { id: "flat", label: "Blend", note: "Soft colour fields melting into each other with a few sharp forms laid over them. The colours are data: each poster takes its hues from its song's lyric imagery." },
+  { id: "pixel", label: "Pixel", note: "The main image built from a coarse grid of square cells in flat colour, with the grid left showing." },
+  { id: "geo", label: "Geometric", note: "Flat geometry, light and shadow: circles, half discs, triangles, lines, hatching and halftone dots, each standing for one image in the song, lit from where the song's light comes from." },
   { id: "illus", label: "Illustrated (first draft)", note: "The first, literal drafts, kept for comparison." },
   { id: "matisse", label: "Matisse cut-outs", note: "After Henri Matisse's paper cut-outs (1940s–50s): every shape cut from a handful of gouache-painted papers, no shading, laid on white.",
     palette: ["#F7F3E8", "#1D4FA3", "#E2412F", "#F3C21C", "#2E8B57", "#F28AB2", "#151515"], paper: "#F7F3E8" },
@@ -2239,21 +2826,279 @@ function stylise(style, src, dst, w, h, d, title) {
 }
 // ---- the poster viewer: one poster at a time, filling the screen, with its card beside it ----
 // tempo, brightness (valence) and energy of each Soulboy song, from its 30-second preview
-const TEMPO = [99.05, 123.59, 114.59, 129.41, 102.52, 108.2, 133.66, 105.02, 153.6, 120.23, 107.24, 125.7, 118.63, 89.1];
+// measured from the audio (rhythm.json tempo_measured)
+const TEMPO = [96.5, 100.5, 136, 58, 93.5, 95, 63.5, 72, 90, 101.5, 103, 133.5, 95, 79.5];
 const VAL = [0.71, 0.76, 0.69, 0.49, 0.81, 0.79, 0.6, 0.53, 0.53, 0.72, 0.74, 0.57, 0.77, 0.61];
 const EN = [0.45, 0.49, 0.3, 0.25, 0.43, 0.3, 0.19, 0.25, 0.5, 0.52, 0.24, 0.26, 0.61, 0.25];
 // each song's strongest colour, taken from its main image, paired with its mood colour in the checker
 const ACCENT = ["#F2934A", "#4F86C6", "#E8505B", "#2F7FB8", "#E46F8E", "#B07A4A", "#C45AD8", "#14121E", "#3E4C8A", "#F5B630", "#4FA35E", "#E0782E", "#7A5CC0", "#8A5A3A"];
 ALBUM.stations.forEach((s, i) => Object.assign(s, { bpm: TEMPO[i], valence: VAL[i], energy: EN[i], accent: ACCENT[i] }));
 // the abstract posters are the default; the first illustrated drafts stay one click away for comparison
+// ---- the other eleven songs: scene cards from the close readings, and a blend poster for each ----
+// same series as 春風吹, 南音 and 跳: a soft field, a few sharp forms, grain and the same type; the composition is the song's own
+const TR = i => TEMPO[i - 1];
+// 01 Prologue — a curtain: ten soft folds, one per spoken line, parting from the middle onto warm stage light
+function blendPrologue(c, w, h, t, p) {
+  const T = reduce ? 0 : t, open = 0.14 + 0.05 * Math.sin(T * 0.3);
+  softPass(c, w, h, "#2A1418", s => {
+    disc(s, w * 0.5, h * 0.5, w * 0.5); s.fillStyle = rad(s, w * 0.5, h * 0.5, w * 0.5, "#FFE9C2", "rgba(255,233,194,0)"); s.fill();
+    for (let k = 0; k < p.heroCount; k++) {
+      const side = k < 5 ? -1 : 1, j = k % 5, x0 = w * 0.5 + side * (w * open + j * w * 0.09);
+      s.fillStyle = lin(s, x0 - w * 0.05, 0, x0 + w * 0.05, 0, "#5A1E26", j % 2 ? "#C8323A" : "#8E2A33");
+      s.beginPath(); s.moveTo(x0 - w * 0.05, 0); s.quadraticCurveTo(x0 + side * w * 0.03, h * 0.5, x0 - w * 0.05 + side * w * 0.04, h); s.lineTo(x0 + w * 0.05 + side * w * 0.04, h); s.quadraticCurveTo(x0 + side * w * 0.06, h * 0.5, x0 + w * 0.05, 0); s.fill();
+    }
+  }, 3);
+  c.save(); c.globalCompositeOperation = "screen"; c.beginPath(); c.ellipse(w * 0.5, h * 0.74, w * 0.2, h * 0.025, 0, 0, Math.PI * 2); c.fillStyle = "rgba(255,233,194,.6)"; c.fill(); c.restore();
+  rule(c, w * 0.1, h * 0.76, w * 0.9, h * 0.76, 1, "rgba(255,233,194,.5)");
+  posterType(c, w, h, p, "#FBEFD9", "#E2B9A6", { y: h * 0.93, size: w * 0.12 });
+}
+// 02 妹妹 — a sky clearing from storm to sun on the diagonal, and two discs, a big cousin and a little one who grows up
+function blendSister(c, w, h, t, p) {
+  const T = reduce ? 0 : t, grow = 0.45 + 0.35 * (0.5 + 0.5 * Math.sin(T * 0.2));
+  softPass(c, w, h, s => { s.fillStyle = lin(s, 0, 0, w, h, "#4A5468", "#FFE3A8"); s.fillRect(0, 0, w, h); }, s => {
+    [[0.15, 0.12, 0.35, "#2E3546"], [0.45, 0.05, 0.3, "#6B7A92"], [0.1, 0.4, 0.28, "#5A6478"]].forEach(([x, y, r, col]) => { disc(s, w * x + Math.sin(T * 0.3 + x * 9) * w * 0.02, h * y, w * r); s.fillStyle = col; s.fill(); });
+    disc(s, w * 0.8, h * 0.72, w * 0.32); s.fillStyle = "#FFD27A"; s.fill();
+    disc(s, w * 0.8, h * 0.72, w * 0.16); s.fillStyle = "#FFF4D6"; s.fill();
+  }, 3);
+  // rain on the storm side, fading out toward the sun
+  for (let i = 0; i < 40; i++) { const x = (i * 0.071 % 0.6) * w, y = ((i * 0.13 + T * 0.4) % 0.5) * h; rule(c, x, y, x - w * 0.01, y + h * 0.04, 1, `rgba(220,230,245,${0.5 - x / w * 0.7})`); }
+  const big = w * 0.12, small = big * grow;
+  disc(c, w * 0.4, h * 0.6, big); c.fillStyle = lin(c, 0, h * 0.6 - big, 0, h * 0.6 + big, "#E3ECF3", "#A9C9EC"); c.fill();
+  disc(c, w * 0.4 + big + small + w * 0.02, h * 0.6 + big - small, small); c.fillStyle = lin(c, 0, h * 0.6 - small, 0, h * 0.6 + big, "#F2A0A8", "#F7C9A6"); c.fill();
+  posterType(c, w, h, p, "#1E2B3A", "#4E5D70", { y: h * 0.93 });
+}
+// 04 每天每天 — every day the same grey street, one thin line per day; on the horizon the promised band of Mediterranean blue;
+// two slim forms side by side, one always on the other's right
+function blendEveryday(c, w, h, t, p) {
+  const T = reduce ? 0 : t, hz = h * 0.38;
+  softPass(c, w, h, "#B8B6B2", s => {
+    s.fillStyle = lin(s, 0, 0, 0, hz, "#E6E3DD", "#CFCBC4"); s.fillRect(0, 0, w, hz);
+    s.fillStyle = lin(s, 0, hz - h * 0.06, 0, hz + h * 0.04, "#2F7FB8", "#8CC7E8"); s.fillRect(0, hz - h * 0.05, w, h * 0.08);
+    s.fillStyle = lin(s, 0, hz, 0, h, "#9A9893", "#6E6C68"); s.fillRect(0, hz + h * 0.03, w, h);
+  }, 3);
+  // the days: thin lines receding to the horizon
+  for (let k = 0; k < 18; k++) { const f = ((k / 18) + T * 0.02) % 1, y = hz + h * 0.04 + Math.pow(f, 1.8) * h * 0.6; rule(c, 0, y, w, y, Math.max(1, f * 3), `rgba(255,255,255,${0.15 + f * 0.25})`); }
+  for (let k = 0; k < p.heroCount; k++) { c.fillStyle = `rgba(255,255,255,${0.4 + 0.15 * k})`; c.fillRect(w * (0.12 + k * 0.2), hz - h * 0.012, w * 0.12, Math.max(1.5, h * 0.004)); }
+  const sway = Math.sin(T * (TR(4) / 60) * Math.PI) * h * 0.004;
+  [[0.42, "#3A3E47"], [0.53, "#2F7FB8"]].forEach(([x, col], i) => { c.fillStyle = col; c.beginPath(); c.roundRect(w * x, h * 0.42 + (i ? sway : -sway), w * 0.07, h * 0.3, w * 0.035); c.fill(); });
+  posterType(c, w, h, p, "#F4F1EA", "#E6E3DD", { y: h * 0.93 });
+}
+// 05 女人 — an old photograph held at a tilt, faded inside, and Venus as one small bright planet in a rose sky
+function blendWoman(c, w, h, t, p) {
+  const T = reduce ? 0 : t;
+  softPass(c, w, h, "#E9C9C4", s => {
+    disc(s, w * 0.8, h * 0.16, w * 0.3); s.fillStyle = "#F7E0B0"; s.fill();
+    disc(s, w * 0.2, h * 0.8, w * 0.45); s.fillStyle = "#C97A8A"; s.fill();
+    disc(s, w * 0.55, h * 0.5, w * 0.35); s.fillStyle = "#E46F8E"; s.fill();
+  }, 4);
+  glow(c, w * 0.78, h * 0.17, w * 0.14, "rgba(255,240,200,.9)"); disc(c, w * 0.78, h * 0.17, w * 0.035); c.fillStyle = "#FFF6E0"; c.fill();
+  c.save(); c.translate(w * 0.46, h * 0.5); c.rotate(-0.12 + Math.sin(T * 0.25) * 0.02);
+  c.shadowColor = "rgba(60,20,30,.35)"; c.shadowBlur = 30; c.shadowOffsetY = 12;
+  c.fillStyle = "#FBF3EA"; c.fillRect(-w * 0.27, -w * 0.33, w * 0.54, w * 0.62); c.shadowColor = "transparent";
+  c.fillStyle = lin(c, 0, -w * 0.3, 0, w * 0.2, "#D9B6A0", "#8A5A5A"); c.fillRect(-w * 0.24, -w * 0.3, w * 0.48, w * 0.48);
+  // the two of them in the photo, half faded: eight bars for the eight times 女人 is sung, fading in turn
+  for (let k = 0; k < p.heroCount; k++) { c.fillStyle = `rgba(251,243,234,${0.12 + 0.5 * (0.5 + 0.5 * Math.sin(T * 0.6 - k * 0.5))})`; c.fillRect(-w * 0.24 + k * w * 0.06, -w * 0.3, w * 0.06, w * 0.48); }
+  c.restore();
+  posterType(c, w, h, p, "#3A1E28", "#6E4250", { y: h * 0.93 });
+}
+// 06 叫我怎麼說 — an old film: sepia, two soft figures meeting in the frame, and twelve frames run down the edges, one for each 愛
+function blendMovie(c, w, h, t, p) {
+  const T = reduce ? 0 : t, meet = 0.5 + 0.5 * Math.sin(T * 0.3);
+  softPass(c, w, h, "#3A2A20", s => {
+    s.fillStyle = lin(s, 0, 0, 0, h, "#C8A27A", "#6E4E36"); s.fillRect(w * 0.12, 0, w * 0.76, h);
+    disc(s, w * (0.32 + 0.1 * meet), h * 0.45, w * 0.1); s.fillStyle = "#2A1E16"; s.fill();
+    disc(s, w * (0.68 - 0.1 * meet), h * 0.45, w * 0.1); s.fillStyle = "#4A2E22"; s.fill();
+    disc(s, w * 0.85, h * 0.2, w * 0.25); s.fillStyle = "rgba(255,170,90,.6)"; s.fill();
+  }, 3);
+  [[0.32 + 0.1 * meet, "#2A1E16"], [0.68 - 0.1 * meet, "#4A2E22"]].forEach(([x, col]) => { c.fillStyle = col; c.beginPath(); c.roundRect(w * x - w * 0.045, h * 0.38, w * 0.09, h * 0.34, w * 0.045); c.fill(); });
+  for (let k = 0; k < p.heroCount; k++) {
+    const y = ((k / p.heroCount) * h + T * h * 0.04) % h;
+    [0.04, 0.92].forEach(x => { c.fillStyle = "#1A120C"; c.fillRect(w * x, y, w * 0.04, h * 0.045); c.fillStyle = "rgba(255,235,200,.12)"; c.fillRect(w * x + 2, y + 2, w * 0.04 - 4, h * 0.045 - 4); });
+  }
+  for (let i = 0; i < 6; i++) { const x = w * (0.15 + ((i * 0.37 + T * 0.7) % 0.7)); rule(c, x, 0, x, h, 1, "rgba(255,240,210,.12)"); }
+  posterType(c, w, h, p, "#F6E6CC", "#D7BC98", { y: h * 0.93, size: w * 0.12 });
+}
+// 07 哪怕 — one huge eye in close-up, the four lines of her face in a row, and his pulse across it beating at 64 BPM
+function blendEye(c, w, h, t, p) {
+  const T = reduce ? 0 : t, beat = beatOf(t, TR(7), 3), cy = h * 0.42;
+  softPass(c, w, h, "#2A0F2E", s => {
+    s.beginPath(); s.ellipse(w * 0.5, cy, w * 0.62, h * 0.2, 0, 0, Math.PI * 2); s.fillStyle = "#F3D7F4"; s.fill();
+    disc(s, w * 0.5, cy, w * 0.26); s.fillStyle = "#C45AD8"; s.fill();
+    disc(s, w * 0.5, h * 0.9, w * 0.5); s.fillStyle = "#7A2A6E"; s.fill();
+  }, 3);
+  const blink = reduce ? 1 : Math.min(1, Math.abs(Math.sin(T * 0.5)) * 6);
+  c.save(); c.beginPath(); c.ellipse(w * 0.5, cy, w * 0.46, h * 0.14 * blink, 0, 0, Math.PI * 2); c.clip();
+  c.fillStyle = "#FBEFFB"; c.fillRect(0, 0, w, h);
+  disc(c, w * 0.5 + Math.sin(T * 0.4) * w * 0.04, cy, w * 0.16); c.fillStyle = rad(c, w * 0.5, cy, w * 0.16, "#2A0F2E", "#C45AD8"); c.fill();
+  disc(c, w * 0.46, cy - w * 0.05, w * 0.03); c.fillStyle = "#FFFFFF"; c.fill(); c.restore();
+  for (let k = 0; k < p.heroCount; k++) rule(c, w * 0.2, cy - h * 0.2 - k * h * 0.025, w * 0.8, cy - h * 0.19 - k * h * 0.025, 1.5, `rgba(243,215,244,${0.6 - k * 0.12})`);
+  // the pulse line
+  c.beginPath(); for (let x = 0; x <= w; x += 4) { const u = (x / w * 4 + T * 0.5) % 1, spike = u > 0.45 && u < 0.55 ? Math.sin((u - 0.45) * 10 * Math.PI) * h * 0.06 * (0.5 + beat) : 0; c.lineTo(x, h * 0.7 - spike); }
+  c.lineWidth = Math.max(1.5, w * 0.005); c.strokeStyle = "#FF8FD8"; c.stroke();
+  posterType(c, w, h, p, "#FBEFFB", "#E3B6E8", { y: h * 0.93, size: w * 0.15 });
+}
+// 09 我們能不能 — a small earth in a huge universe under one sun, ringed by eight figures of different skin tones, one per chorus
+function blendEarth(c, w, h, t, p) {
+  const T = reduce ? 0 : t, ex = w * 0.5, ey = h * 0.55, er = w * 0.12;
+  softPass(c, w, h, "#0B0E22", s => {
+    disc(s, w * 0.5, h * 0.08, w * 0.55); s.fillStyle = rad(s, w * 0.5, h * 0.08, w * 0.55, "#FFD27A", "rgba(242,147,74,0)"); s.fill();
+    disc(s, ex, ey, w * 0.4); s.fillStyle = "rgba(62,76,138,.8)"; s.fill();
+  }, 4);
+  for (let i = 0; i < 60; i++) { const x = (i * 0.618 % 1) * w, y = (i * 0.377 % 1) * h; circle(c, x, y, i % 7 ? 0.8 : 1.6, `rgba(255,255,255,${0.3 + 0.3 * Math.sin(T + i)})`); }
+  disc(c, ex, ey, er); c.fillStyle = lin(c, ex - er, ey - er, ex + er, ey + er, "#8CCBC4", "#2F7FB8"); c.fill();
+  c.save(); disc(c, ex, ey, er); c.clip(); glow(c, ex, ey - er * 1.4, er * 1.6, "rgba(255,210,122,.7)"); c.restore();
+  const tones = ["#F6D7BE", "#E8B48E", "#C68A5E", "#9A6440", "#6E4428", "#4A2E1C", "#D9A07A", "#B07850"];
+  c.beginPath(); c.arc(ex, ey, er * 2, 0, Math.PI * 2); c.lineWidth = 1; c.strokeStyle = "rgba(255,255,255,.3)"; c.stroke();
+  for (let k = 0; k < p.heroCount; k++) { const a = (k / p.heroCount) * Math.PI * 2 + T * 0.05; blobPath(c, ex + Math.cos(a) * er * 2, ey + Math.sin(a) * er * 2, w * 0.035, { n: 0 }); c.fillStyle = tones[k]; c.fill(); }
+  posterType(c, w, h, p, "#F4E9D8", "#B9B5D6", { y: h * 0.93, size: w * 0.12 });
+}
+// 11 總結 — one string drawn across the whole poster and tied in five knots, over endless plains under a sky of butterflies
+function blendKnot(c, w, h, t, p) {
+  const T = reduce ? 0 : t;
+  softPass(c, w, h, s => { s.fillStyle = lin(s, 0, 0, 0, h, "#C9D7E0", "#E8E2C8"); s.fillRect(0, 0, w, h); }, s => {
+    s.fillStyle = lin(s, 0, h * 0.55, 0, h, "#7FB46A", "#3E7A44"); s.fillRect(0, h * 0.58, w, h);
+    for (let i = 0; i < 14; i++) { disc(s, ((i * 0.29 + T * 0.01) % 1) * w, h * (0.1 + (i * 0.17 % 0.4)), w * 0.05); s.fillStyle = ["#DD7FF2", "#F5D84E", "#FFFFFF"][i % 3]; s.fill(); }
+  }, 3);
+  // a thousand dotted lines, faint, all crossing
+  c.save(); c.setLineDash([2, 6]); for (let k = 0; k < 9; k++) rule(c, 0, h * (0.2 + k * 0.08), w, h * (0.15 + k * 0.09), 1, "rgba(30,43,58,.15)"); c.restore();
+  // the string and its knots
+  c.beginPath();
+  for (let x = -10; x <= w + 10; x += 3) {
+    let y = h * 0.5 + Math.sin(x / w * Math.PI * 2 + T * 0.4) * h * 0.06;
+    c.lineTo(x, y);
+  }
+  c.lineWidth = Math.max(2, w * 0.006); c.strokeStyle = "#8A2E3A"; c.stroke();
+  for (let k = 0; k < p.heroCount; k++) {
+    const x = w * (0.14 + k * 0.18), y = h * 0.5 + Math.sin(x / w * Math.PI * 2 + T * 0.4) * h * 0.06;
+    c.beginPath(); c.ellipse(x, y - w * 0.02, w * 0.025, w * 0.03, 0.4, 0, Math.PI * 2); c.stroke();
+  }
+  // butterflies, sharp: two wings each
+  for (let i = 0; i < 6; i++) { const x = w * (0.1 + ((i * 0.31 + T * 0.03) % 0.8)), y = h * (0.12 + (i % 3) * 0.08), f = Math.abs(Math.sin(T * 6 + i)) * 0.8 + 0.2, s = w * 0.025;
+    c.fillStyle = ["#DD7FF2", "#F5D84E", "#5CB35B"][i % 3]; c.beginPath(); c.ellipse(x - s * f * 0.6, y, s * f * 0.6, s, -0.4, 0, Math.PI * 2); c.ellipse(x + s * f * 0.6, y, s * f * 0.6, s, 0.4, 0, Math.PI * 2); c.fill(); }
+  posterType(c, w, h, p, "#1E2B3A", "#3E5566", { y: h * 0.93 });
+}
+// 12 趕場 — on the left the rush: streaks of hurrying light, three groups for the three friends who never meet;
+// on the right a calm river between two banks, the one pause in the song
+function blendRush(c, w, h, t, p) {
+  const T = reduce ? 0 : t;
+  softPass(c, w, h, "#2A2E38", s => {
+    s.fillStyle = lin(s, w * 0.6, 0, w, 0, "#6E8B5B", "#3E5A44"); s.fillRect(w * 0.6, 0, w * 0.4, h);
+    s.fillStyle = lin(s, 0, 0, 0, h, "#A9D3E8", "#4F86C6"); s.beginPath(); s.moveTo(w * 0.7, 0); s.bezierCurveTo(w * 0.62, h * 0.4, w * 0.9, h * 0.6, w * 0.78, h); s.lineTo(w * 0.92, h); s.bezierCurveTo(w * 1.02, h * 0.6, w * 0.76, h * 0.4, w * 0.84, 0); s.fill();
+    disc(s, w * 0.25, h * 0.4, w * 0.35); s.fillStyle = "rgba(224,120,46,.5)"; s.fill();
+  }, 3);
+  const cols = ["#F5B630", "#E0782E", "#F2EDE4"];
+  for (let g = 0; g < p.heroCount; g++) for (let i = 0; i < 9; i++) {
+    const y = h * (0.12 + g * 0.22 + i * 0.018), len = w * (0.08 + (i % 4) * 0.05), x = ((i * 0.23 + g * 0.4 + T * (0.25 + 0.05 * i) * (TR(12) / 120)) % 1.2) * w * 0.7 - w * 0.15;
+    c.fillStyle = lin(c, x, 0, x + len, 0, "rgba(255,255,255,0)", cols[g]); c.fillRect(x, y, len, Math.max(1.5, h * 0.004));
+  }
+  posterType(c, w, h, p, "#F2EDE4", "#C9C2B6", { y: h * 0.93 });
+}
+// 13 等著你回來 — the four seasons as four soft quarters turning, the swallows coming back, and at the centre an empty doorway
+function blendSeasons(c, w, h, t, p) {
+  const T = reduce ? 0 : t, cx = w * 0.5, cy = h * 0.44, R = w * 0.6, rot = T * 0.05;
+  const seasons = ["#A9C9EC", "#F4B6C2", "#7FB46A", "#E0A24A"];
+  softPass(c, w, h, "#EDE6DA", s => {
+    seasons.forEach((col, k) => { s.beginPath(); s.moveTo(cx, cy); s.arc(cx, cy, R, rot + k * Math.PI / 2, rot + (k + 1) * Math.PI / 2); s.closePath(); s.fillStyle = col; s.fill(); });
+    disc(s, cx, cy, w * 0.2); s.fillStyle = "#FFF6E8"; s.fill();
+  }, 4);
+  c.fillStyle = "#3A2E2A"; c.beginPath(); c.moveTo(cx - w * 0.08, cy + h * 0.12); c.lineTo(cx - w * 0.08, cy - h * 0.04); c.arc(cx, cy - h * 0.04, w * 0.08, Math.PI, 0); c.lineTo(cx + w * 0.08, cy + h * 0.12); c.closePath(); c.fill();
+  c.fillStyle = lin(c, 0, cy - h * 0.1, 0, cy + h * 0.12, "#FFE9C2", "#F4B6C2"); c.beginPath(); c.moveTo(cx - w * 0.06, cy + h * 0.12); c.lineTo(cx - w * 0.06, cy - h * 0.04); c.arc(cx, cy - h * 0.04, w * 0.06, Math.PI, 0); c.lineTo(cx + w * 0.06, cy + h * 0.12); c.closePath(); c.fill();
+  for (let i = 0; i < 5; i++) { const a = -Math.PI / 2 + i * 0.5 - T * 0.15, r = w * (0.32 + (i % 2) * 0.06), x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r * 1.1, s = w * 0.04;
+    tri(c, [x, y], [x - s, y - s * 0.45], [x - s * 0.35, y + s * 0.05], "#1E2B3A"); tri(c, [x, y], [x + s * 0.8, y - s * 0.6], [x + s * 0.3, y + s * 0.08], "#1E2B3A"); }
+  posterType(c, w, h, p, "#1E2B3A", "#5A4A40", { y: h * 0.93, size: w * 0.12 });
+}
+// 14 認識你 — a café table seen from above: two cups, one a cappuccino, a book with her name, and six days ticking to Saturday's film
+function blendCafe(c, w, h, t, p) {
+  const T = reduce ? 0 : t, day = reduce ? 5 : Math.floor(T * 0.5) % 6;
+  softPass(c, w, h, "#7A5238", s => {
+    disc(s, w * 0.3, h * 0.25, w * 0.4); s.fillStyle = "#C8955E"; s.fill();
+    disc(s, w * 0.8, h * 0.65, w * 0.35); s.fillStyle = "#5A3A28"; s.fill();
+    disc(s, w * 0.6, h * 0.1, w * 0.3); s.fillStyle = "rgba(255,230,190,.7)"; s.fill();
+  }, 4);
+  c.save(); c.translate(w * 0.62, h * 0.52); c.rotate(0.18); c.fillStyle = "#E9DCC6"; c.fillRect(-w * 0.2, -w * 0.14, w * 0.4, w * 0.28); c.fillStyle = "#4F86C6"; c.fillRect(-w * 0.2, -w * 0.14, w * 0.04, w * 0.28); c.fillStyle = "#3A2A20"; c.fillRect(-w * 0.1, -w * 0.02, w * 0.18, w * 0.02); c.restore();
+  [[0.32, 0.4, "#F3E6D2", "#B07A4A"], [0.42, 0.62, "#2A1A12", "#6B4428"]].forEach(([x, y, a, b], i) => {
+    disc(c, w * x, h * y, w * 0.12); c.fillStyle = "#FBF6EE"; c.fill();
+    disc(c, w * x, h * y, w * 0.09); c.fillStyle = rad(c, w * x, h * y, w * 0.09, a, b); c.fill();
+    if (!i) { c.beginPath(); for (let k = 0; k < 40; k++) { const r = w * 0.04 * (k / 40), an = k * 0.5 + T * 0.3; c.lineTo(w * x + Math.cos(an) * r, h * y + Math.sin(an) * r); } c.lineWidth = 1.5; c.strokeStyle = "rgba(255,255,255,.7)"; c.stroke(); }
+  });
+  for (let k = 0; k < p.heroCount; k++) { const x = w * (0.12 + k * 0.13), on = k <= day; circle(c, x, h * 0.8, k === 5 ? w * 0.025 : w * 0.015, on ? (k === 5 ? "#F5B630" : "#FBF6EE") : "rgba(251,246,238,.3)"); }
+  posterType(c, w, h, p, "#FBF6EE", "#E6CFAE", { y: h * 0.93, size: w * 0.13 });
+}
+const NEW_CARDS = [
+  { track: 1, name: "Prologue", line: "about life and love", hero: "a curtain opening: a spoken intro with no imagery", heroCount: 10, heroUnit: "curtain folds, one per spoken line",
+    setting: "A stage before the first song", supporting: "his first CD · thanks to the listener · life and love, the good and the bad", people: "He speaks to you directly",
+    motion: "Opening: the folds part onto warm light", mood: "Warm and expectant: velvet red, stage gold", arc: "A single spoken stanza that opens the album", draw: blendPrologue,
+    absNote: "Ten curtain folds, one for each spoken line, part slowly onto warm stage light. The song has no imagery to count, so the poster is the album's curtain." },
+  { track: 2, name: "妹妹", line: "好像變了晴天", hero: "天氣 the weather turning: cloudy, stormy, then sunny", heroCount: 3, heroUnit: "weather turns",
+    setting: "A family memory around 1987, then the present", supporting: "多雲天 · 暴雨天 · 晴天 · 媽媽 · 表妹", people: "Him at five, his cousin at one, then at seventeen",
+    motion: "Clearing: storm in one corner, sun in the other", mood: "Tender: grey storm giving way to warm gold", arc: "Childhood → a blink → she is seventeen", draw: blendSister,
+    absNote: "The sky clears on the diagonal, storm to sun, the three weathers of the verse. Two discs stand under it, a big cousin and a little one, and the little one slowly grows." },
+  { track: 4, name: "每天每天", line: "約好去看地中海", hero: "地中海 the promised Mediterranean blue", heroCount: 4, heroUnit: "times the sea is promised",
+    setting: "A busy, dull roadside, every day", supporting: "路旁 · 右手邊 · 搞笑片 · 地中海 · friend", people: "Two friends walking, her on his right",
+    motion: "Repetition: the same street every day, the sea far off", mood: "Grey everyday with one band of blue", arc: "Routine → confession: friend to more than a friend", draw: blendEveryday,
+    absNote: "The same grey street every day, one fine line per day running to the horizon. On the horizon a single band of Mediterranean blue, marked four times for the four promises, and two slim forms side by side, one always on the other's right." },
+  { track: 5, name: "女人", line: "只有一張舊照片", hero: "舊照片 an old photograph held in a hand", heroCount: 8, heroUnit: "times 女人 is sung",
+    setting: "No landscape: advice to a man, then a future regret", supporting: "維納斯 Venus's world · 眼 · 手 · 舊照片", people: "A man, the woman he takes for granted",
+    motion: "Held: one frame, tilted, fading", mood: "Rose and warm, a little regretful", arc: "Present quarrels → an imagined regret, holding only a photo", draw: blendWoman,
+    absNote: "An old photograph held at a tilt, its picture fading in eight bands for the eight times 女人 is sung. Venus is one small bright planet in a rose sky." },
+  { track: 6, name: "叫我怎麼說", line: "就像在舊電影裡的", hero: "舊電影 a chance meeting on a street, framed like an old movie", heroCount: 12, heroUnit: "film frames, one per 愛",
+    setting: "A street in an old film", supporting: "街上 · 電影 · 情男情女", people: "Two lovers meeting by chance",
+    motion: "Meeting: two figures drifting toward each other", mood: "Sepia, grain, a warm light leak", arc: "Hesitation → confession, unresolved", draw: blendMovie,
+    absNote: "Sepia film with two soft figures drifting toward each other in the frame. Twelve frames run down each edge, one for each time the lyrics sing 愛, the most of any song here." },
+  { track: 7, name: "哪怕", line: "眼睛在說話", hero: "眼睛 her eyes in close-up, about to speak", heroCount: 4, heroUnit: "lines of her face in a row",
+    setting: "A dance floor, in close-up", supporting: "頭 · 臉 · 雙目 · 眼睛 · 舞 · 心 · 脈", people: "Her face; him stepping out of the dance",
+    motion: "Close-up: one eye, blinking; his pulse racing", mood: "Magenta and nervous: all heart, no landscape", arc: "Her face → his chest; looking → hiding", draw: blendEye,
+    absNote: "One huge eye in close-up, blinking, with four lines above it for the four lines of her face in a row. Across the bottom his pulse runs, spiking at the song's 64 BPM: the doctor taking it." },
+  { track: 9, name: "我們能不能", line: "一個太陽下", hero: "地球 a small earth in a huge universe, under one sun", heroCount: 8, heroUnit: "figures, one per chorus",
+    setting: "The cosmos, down to countries, friends and home", supporting: "宇宙 · 地球 · 太陽 · 膚色 every skin colour", people: "Everyone, of every skin tone",
+    motion: "Orbit: figures circling one small planet", mood: "Deep night blue with one warm sun", arc: "Cosmos → home → a hoped-for future", draw: blendEarth,
+    absNote: "A small earth in a huge dark universe, lit by one sun from above. Eight figures of different skin tones circle it on one ring, one for each time the chorus asks 我們能不能." },
+  { track: 11, name: "總結", line: "打了一個結", hero: "結 a string tied in knots, which the lexicon misses", heroCount: 5, heroUnit: "knots",
+    setting: "Before history, then endless plains under a sky of butterflies", supporting: "祖先 · 閃電 · 蝴蝶 · 原野 · 雲煙 · 千條虛線", people: "Silent ancestors, you and me",
+    motion: "One line: a string drawn across everything", mood: "Wide sky and green plains, one dark red thread", arc: "Prehistory → the present → the end of a story", draw: blendKnot,
+    absNote: "One dark red string drawn across the whole poster and tied in five knots, the song's real motif. Under it the plains; above, a sky of butterflies; behind, a thousand faint dotted lines." },
+  { track: 12, name: "趕場", line: "多看兩岸的風光", hero: "趕 the rush, against one calm river", heroCount: 3, heroUnit: "friends who never meet",
+    setting: "Roads, shows, exam halls, commutes; and two riverbanks", supporting: "路上 · 早場 尾場 · 科場 試場 · 兩岸 · 東西南北", people: "You, me and her, each promising a get-together",
+    motion: "Rush: streaks of light hurrying left to right", mood: "Hurried amber against calm river blue and green", arc: "The same scene loops while time slides back; the bridge pauses at the river", draw: blendRush,
+    absNote: "On the left the rush: streaks of hurrying light in three groups, for the three friends who keep promising to meet and never do. On the right a calm river between two green banks, the song's one pause." },
+  { track: 13, name: "等著你回來", line: "樑上燕子已回來", hero: "四季 the four seasons turning, and an empty doorway", heroCount: 4, heroUnit: "seasons",
+    setting: "A courtyard with a roof beam and a path to the gate", supporting: "燕子 · 春花 · 樑 · 庭前 · 春光 · 熱淚 · winter spring summer fall", people: "Him, waiting; you, not yet back",
+    motion: "Return: everything comes back around except one", mood: "Soft seasonal pastels around a warm empty door", arc: "Hope (spring light) → tears", draw: blendSeasons,
+    absNote: "The four seasons as four soft quarters turning slowly, the only song that names all four. The swallows come back around them; at the centre the doorway stays empty." },
+  { track: 14, name: "認識你", line: "那就星期六看電影", hero: "咖啡 a café table for two", heroCount: 6, heroUnit: "days, Monday to Saturday",
+    setting: "A café, then a phone, then a weekend film", supporting: "cappuccino · 書 · 手機 · 電話 · 電影", people: "Two strangers at one table",
+    motion: "Counting down: the days light up toward Saturday", mood: "Warm coffee browns and cream", arc: "Strangers at a table → a date on Saturday", draw: blendCafe,
+    absNote: "A café table from above: a cappuccino with its swirl, a dark coffee, and her book with its name. Six dots light up in turn, Monday to Saturday, and Saturday's is the film." },
+];
+NEW_CARDS.forEach(cd => { cd.bpm = TEMPO[cd.track - 1]; cd.newCard = true; });
+CARDS.push(...NEW_CARDS); CARDS.sort((a, b) => a.track - b.track);
+// three live versions of each poster: blend (the default), pixel and geometric; the first illustrated drafts stay one click away
 const ABS = {
-  3: [absWind, "A peach-red ring blown out of round over a green field bent by the wind. The ring has 33 segments, 11 × 3 for the 11 times 春風 is sung; eleven white bars of wind cross the sky."],
-  8: [absLenses, "Two dark rings for the glasses, five bands each for the five times the moon over the spring returns. In the left lens the moon and its reflection, in the right the rainbow he plays. Red strings fall to a gold point and the sound opens below in rings of gold."],
-  10: [absJump, "A grey checker world, whole on the left of a crack and shattered on the right. Out of the crack rises an arch of six rainbow bands, one for each time 彩虹 is sung, and eight squares jump on the beat at 120 BPM."],
+  3: [blendWind, pixWind, "Flow. Eleven ribbons of wind, one for each time 春風 is sung, sweep up across the whole poster, pink, willow green and sky melting together. The peach blossom rides them as one sharp red flower, and its petals are carried off along the same lines."],
+  8: [blendLenses, pixLenses, "Frame. A dark alley lit by one candle, and two great lenses hanging in it: black voids with gold light along their rims and five faint rings within, for the five times the moon over the spring returns. In the left the moon and its reflection, in the right the rainbow he plays. His sound falls from the strings as streaks of light."],
+  10: [blendJump, pixJump, "Split, then healed. A grey world cut down the middle: smooth on the left, broken into tilted slabs on the right that drift apart and slowly come back together. Out of the crack a rainbow of six bands, one for each time 彩虹 is sung, rises from the warm ground, and eight bright forms jump together on the 120 BPM beat."],
 };
-CARDS.forEach(cd => { cd.drawIllus = cd.draw; cd.draw = (ABS[cd.track] || [cd.draw])[0]; cd.absNote = (ABS[cd.track] || [])[1]; });
-const PLATES = [{ ...ALBUM, album: true, draw: absAlbum, drawIllus: drawAlbum,
-  about: "Fourteen checker columns, one per song in track order. A column's cells get smaller as the song gets faster, it stands taller the brighter the song is, and its two colours are the song's mood and its main image. Through them turns one ring made of all fourteen colours: the album as a whole. Read left to right, the night of 南音 sits in the middle like a dark seam." }, ...CARDS];
+const PIXNOTE = {
+  3: "A five-petalled peach blossom in red and pink, with eleven stepped bands of wind flowing past it and petals blowing off the grid.",
+  8: "A pair of pixel sunglasses: five rings in each rim, a moon over its reflection in the left lens, the rainbow he plays in the right. Red strings fall to a gold bridge and the sound spreads from it in stepped rings.",
+  10: "The world as a pixel disc, whole on the left and scattered on the right; the scatter slowly fills back in until the halves are one. A stepped rainbow of six bands rises from the crack around a sun, and eight blocks jump on the beat.",
+};
+const GEO = {
+  3: [absWind, "A red disc for the peach blossom and eleven lines of wind, one for each time 春風 is sung. Willow leans downwind as green blades, a cloud is a hatched half disc, petals are carried off the page, and the river runs along the bottom as a strip of blue and white checks."],
+  8: [absLenses, "Two black discs for the glasses, five fine rings in each for the five times the moon over the spring returns. In the left lens a silver half moon above its reflection, in the right the rainbow he plays. Red strings fall to a gold triangle, the sound rises from it in arcs, and the listeners he cannot see are a field of dots."],
+  10: [absJump, "The world as one grey disc: whole on the left of a crack, broken into drifting shards on the right, with dark arrows flying in. Out of the crack rise six rainbow bands, one for each time 彩虹 is sung, crossed by the rays of one sun. Eight shapes jump on the beat at 120 BPM, joined by a single line."],
+};
+CARDS.forEach(cd => {
+  const A = ABS[cd.track], G = GEO[cd.track];
+  cd.drawIllus = cd.draw;
+  if (A) Object.assign(cd, { draw: A[0], drawPixel: A[1], absNote: A[2], pixNote: PIXNOTE[cd.track] });
+  if (cd.newCard) cd.drawIllus = null;
+  if (G) Object.assign(cd, { drawGeo: G[0], geoNote: G[1] });
+});
+const PLATES = [{ ...ALBUM, album: true, draw: blendAlbum, drawPixel: pixAlbum, drawGeo: absAlbum, drawIllus: drawAlbum,
+  about: "Of the 262 imagery words on the album, three kinds lead by far: his heart and body (64, 心 alone 22), the people at home (51) and the street (46). The poster is those three, abstracted: the street a band of light sweeping up from the corner, home an open embrace it runs into, and the heart a glowing core held inside it, each as big as the album uses it. Everything else he sings of is a soft cloud around them, as large as it is common. The fourteen songs travel the street toward home in track order, each in the shape of its bar (a square for 4/4, a triangle for 3/4, a wavy square for 12/8), coloured by its lyric imagery, flashing and turning on its own beat.",
+  pixAbout: "A stepped, stacked chart across the fourteen songs in track order: the main-image colour stands as tall as the song's energy, the mood colour as tall as its brightness, and a dark band as thick as its tempo. Hover a song and its stretch of the chart lifts.",
+  geoAbout: "Fourteen columns, one per song in track order. Each is a stack of shapes: more of them the faster the song, circles for the quiet songs, half discs for the middle ones and triangles for the most energetic. A column stands taller the brighter the song is, and its two colours are the song's mood and its main image. Through them turns one ring of fourteen arcs, thicker where the song has more energy: the album as a whole." }, ...CARDS];
 const prints = document.getElementById("prints");
 const esc = v => String(v).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
 prints.innerHTML = `
@@ -2279,13 +3124,15 @@ const songFor = track => (typeof songs !== "undefined" ? songs.find(s => /soulbo
 function card(p) {
   if (p.album) return `
     <h2>Soulboy<span>2005 · 14 songs</span></h2>
-    <p class="about">${esc(p.about)}</p>
+    <p class="about">${esc(style.id === "pixel" ? p.pixAbout : style.id === "flat" ? p.about : p.geoAbout)}</p>
+    <p class="hint">Colour = each song's lyric imagery, in the garden's colour key. The spoken Prologue has none, so it is grey.</p>
     <p class="hint">Hover a station to hear its song${typeof soundOn !== "undefined" && soundOn ? "" : " (turn sound on first)"}.</p>
     <ol class="stations">${p.stations.map(s => `<li><b>${String(s.track).padStart(2, "0")}</b><span lang="zh">${esc(s.name)}</span><em>${esc(s.note)}</em></li>`).join("")}</ol>`;
   return `
     <h2 lang="zh">${esc(p.name)}<span>Soulboy · track ${p.track} · ${Math.round(p.bpm)} BPM</span></h2>
     <p class="line" lang="zh">「${esc(p.line)}」</p>
-    <p class="about">${esc(style.id === "illus" || !p.absNote ? p.motion + ". " + p.mood + "." : p.absNote)}</p>
+    <p class="about">${esc(style.id === "illus" || !p.absNote ? p.motion + ". " + p.mood + "." : style.id === "pixel" ? p.pixNote || p.absNote : style.id === "flat" ? p.absNote : p.geoNote || p.absNote)}</p>
+    ${style.id === "flat" ? `<p class="hint swatches">Colour = lyric imagery: ${(imageryOf(p.track) || []).map(([val, col, zh]) => `<span><i style="background:${col}"></i>${esc(zh)} ${Math.round(val * 100)}%</span>`).join("") || "none (spoken intro), so it stays grey"}</p>` : ""}
     <p class="hint">Hover the poster to hear the song${typeof soundOn !== "undefined" && soundOn ? "" : " (turn sound on first)"}.</p>
     <dl>
       <dt>Main image</dt><dd>${esc(p.hero)} <span class="count">→ ${p.heroCount} ${esc(p.heroUnit)}</span></dd>
@@ -2306,8 +3153,11 @@ function size() {
   const p = PLATES[cur], boxW = plateBox.clientWidth;
   if (!boxW) return;
   const top = plateBox.getBoundingClientRect().top + window.scrollY;
-  const availH = Math.max(380, window.innerHeight - top - 70);
-  if (p.album) { pw = boxW; ph = Math.min(availH, boxW * 0.9); if (boxW < 700) ph = boxW * 1.05; }
+  // leave room for the two rows of toggles under the poster, so nothing needs scrolling
+  const below = [".plate-nav", ".style-bar"].reduce((a, q) => a + ((document.querySelector(".posters " + q) || {}).offsetHeight || 0), 0) + 28;
+  const availH = Math.max(320, window.innerHeight - top - below);
+  // the blend album is a poster like the songs; the other styles keep the wide plate
+  if (p.album && style.id !== "flat") { pw = boxW; ph = Math.min(availH, boxW * 0.62); if (boxW < 700) ph = boxW * 1.05; }
   else { ph = Math.min(availH, boxW * 4 / 3); pw = ph * 3 / 4; }
   dpr = Math.max(1, Math.min(2, devicePixelRatio || 1));
   cv.width = off.width = Math.round(pw * dpr); cv.height = off.height = Math.round(ph * dpr); cv.style.width = pw + "px"; cv.style.height = ph + "px";
@@ -2331,7 +3181,14 @@ function hoverAt(e) {
   const r = cv.getBoundingClientRect(), x = e.clientX - r.left, p = PLATES[cur];
   let s = null;
   const was = hoverStation;
-  if (p.album) { hoverStation = Math.max(0, Math.min(p.stations.length - 1, Math.round(((x / pw) - 0.06) / 0.88 * (p.stations.length - 1)))); s = songFor(p.stations[hoverStation].track); }
+  if (p.album && style.id === "flat" && p._hit) {
+    // the blend album is his figure cut into blocks, so hover picks the block under the pointer; an open poster stays open under it
+    const y = e.clientY - r.top, o = p._open; let best;
+    if (o && hoverStation >= 0 && x >= o[0] && x <= o[2] && y >= o[1] && y <= o[3]) best = hoverStation;
+    else best = p._hit(x, y);
+    hoverStation = best; s = best >= 0 ? songFor(p.stations[best].track) : null;
+  }
+  else if (p.album) { hoverStation = Math.max(0, Math.min(p.stations.length - 1, Math.round(((x / pw) - 0.06) / 0.88 * (p.stations.length - 1)))); s = songFor(p.stations[hoverStation].track); }
   else s = songFor(p.track);
   hoverPlate = true;
   if (was !== hoverStation) dirty = true;
@@ -2345,9 +3202,11 @@ function frame(ms) {
   requestAnimationFrame(frame);
   if (prints.closest("[hidden]") || !pw) return;
   const t = ms / 1000, c = cv.getContext("2d"), p = PLATES[cur];
-  if (style.id === "flat" || style.id === "illus") {
+  const live = { flat: p.draw, pixel: p.drawPixel || p.draw, geo: p.drawGeo || p.draw, illus: p.drawIllus || p.draw }[style.id];
+  if (live) {
     c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, pw, ph);
-    (style.id === "illus" ? p.drawIllus : p.draw)(c, pw, ph, t, p, hoverStation);
+    if (style.id === "flat" && !p.album) drawTinted(live, c, pw, ph, t, p, hoverStation);
+    else live(c, pw, ph, t, p, hoverStation);
     finish(c, pw, ph);
     return;
   }
@@ -2356,7 +3215,8 @@ function frame(ms) {
   lastStyled = ms; dirty = false;
   const oc = off.getContext("2d", { willReadFrequently: true });
   oc.setTransform(dpr, 0, 0, dpr, 0, 0); oc.clearRect(0, 0, pw, ph);
-  p.draw(oc, pw, ph, t, p, hoverStation);
+  // the painters and print traditions rework the geometric version, whose flat shapes suit them best
+  (p.drawGeo || p.draw)(oc, pw, ph, t, p, hoverStation);
   stylise(style, off, c, pw, ph, dpr, p.name);
 }
 new ResizeObserver(size).observe(plateBox);
