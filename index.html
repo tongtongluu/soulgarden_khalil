@@ -2546,7 +2546,7 @@ function soulboyAlbum(S) {
 }
 function bez(p0, p1, p2, p3, u) { const v = 1 - u; return [0, 1].map(i => v * v * v * p0[i] + 3 * v * v * u * p1[i] + 3 * v * u * u * p2[i] + u * u * u * p3[i]); }
 function blendAlbum(c, w, h, t, card, hs = -1) {
-  if (!card._album || !card._album.recs[0].color) card._album = albumCounts(soulboyAlbum(card.stations));
+  if (!card._album || !card._album.recs.some(r => r.color)) card._album = albumCounts(soulboyAlbum(card.stations));
   drawAlbumPoster(c, w, h, t, card, card._album, hs);
 }
 // the same poster for any album: the most-sung kind of imagery is the glowing core, the second the embrace around it,
@@ -3099,6 +3099,33 @@ const PLATES = [{ ...ALBUM, album: true, draw: blendAlbum, drawPixel: pixAlbum, 
   about: "Of the 262 imagery words on the album, three kinds lead by far: his heart and body (64, 心 alone 22), the people at home (51) and the street (46). The poster is those three, abstracted: the street a band of light sweeping up from the corner, home an open embrace it runs into, and the heart a glowing core held inside it, each as big as the album uses it. Everything else he sings of is a soft cloud around them, as large as it is common. The fourteen songs travel the street toward home in track order, each in the shape of its bar (a square for 4/4, a triangle for 3/4, a wavy square for 12/8), coloured by its lyric imagery, flashing and turning on its own beat.",
   pixAbout: "A stepped, stacked chart across the fourteen songs in track order: the main-image colour stands as tall as the song's energy, the mood colour as tall as its brightness, and a dark band as thick as its tempo. Hover a song and its stretch of the chart lifts.",
   geoAbout: "Fourteen columns, one per song in track order. Each is a stack of shapes: more of them the faster the song, circles for the quiet songs, half discs for the middle ones and triangles for the most energetic. A column stands taller the brighter the song is, and its two colours are the song's mood and its main image. Through them turns one ring of fourteen arcs, thicker where the song has more energy: the album as a whole." }, ...CARDS];
+// ---- the second album, This Love / 愛愛愛 (2006): the same counts as Soulboy's, from soul-garden-data/this-love/tracks.json ----
+// imagery hits per group, imagery words as word:group:count, measured tempo and bar. 春風吹之吹吹風Mix has no measured tempo, so it keeps 90.
+const THIS_LOVE = [{"track":1,"name":"愛愛愛","lines":18,"imagery":{"body_gesture":0,"time_memory":0,"people_relationships":4,"city_street":2,"cosmos":0,"sky_weather":0,"nature_plants":7,"light_fire":0,"night_moon":0,"water":5},"terms":["海:9:5","家:2:4","樹:6:3","花:6:3","桃花:6:1","街:3:1","電影:3:1"],"tempo":66,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b8/bd/7e/b8bd7ee8-0e9d-566f-4cca-8bfe6e18fa75/mzaf_1453766286012772639.plus.aac.p.m4a"},{"track":2,"name":"蘇麗珍","lines":30,"imagery":{"body_gesture":1,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":3,"light_fire":0,"night_moon":0,"water":0},"terms":["花:6:3","頭:0:1"],"tempo":88.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/86/61/b3/8661b3ef-4045-be5d-e73b-138a3827bf5b/mzaf_15124720786251433710.plus.aac.p.m4a"},{"track":3,"name":"歌手與模特兒","lines":46,"imagery":{"body_gesture":9,"time_memory":0,"people_relationships":1,"city_street":0,"cosmos":0,"sky_weather":3,"nature_plants":0,"light_fire":3,"night_moon":0,"water":0},"terms":["臉:0:5","光:7:3","風:5:3","眼:0:2","家:2:1","心:0:1","手:0:1"],"tempo":73.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/58/50/38/585038dd-f55b-c5ff-269d-d8267871397d/mzaf_16953057221375593774.plus.aac.p.m4a"},{"track":4,"name":"唉!","lines":34,"imagery":{"body_gesture":2,"time_memory":0,"people_relationships":10,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":["妹妹:2:4","墨鏡:0:2","媽媽:2:2","家:2:2","朋友:2:2"],"tempo":92,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3e/cd/9a/3ecd9a50-6c08-ec5c-9092-851b5ed9580f/mzaf_13613359387326311800.plus.aac.p.m4a"},{"track":5,"name":"四人遊","lines":45,"imagery":{"body_gesture":10,"time_memory":0,"people_relationships":5,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":1,"water":0},"terms":["頭:0:6","朋友:2:5","手:0:3","夜:8:1","眼淚:0:1"],"tempo":75.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/13/79/a4/1379a403-72aa-8049-10e5-7528f321744e/mzaf_15694587935441905750.plus.aac.p.m4a"},{"track":6,"name":"手拖手","lines":13,"imagery":{"body_gesture":6,"time_memory":0,"people_relationships":0,"city_street":1,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":1,"water":0},"terms":["心:0:3","手:0:2","月:8:1","舞:0:1","路:3:1"],"tempo":68.5,"beats_per_bar":12,"feel":"triplet (12/8)","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9e/1c/31/9e1c3126-84c5-fd75-5a32-9b1300203fdf/mzaf_11488019507183491661.plus.aac.p.m4a"},{"track":7,"name":"偷笑","lines":38,"imagery":{"body_gesture":6,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":2},"terms":["心:0:4","手:0:2","水:9:2"],"tempo":131,"beats_per_bar":3,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/20/c4/60/20c46010-0c00-6370-ed83-8b2af9fba1a9/mzaf_12061536084731180113.plus.aac.p.m4a"},{"track":8,"name":"Goodbye Melody Rose","lines":17,"imagery":{"body_gesture":3,"time_memory":0,"people_relationships":0,"city_street":1,"cosmos":0,"sky_weather":1,"nature_plants":0,"light_fire":0,"night_moon":0,"water":1},"terms":["頭:0:2","城:3:1","水:9:1","眼淚:0:1","雨:5:1"],"tempo":78,"beats_per_bar":12,"feel":"triplet (12/8)","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4b/67/28/4b6728ac-d2f3-642d-a208-5d3d297048b6/mzaf_13704215799642765582.plus.aac.p.m4a"},{"track":9,"name":"詩人的情人","lines":24,"imagery":{"body_gesture":5,"time_memory":0,"people_relationships":0,"city_street":1,"cosmos":0,"sky_weather":1,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":["手:0:4","北風:5:1","城:3:1","心:0:1"],"tempo":67,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/85/c9/3a/85c93aba-ab01-f759-c9cf-4c3375fd8148/mzaf_1510647169090981382.plus.aac.p.m4a"},{"track":10,"name":"拖男帶女","lines":54,"imagery":{"body_gesture":4,"time_memory":1,"people_relationships":1,"city_street":0,"cosmos":2,"sky_weather":1,"nature_plants":0,"light_fire":0,"night_moon":1,"water":1},"terms":["心:0:4","friend:2:1","sun:4:1","夏天:1:1","太陽:4:1","春風:5:1","月:8:1","海:9:1"],"tempo":97.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3e/98/92/3e989268-049c-4b61-0884-fd08e3c21130/mzaf_14914902021696607515.plus.aac.p.m4a"},{"track":11,"name":"Love Outrolude (Instrumental)","lines":0,"imagery":{"body_gesture":0,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":[],"tempo":63,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/35/d2/ba/35d2ba60-d223-0542-e7c4-f2bdc722d260/mzaf_13099010327550584627.plus.aac.p.m4a"},{"track":12,"name":"If You Leave Me Now","lines":33,"imagery":{"body_gesture":0,"time_memory":0,"people_relationships":0,"city_street":0,"cosmos":0,"sky_weather":0,"nature_plants":0,"light_fire":0,"night_moon":0,"water":0},"terms":[],"tempo":96.5,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/48/2a/cd/482acda8-f100-7583-dc2e-fbab54ce2f1c/mzaf_8886205228524802294.plus.aac.p.m4a"},{"track":13,"name":"春風吹之吹吹風Mix","lines":32,"imagery":{"body_gesture":2,"time_memory":5,"people_relationships":0,"city_street":2,"cosmos":0,"sky_weather":8,"nature_plants":9,"light_fire":0,"night_moon":0,"water":1},"terms":["春風:5:6","冬日:1:2","原上草:6:2","夏天:1:2","流淚:0:2","蛇:6:2","三月:1:1","城裡:3:1","悶雷:5:1","柳樹:6:1","桃花:6:1","河水:9:1","燕子:6:1","玫瑰:6:1","路上:3:1","雲堆:5:1","青蛙:6:1"],"tempo":null,"beats_per_bar":4,"feel":"straight","preview_url":"https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d3/52/58/d3525893-f2df-aec6-b6b0-83ff02d5c493/mzaf_4334223756224608925.plus.aac.p.m4a"}];
+function thisLoveAlbum() {
+  return albumCounts({ title: "This Love", year: 2006, songs: THIS_LOVE.map(d => {
+    const top = HOME_KEYS.slice().sort((a, b) => (d.imagery[b] || 0) - (d.imagery[a] || 0))[0], n = d.beats_per_bar;
+    return { name: d.name, track: d.track, imagery: d.imagery, terms: d.terms.map(x => { const [w, c, k] = x.split(":"); return [w, CAT_IDS[+c], +k]; }),
+      tempo: d.tempo || 90, bar: n > 3 && n % 3 === 0 ? n / 3 : n, rh: { beats_per_bar: n, feel: d.feel }, lines: d.lines,
+      color: d.imagery[top] ? catColor(CATS.find(c => c.id === top)) : null, preview_url: d.preview_url };
+  }) });
+}
+// two albums side by side, each its own poster, drawn by the same rules so that only the data differs
+function compareAlbums(c, w, h, t, p, hs = -1) {
+  const gap = w * 0.03, pw = (w - gap) / 2, L = p._L || (p._L = { stations: PLATES[0].stations }), R = p._R || (p._R = {});
+  if (!R._album) R._album = thisLoveAlbum();
+  const nL = PLATES[0].stations.length;
+  c.fillStyle = "#0F0C14"; c.fillRect(0, 0, w, h);
+  c.save(); c.beginPath(); c.rect(0, 0, pw, h); c.clip(); blendAlbum(c, pw, h, t, L, hs < nL ? hs : -1); c.restore();
+  c.save(); c.translate(pw + gap, 0); c.beginPath(); c.rect(0, 0, pw, h); c.clip(); drawAlbumPoster(c, pw, h, t, R, R._album, hs >= nL ? hs - nL : -1); c.restore();
+  p._hit = (x, y) => { if (x < pw) return L._hit ? L._hit(x, y) : -1; const k = R._hit ? R._hit(x - pw - gap, y) : -1; return k >= 0 ? k + nL : -1; };
+  p._open = null;
+}
+const THIS_LOVE_STATIONS = THIS_LOVE.map(d => ({ track: d.track, name: d.name, note: "", album: "This Love", preview_url: d.preview_url }));
+PLATES.splice(1, 0,
+  { album: true, portrait: true, tab: "This Love · the album", name: "This Love", stations: THIS_LOVE_STATIONS, about: "", pixAbout: "", geoAbout: "",
+    draw(c, w, h, t, p, hs) { if (!p._album) p._album = thisLoveAlbum(); drawAlbumPoster(c, w, h, t, p, p._album, hs); } },
+  { album: true, compare: true, tab: "Soulboy × This Love", name: "Compare", stations: [...PLATES[0].stations, ...THIS_LOVE_STATIONS], about: "", pixAbout: "", geoAbout: "", draw: compareAlbums });
 const prints = document.getElementById("prints");
 const esc = v => String(v).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
 prints.innerHTML = `
@@ -3108,7 +3135,7 @@ prints.innerHTML = `
   </div>
   <nav class="plate-nav" aria-label="Posters">
     <button type="button" id="plate-prev" aria-label="Previous poster">←</button>
-    ${PLATES.map((p, i) => `<button type="button" class="plate-tab" data-i="${i}" lang="zh">${p.album ? "Soulboy · the album" : esc(p.name)}</button>`).join("")}
+    ${PLATES.map((p, i) => `<button type="button" class="plate-tab" data-i="${i}" lang="zh">${p.tab ? esc(p.tab) : p.album ? "Soulboy · the album" : esc(p.name)}</button>`).join("")}
     <button type="button" id="plate-next" aria-label="Next poster">→</button>
   </nav>
   <div class="style-bar" role="group" aria-label="Print style">
@@ -3157,7 +3184,8 @@ function size() {
   const below = [".plate-nav", ".style-bar"].reduce((a, q) => a + ((document.querySelector(".posters " + q) || {}).offsetHeight || 0), 0) + 28;
   const availH = Math.max(320, window.innerHeight - top - below);
   // the blend album is a poster like the songs; the other styles keep the wide plate
-  if (p.album && style.id !== "flat") { pw = boxW; ph = Math.min(availH, boxW * 0.62); if (boxW < 700) ph = boxW * 1.05; }
+  if (p.compare) { ph = Math.min(availH, ((boxW - boxW * 0.03) / 2) * 4 / 3); pw = Math.min(boxW, (ph * 3 / 4) * 2 / 0.97); }
+  else if (p.album && style.id !== "flat" && !p.portrait) { pw = boxW; ph = Math.min(availH, boxW * 0.62); if (boxW < 700) ph = boxW * 1.05; }
   else { ph = Math.min(availH, boxW * 4 / 3); pw = ph * 3 / 4; }
   dpr = Math.max(1, Math.min(2, devicePixelRatio || 1));
   cv.width = off.width = Math.round(pw * dpr); cv.height = off.height = Math.round(ph * dpr); cv.style.width = pw + "px"; cv.style.height = ph + "px";
@@ -3186,7 +3214,8 @@ function hoverAt(e) {
     const y = e.clientY - r.top, o = p._open; let best;
     if (o && hoverStation >= 0 && x >= o[0] && x <= o[2] && y >= o[1] && y <= o[3]) best = hoverStation;
     else best = p._hit(x, y);
-    hoverStation = best; s = best >= 0 ? songFor(p.stations[best].track) : null;
+    hoverStation = best; const st = best >= 0 ? p.stations[best] : null;
+    s = !st ? null : st.album ? (typeof songs !== "undefined" && songs.find(x => x.album === st.album && x.track === st.track)) || st : songFor(st.track);
   }
   else if (p.album) { hoverStation = Math.max(0, Math.min(p.stations.length - 1, Math.round(((x / pw) - 0.06) / 0.88 * (p.stations.length - 1)))); s = songFor(p.stations[hoverStation].track); }
   else s = songFor(p.track);
