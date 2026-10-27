@@ -120,12 +120,18 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 .posters .stations b { font: 500 10px var(--mono); color: var(--muted); }
 .posters .stations span { font: 500 11.5px "Noto Serif SC", var(--display); white-space: nowrap; }
 .posters .stations em { font-style: normal; color: var(--muted); font-size: 11px; min-width: 0; }
+.posters .album-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; justify-content: center; }
+.posters .album-nav button { border: 0; background: transparent; color: var(--muted); font: 500 15px var(--display); padding: 6px 4px; cursor: pointer; }
+.posters .album-nav button:hover, .posters .album-nav button[aria-pressed="true"] { color: var(--fg); }
+.posters .album-nav button[aria-pressed="true"] { box-shadow: inset 0 -2px 0 var(--fg); }
+.posters .album-nav button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 .posters .plate-nav { display: flex; flex-wrap: wrap; gap: 4px 6px; justify-content: center; }
+.posters .plate-nav[hidden] { display: none; }
 .posters .plate-nav button { border: 0; background: transparent; color: var(--muted); font: 500 12px var(--body); padding: 6px 10px; border-radius: 999px; cursor: pointer; }
 .posters .plate-nav button:hover, .posters .plate-nav button[aria-pressed="true"] { color: var(--fg); }
 .posters .plate-nav button[aria-pressed="true"] { box-shadow: inset 0 -1px 0 var(--fg); border-radius: 0; }
 .posters .plate-nav button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
-@media (max-width: 860px) { .posters .prints { display: grid; gap: 18px; } .posters .viewer { display: contents; } .posters .plate { order: -2; } .posters .plate-nav, .posters .style-bar { order: -1; } }
+@media (max-width: 860px) { .posters .prints { display: grid; gap: 18px; } .posters .viewer { display: contents; } .posters .plate { order: -2; } .posters .album-nav, .posters .plate-nav, .posters .style-bar { order: -1; } }
 .posters .style-bar { display: flex; flex-wrap: wrap; gap: 4px 6px; justify-content: center; align-items: center; font-size: 11px; color: var(--muted); }
 /* the captions are hidden for now, so the poster and its two rows of toggles fit on one screen */
 .posters .plate-text { display: none; }
@@ -2950,6 +2956,7 @@ function wonderScene(c, w, h, t, card, hs = -1) {
 // the big type is the sentence; each image word in it is drawn in its colour, and lights the songs that sing it
 const ALBUM_KEY = { "Soulboy": "soulboy", "This Love": "thislove", "未來": "wonderland" };
 function albumRows(key) {
+  if (key === "all") return ["soulboy", "thislove", "wonderland"].flatMap(albumRows);
   if (key === "wonderland") return WONDERLAND;
   if (key === "thislove") return THIS_LOVE.map(d => ({ track: d.track, name: d.name.replace(" (Instrumental)", ""), terms: d.terms, objects: [] }));
   return SOULBOY.map(d => ({ track: d.track, name: d.name, terms: (d.terms || []).map(([wd, cat, n]) => `${wd}:${CAT_IDS.indexOf(cat)}:${n}`), objects: [] }));
@@ -2997,7 +3004,8 @@ function sentenceType(c, w, h, card, key, o = {}) {
   c.font = `500 ${Math.max(8, w * 0.017)}px "IBM Plex Mono", monospace`; c.fillStyle = "rgba(255,246,238,.6)"; c.fillText(o.meta, x, h * 0.055);
   // an image word under the pointer: say which songs sing it, and light them
   if (card._word) {
-    const tracks = wordSongsIn(key, card._word), rows2 = albumRows(key), names = tracks.map(tr => (rows2.find(r => r.track === tr) || {}).name).filter(Boolean);
+    const named = k => { const rows = albumRows(k); return wordSongsIn(k, card._word).map(tr => (rows.find(r => r.track === tr) || {}).name).filter(Boolean); };
+    const tracks = key === "all" ? [] : wordSongsIn(key, card._word), names = key === "all" ? ["soulboy", "thislove", "wonderland"].flatMap(named) : named(key);
     c.font = `500 ${Math.max(9, w * 0.021)}px "Noto Sans SC", sans-serif`; c.fillStyle = "rgba(255,246,238,.92)";
     const ty = o.noteAbove ? y0 - size * 1.2 : yEnd + w * 0.05;
     c.fillText(`「${card._word}」唱在 ${names.length} 首歌：${names.join("、")}`, x, ty);
@@ -3804,6 +3812,33 @@ function compareAlbums(c, w, h, t, p, hs = -1) {
     if (!q || !q._hit) return -1; const i = q._hit(lx, y); return i >= 0 ? i + off : -1; };
   p._open = null;
 }
+// ---- 三張合一: the three albums blended into one poster, the way each album blends its songs' images ----
+// Each album's scene is painted whole and laid over the others through a soft mask: Soulboy rises from the lower left,
+// 未來 from the upper right, This Love lies beneath both. The masks drift slowly, so the three keep mixing.
+// The big type walks the images the albums share, in album order: Soulboy's wind and lane, This Love's rain on the city,
+// 未來's dusk snow, and the flowers, sea, rose and moon that more than one album sings.
+ALBUM_IMAGE.all = { sentence: "春風吹過小巷，燈籠照著雨裡的城，黃昏落雪，花開在海邊，玫瑰交給月亮。",
+  stations: [[0, "春風"], [0, "小巷"], [0, "燈籠"], [0, "雨"], [0, "城"], [0, "黃昏"], [0, "雪花"], [0, "花"], [0, "海"], [0, "玫瑰"], [0, "月亮"]], emblems: {} };
+function mergeAlbums(c, w, h, t, p) {
+  const L = p._L || (p._L = { stations: PLATES[0].stations }), M = p._M || (p._M = {}), R = p._R || (p._R = {});
+  if (!M._album) M._album = thisLoveAlbum();
+  const d = c.getTransform().a, W = Math.round(w * d), H = Math.round(h * d), T = reduce ? 0 : t;
+  const layers = p._layers || (p._layers = [0, 1, 2].map(() => document.createElement("canvas")));
+  const paint = (k, fn) => {
+    const l = layers[k]; if (l.width !== W || l.height !== H) { l.width = W; l.height = H; }
+    const x = l.getContext("2d"); x.setTransform(d, 0, 0, d, 0, 0); x.clearRect(0, 0, w, h);
+    posterType.off = true; try { fn(x); } finally { posterType.off = false; }
+    return x;
+  };
+  const mask = (x, cx, cy, r) => { x.save(); x.globalCompositeOperation = "destination-in"; x.fillStyle = rad(x, cx, cy, r, "rgba(0,0,0,1)", "rgba(0,0,0,0)"); x.fillRect(0, 0, w, h); x.restore(); };
+  paint(1, x => drawAlbumPoster(x, w, h, t, M, M._album, -1));
+  mask(paint(0, x => blendAlbum(x, w, h, t, L, -1)), w * (0.12 + 0.08 * Math.sin(T * 0.07)), h * (0.9 + 0.05 * Math.cos(T * 0.05)), w * 1.05);
+  mask(paint(2, x => wonderScene(x, w, h, t, R, -1)), w * (0.88 + 0.08 * Math.cos(T * 0.06)), h * (0.1 + 0.05 * Math.sin(T * 0.08)), w * 1.05);
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); [1, 0, 2].forEach(k => c.drawImage(layers[k], 0, 0)); c.restore();
+  p._hit = null; p._marks = [];
+  sentenceType(c, w, h, p, "all", { y0: h * 0.62, veil: true, noteAbove: true, title: "三張合一",
+    meta: "KHALIL FONG 方大同 · SOULBOY 2005 · THIS LOVE 2006 · 未來 2007 · 38 SONGS" });
+}
 // ---- This Love's thirteen songs: a blend poster each, the same series as Soulboy's ----
 // each poster is built from its song's scene card (soul-garden-data/this-love/01–13.md): its key line, its main image,
 // and a count from the lyrics where one carries the picture. Colour is the same data tint as Soulboy's posters.
@@ -4065,10 +4100,11 @@ PLATES.splice(1, 0,
     draw(c, w, h, t, p, hs) { if (!p._album) p._album = thisLoveAlbum(); drawAlbumPoster(c, w, h, t, p, p._album, hs); } },
   { album: true, portrait: true, tab: "未來 · the album", name: "未來", group: "wonderland", stations: WONDERLAND.map(r => ({ track: r.track, name: r.name, note: "", album: "未來", preview_url: r.preview_url })),
     about: "", pixAbout: "", geoAbout: "", draw(c, w, h, t, p, hs) { wonderScene(c, w, h, t, p, hs); } },
-  { album: true, compare: true, tab: "三張並排", name: "Compare", stations: [...PLATES[0].stations, ...THIS_LOVE_STATIONS, ...WONDERLAND.map(r => ({ track: r.track, name: r.name, note: "", album: "未來", preview_url: r.preview_url }))], about: "", pixAbout: "", geoAbout: "", draw: compareAlbums });
+  { album: true, merge: true, portrait: true, group: "all", tab: "三張合一", name: "三張合一", stations: [...PLATES[0].stations, ...THIS_LOVE_STATIONS, ...WONDERLAND.map(r => ({ track: r.track, name: r.name, note: "", album: "未來", preview_url: r.preview_url }))],
+    about: "The three albums as one poster. Each album's scene is laid over the others through a soft mask, so their images mix the way each album mixes its songs'. The sentence walks the images more than one album sings.", pixAbout: "", geoAbout: "", draw(c, w, h, t, p) { mergeAlbums(c, w, h, t, p); } });
 // This Love's songs follow Soulboy's; the tabs show the songs of whichever album is open
 PLATES.push(...TL_CARDS, ...WL_CARDS);
-PLATES.forEach((p, i) => { p.group = p.group || (i === 1 ? "thislove" : p.compare ? "compare" : "soulboy"); });
+PLATES.forEach((p, i) => { p.group = p.group || (i === 1 ? "thislove" : "soulboy"); });
 const prints = document.getElementById("prints");
 const esc = v => String(v).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
 prints.innerHTML = `
@@ -4076,9 +4112,12 @@ prints.innerHTML = `
     <aside class="plate-text" id="plate-text" aria-live="polite"></aside>
     <div class="plate" id="plate"><canvas id="plate-canvas"></canvas></div>
   </div>
+  <nav class="album-nav" aria-label="Albums">
+    ${[["all", "三張合一"], ["soulboy", "Soulboy"], ["thislove", "This Love"], ["wonderland", "未來"]].map(([g, l]) => `<button type="button" class="album-tab" data-album="${g}" lang="zh">${l}</button>`).join("")}
+  </nav>
   <nav class="plate-nav" aria-label="Posters">
     <button type="button" id="plate-prev" aria-label="Previous poster">←</button>
-    ${PLATES.map((p, i) => `<button type="button" class="plate-tab${p.album ? " is-album" : ""}" data-i="${i}" data-group="${p.group}" lang="zh">${p.tab ? esc(p.tab) : p.album ? "Soulboy · the album" : esc(p.name)}</button>`).join("")}
+    ${PLATES.map((p, i) => p.merge ? "" : `<button type="button" class="plate-tab${p.album ? " is-album" : ""}" data-i="${i}" data-group="${p.group}" lang="zh">${p.album ? "the album" : esc(p.name)}</button>`).join("")}
     <button type="button" id="plate-next" aria-label="Next poster">→</button>
   </nav>
   <div class="style-bar" role="group" aria-label="Print style">
@@ -4093,7 +4132,7 @@ const songFor = track => (typeof songs !== "undefined" ? songs.find(s => /soulbo
 
 function card(p) {
   if (p.album) return `
-    <h2 lang="zh">${esc(p.compare ? "三張並排" : p.name || "Soulboy")}<span>${p.compare ? "2005–2007" : { soulboy: "2005", thislove: "2006", wonderland: "2007" }[p.group] || "2005"} · ${p.stations.length} songs</span></h2>
+    <h2 lang="zh">${esc(p.name || "Soulboy")}<span>${p.merge ? "2005–2007" : { soulboy: "2005", thislove: "2006", wonderland: "2007" }[p.group] || "2005"} · ${p.stations.length} songs</span></h2>
     <p class="about">${esc(style.id === "pixel" ? p.pixAbout : style.id === "flat" ? p.about : p.geoAbout)}</p>
     ${p.group === "soulboy" ? `<p class="hint">Colour = each song's lyric imagery, in the garden's colour key. The spoken Prologue has none, so it is grey.</p>` : ""}
     <p class="hint">Hover a station to hear its song${typeof soundOn !== "undefined" && soundOn ? "" : " (turn sound on first)"}.</p>
@@ -4113,10 +4152,14 @@ function card(p) {
     </dl>`;
 }
 // the arrows walk through the posters the tabs are showing
+// on the blended poster there are no song tabs, so the arrows walk the albums instead
 function step(d) {
   const vis = [...prints.querySelectorAll(".plate-tab")].filter(b => !b.hidden).map(b => +b.dataset.i), k = vis.indexOf(cur);
-  show(vis[(k + d + vis.length) % vis.length]);
+  if (vis.length) return show(vis[(k + d + vis.length) % vis.length]);
+  const order = ["all", "soulboy", "thislove", "wonderland"], j = order.indexOf(PLATES[cur].group);
+  showAlbum(order[(j + d + order.length) % order.length]);
 }
+const showAlbum = g => show(PLATES.findIndex(p => p.album && p.group === g));
 // where each preview reaches the poster's key line (seconds into the 30 s clip); the album covers open on the first 愛 of the song that sings it most
 // found by transcribing each preview with whisper and aligning it to the synced lyrics; when the key line falls outside the 30 s clip, the clip's first sung line
 const LINE_AT = {"sb:1":13.4,"sb:3":0.1,"sb:4":17.7,"sb:5":1.6,"sb:6":0.6,"sb:7":13.7,"sb:9":0.4,"sb:11":15.6,"tl:1":6.1,"tl:2":1.6,"tl:3":15.6,"tl:4":0.1,"tl:7":10.5,"tl:8":0.1,"tl:10":11.7,"tl:12":0.2,"tl:13":0.4,"sb-album:6":2.4,"tl-album:1":7.2,"wl:1":9.2,"wl:2":25.7,"wl:3":21.0,"wl:4":23.6,"wl:5":16.8,"wl:6":7.1,"wl:7":13.3,"wl:8":23.3,"wl:9":0.5,"wl:10":0,"wl:11":0,"wl-album:8":23.3};
@@ -4124,7 +4167,7 @@ const ALBUM_SONG = { soulboy: ["sb-album", 6], thislove: ["tl-album", 1], wonder
 const keyOf = (album, track) => (album === "This Love" || album === "tl" ? "tl:" : album === "未來" || album === "wl" ? "wl:" : "sb:") + track;
 const tlSong = track => TL_CARDS.find(c => c.track === track);
 function plateSong(p) {
-  if (p.compare) return null;
+  if (p.merge) return null;
   if (p.album) { const [k, tr] = ALBUM_SONG[p.group]; return { s: p.group === "thislove" ? tlSong(tr) : p.group === "wonderland" ? WL_CARDS.find(x => x.track === tr) : songFor(tr), at: LINE_AT[k + ":" + tr] }; }
   return { s: p.preview_url ? p : songFor(p.track), at: LINE_AT[keyOf(p.group === "thislove" ? "tl" : p.group === "wonderland" ? "wl" : "sb", p.track)] };
 }
@@ -4139,8 +4182,11 @@ function playPlate() {
 function show(i) {
   cur = (i + PLATES.length) % PLATES.length;
   text.innerHTML = card(PLATES[cur]) + `<p class="hint style-note">${esc(style.label)}: ${esc(style.note)}</p>`;
-  const g = PLATES[cur].group === "compare" ? "soulboy" : PLATES[cur].group;
-  prints.querySelectorAll(".plate-tab").forEach((b, k) => { b.setAttribute("aria-pressed", String(k === cur)); b.hidden = !b.classList.contains("is-album") && b.dataset.group !== g; });
+  // the albums are the first row; an album's own posters (the album, then its songs) appear in the second only once it is chosen
+  const g = PLATES[cur].group;
+  prints.querySelectorAll(".album-tab").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.album === g)));
+  prints.querySelector(".plate-nav").hidden = g === "all";
+  prints.querySelectorAll(".plate-tab").forEach(b => { b.setAttribute("aria-pressed", String(+b.dataset.i === cur)); b.hidden = b.dataset.group !== g; });
   hoverStation = -1;
   size();
   if (opened) playPlate();
@@ -4150,11 +4196,10 @@ function size() {
   if (!boxW) return;
   const top = plateBox.getBoundingClientRect().top + window.scrollY;
   // leave room for the two rows of toggles under the poster, so nothing needs scrolling
-  const below = [".plate-nav", ".style-bar"].reduce((a, q) => a + ((document.querySelector(".posters " + q) || {}).offsetHeight || 0), 0) + 28;
+  const below = [".album-nav", ".plate-nav", ".style-bar"].reduce((a, q) => a + ((document.querySelector(".posters " + q) || {}).offsetHeight || 0), 0) + 28;
   const availH = Math.max(320, window.innerHeight - top - below);
   // the blend album is a poster like the songs; the other styles keep the wide plate
-  if (p.compare) { ph = Math.min(availH, ((boxW - boxW * 0.04) / 3) * 4 / 3); pw = Math.min(boxW, (ph * 3 / 4) * 3 / 0.96); }
-  else if (p.album && style.id !== "flat" && !p.portrait) { pw = boxW; ph = Math.min(availH, boxW * 0.62); if (boxW < 700) ph = boxW * 1.05; }
+  if (p.album && style.id !== "flat" && !p.portrait) { pw = boxW; ph = Math.min(availH, boxW * 0.62); if (boxW < 700) ph = boxW * 1.05; }
   else { ph = Math.min(availH, boxW * 4 / 3); pw = ph * 3 / 4; }
   dpr = Math.max(1, Math.min(2, devicePixelRatio || 1));
   cv.width = off.width = Math.round(pw * dpr); cv.height = off.height = Math.round(ph * dpr); cv.style.width = pw + "px"; cv.style.height = ph + "px";
@@ -4168,7 +4213,7 @@ prints.addEventListener("click", e => {
     prints.querySelectorAll(".style-btn").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
     show(cur); return;
   }
-  if (b.id === "plate-prev") step(-1); else if (b.id === "plate-next") step(1); else if (b.dataset.i) show(+b.dataset.i);
+  if (b.id === "plate-prev") step(-1); else if (b.id === "plate-next") step(1); else if (b.dataset.album) showAlbum(b.dataset.album); else if (b.dataset.i) show(+b.dataset.i);
 });
 addEventListener("keydown", e => {
   if (prints.closest("[hidden]") || e.target.closest?.("input, select, textarea")) return;
@@ -4228,7 +4273,7 @@ function frame(ms) {
 }
 new ResizeObserver(size).observe(plateBox);
 addEventListener("resize", size);
-show(0);
+show(PLATES.findIndex(p => p.merge));
 requestAnimationFrame(frame);
 document.fonts && document.fonts.ready.then(size);
 })();
