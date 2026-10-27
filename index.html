@@ -4102,7 +4102,7 @@ function card(p) {
     <h2 lang="zh">${esc(p.name)}<span>${p.group === "thislove" ? "This Love" : p.group === "wonderland" ? "未來" : "Soulboy"} · track ${p.track} · ${Math.round(p.bpm)} BPM</span></h2>
     <p class="line" lang="zh">「${esc(p.line)}」</p>
     <p class="about">${esc(style.id === "illus" || !p.absNote ? p.motion + ". " + p.mood + "." : style.id === "pixel" ? p.pixNote || p.absNote : style.id === "flat" ? p.absNote : p.geoNote || p.absNote)}</p>
-    ${style.id === "flat" ? `<p class="hint swatches">Colour = lyric imagery: ${(imageryOf(p.track) || []).map(([val, col, zh]) => `<span><i style="background:${col}"></i>${esc(zh)} ${Math.round(val * 100)}%</span>`).join("") || "none (spoken intro), so it stays grey"}</p>` : ""}
+    ${style.id === "flat" ? `<p class="hint swatches">Colour = the colours its lyrics name: ${(lyricPalette(p) || []).map(([val, col, zh]) => `<span><i style="background:${col}"></i>${esc(zh)} ${Math.round(val * 100)}%</span>`).join("") || "none named, so it stays grey"}</p>` : ""}
     <p class="hint">Hover the poster to hear the song${typeof soundOn !== "undefined" && soundOn ? "" : " (turn sound on first)"}.</p>
     <dl>
       <dt>Main image</dt><dd>${esc(p.hero)} <span class="count">→ ${p.heroCount} ${esc(p.heroUnit)}</span></dd>
