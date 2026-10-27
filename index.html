@@ -2117,6 +2117,7 @@ function lineRows(text) {
 function posterType(c, w, h, p, ink, sub, opts = {}) {
   if (posterType.off) return;
   if (posterType.queue) { posterType.queue.push([c, w, h, p, ink, sub, opts]); return; }
+  if (posterType.defer) { posterType.defer.push([c, w, h, p, ink, sub, opts]); return; }
   const x = opts.x ?? w * 0.07, y = opts.y ?? h * 0.9, big = String(p.line || p.name).replace(/^（(.*)）$/, "$1"), rows = lineRows(big);
   c.save(); c.textBaseline = "alphabetic"; c.fillStyle = ink;
   const latin = !/\p{Script=Han}/u.test(big), face = latin ? `"Young Serif", "Noto Serif SC", serif` : `"Noto Sans SC", "Noto Serif SC", sans-serif`, wt = latin ? 400 : 900;
@@ -3025,6 +3026,7 @@ function wordColour(key, word) {
 }
 function sentenceType(c, w, h, card, key, o = {}) {
   if (posterType.off) return;
+  if (sentenceType.defer) { sentenceType.defer.push([c, w, h, card, key, o]); return; }
   const IM = ALBUM_IMAGE[key], rows = IM.sentence.split(/(?<=，)/), shown = wd => IM.sentence.includes(wd) ? wd : wd[0];
   const words = IM.stations.map(([, wd]) => shown(wd)), stationOf = txt => (IM.stations.find(([, wd]) => shown(wd) === txt) || [])[1];
   const hovTrack = o.hovTrack, x = w * 0.07, y0 = o.y0 ?? h * 0.12;
@@ -3295,6 +3297,41 @@ function paperGrain(c, w, h, a) { c.save(); c.globalCompositeOperation = "multip
 function stylise(style, src, dst, w, h, d, title) {
   const W = src.width, H = src.height, sc = src.getContext("2d"), img = sc.getImageData(0, 0, W, H), px = img.data;
   dst.setTransform(1, 0, 0, 1, 0, 0);
+  const at = (x, y) => (Math.min(H - 1, Math.max(0, y | 0)) * W + Math.min(W - 1, Math.max(0, x | 0))) * 4;
+  if (style.id === "pixel") {
+    // a coarse grid of square cells in flat colour, each from the centre of its patch, the grid left showing
+    const cell = Math.max(4, Math.round(Math.min(W, H) / 54)), q = v => Math.round(v / 42.5) * 42.5;
+    dst.fillStyle = "#0E0C12"; dst.fillRect(0, 0, W, H);
+    for (let y = 0; y < H; y += cell) for (let x = 0; x < W; x += cell) {
+      const i = at(x + cell / 2, y + cell / 2); dst.fillStyle = `rgb(${q(px[i])},${q(px[i + 1])},${q(px[i + 2])})`; dst.fillRect(x, y, cell - Math.max(1, d * 0.6), cell - Math.max(1, d * 0.6));
+    }
+    dst.setTransform(d, 0, 0, d, 0, 0); return;
+  }
+  if (style.id === "geo") {
+    // flat geometry: the picture posterised into a few hard-edged tones, with halftone dots laid into the shadows
+    const q = v => Math.round(v / 64) * 64;
+    for (let i = 0; i < px.length; i += 4) { px[i] = q(px[i]); px[i + 1] = q(px[i + 1]); px[i + 2] = q(px[i + 2]); }
+    dst.putImageData(img, 0, 0);
+    const step = Math.max(5, Math.round(6 * d));
+    for (let y = step / 2; y < H; y += step) for (let x = step / 2; x < W; x += step) {
+      const i = at(x, y), l = (0.3 * px[i] + 0.55 * px[i + 1] + 0.15 * px[i + 2]) / 255;
+      if (l < 0.55) { dst.beginPath(); dst.arc(x, y, step * 0.42 * (1 - l / 0.55), 0, Math.PI * 2); dst.fillStyle = "rgba(10,8,14,.55)"; dst.fill(); }
+    }
+    dst.setTransform(d, 0, 0, d, 0, 0); return;
+  }
+  if (style.id === "illus") {
+    // a drawing: pencil lines where tones change, a light wash of the colours, on paper
+    const out = dst.createImageData(W, H), o = out.data, paper = [244, 238, 226], lum = new Float32Array(W * H);
+    for (let k = 0, i = 0; i < px.length; i += 4, k++) lum[k] = 0.3 * px[i] + 0.55 * px[i + 1] + 0.15 * px[i + 2];
+    const t = Math.max(1, Math.round(d));
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const k = y * W + x, i = k * 4, gx = Math.abs(lum[k] - lum[Math.min(W * H - 1, k + t)]), gy = Math.abs(lum[k] - lum[Math.min(W * H - 1, k + t * W)]);
+      const edge = Math.min(1, (gx + gy) / 70), m = (px[i] + px[i + 1] + px[i + 2]) / 3;
+      for (let c2 = 0; c2 < 3; c2++) { const wash = paper[c2] + ((m + (px[i + c2] - m) * 1.2) - paper[c2]) * 0.38; o[i + c2] = wash * (1 - edge) + 40 * edge; }
+      o[i + 3] = 255;
+    }
+    dst.putImageData(out, 0, 0); dst.setTransform(d, 0, 0, d, 0, 0); paperGrain(dst, w, h, 0.14); return;
+  }
   if (style.palette) {
     const pal = style.palette.map(hex), idx = new Uint8Array(W * H);
     for (let i = 0, k = 0; i < px.length; i += 4, k++) { const n = nearest(pal, px[i], px[i + 1], px[i + 2]); idx[k] = n; px[i] = pal[n][0]; px[i + 1] = pal[n][1]; px[i + 2] = pal[n][2]; }
@@ -4349,11 +4386,11 @@ function frame(ms) {
   requestAnimationFrame(frame);
   if (prints.closest("[hidden]") || !pw) return;
   const t = ms / 1000, c = cv.getContext("2d"), p = PLATES[cur];
-  const live = { flat: p.draw, pixel: p.drawPixel || p.draw, geo: p.drawGeo || p.draw, illus: p.drawIllus || p.draw }[style.id];
-  if (live) {
+  // every style draws the same poster: the blend scene with its sentence or key line; the styles only change the drawing language
+  if (style.id === "flat") {
     c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, pw, ph);
-    if (style.id === "flat" && !p.album) drawTinted(live, c, pw, ph, t, p, hoverStation);
-    else live(c, pw, ph, t, p, hoverStation);
+    if (!p.album) drawTinted(p.draw, c, pw, ph, t, p, hoverStation);
+    else p.draw(c, pw, ph, t, p, hoverStation);
     finish(c, pw, ph);
     return;
   }
@@ -4362,9 +4399,15 @@ function frame(ms) {
   lastStyled = ms; dirty = false;
   const oc = off.getContext("2d", { willReadFrequently: true });
   oc.setTransform(dpr, 0, 0, dpr, 0, 0); oc.clearRect(0, 0, pw, ph);
-  // the painters and print traditions rework the geometric version, whose flat shapes suit them best
-  (p.drawGeo || p.draw)(oc, pw, ph, t, p, hoverStation);
+  // the scene is drawn without its words, reworked in the style's language, and the words are set crisply on top
+  posterType.defer = []; sentenceType.defer = [];
+  let pq, sq;
+  try { if (!p.album) drawTinted(p.draw, oc, pw, ph, t, p, hoverStation); else p.draw(oc, pw, ph, t, p, hoverStation); }
+  finally { pq = posterType.defer; sq = sentenceType.defer; posterType.defer = sentenceType.defer = null; }
   stylise(style, off, c, pw, ph, dpr, p.name);
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (pq.length) { delete p._ink; const ink = inkFor(c, pw, ph, p); pq.forEach(([, w, h, pp, , , opts]) => posterType(c, w, h, pp, ink.ink, ink.sub, opts)); }
+  sq.forEach(([, w, h, card, key, o]) => sentenceType(c, w, h, card, key, o));
 }
 new ResizeObserver(size).observe(plateBox);
 addEventListener("resize", size);
