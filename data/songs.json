@@ -4,7 +4,7 @@
     "year": 2005,
     "track": 1,
     "name": "Prologue",
-    "tempo": 99.05,
+    "tempo": 96.5,
     "energy": 0.45,
     "valence": 0.71,
     "intensity": 0.623,
@@ -39,6 +39,9 @@
       "people_relationships": 0,
       "cosmos": 0
     },
+    "meter": "4/4",
+    "beats_per_bar": 4,
+    "feel": "straight",
     "love": 1,
     "love_en": 1,
     "palette": [
@@ -56,7 +59,7 @@
     "year": 2005,
     "track": 2,
     "name": "妹妹",
-    "tempo": 123.59,
+    "tempo": 100.5,
     "energy": 0.49,
     "valence": 0.76,
     "intensity": 0.717,
@@ -91,6 +94,9 @@
       "people_relationships": 7,
       "cosmos": 0
     },
+    "meter": "4/4",
+    "beats_per_bar": 4,
+    "feel": "straight",
     "love": 1,
     "love_en": 0,
     "palette": [
@@ -109,7 +115,7 @@
     "year": 2005,
     "track": 3,
     "name": "春風吹",
-    "tempo": 114.59,
+    "tempo": 136,
     "energy": 0.3,
     "valence": 0.69,
     "intensity": 0.273,
@@ -144,6 +150,9 @@
       "people_relationships": 0,
       "cosmos": 0
     },
+    "meter": "4/4",
+    "beats_per_bar": 4,
+    "feel": "straight",
     "love": 0,
     "love_en": 0,
     "palette": [
@@ -163,7 +172,7 @@
     "year": 2005,
     "track": 4,
     "name": "每天每天",
-    "tempo": 129.41,
+    "tempo": 58,
     "energy": 0.25,
     "valence": 0.49,
     "intensity": 0.152,
@@ -198,6 +207,9 @@
       "people_relationships": 5,
       "cosmos": 0
     },
+    "meter": "12/8",
+    "beats_per_bar": 12,
+    "feel": "triplet (12/8)",
     "love": 1,
     "love_en": 1,
     "palette": [
@@ -215,7 +227,7 @@
     "year": 2005,
     "track": 5,
     "name": "女人",
-    "tempo": 102.52,
+    "tempo": 93.5,
     "energy": 0.43,
     "valence": 0.81,
     "intensity": 0.572,
@@ -250,6 +262,9 @@
       "people_relationships": 8,
       "cosmos": 0
     },
+    "meter": "4/4",
+    "beats_per_bar": 4,
+    "feel": "straight",
     "love": 9,
     "love_en": 0,
     "palette": [
@@ -267,7 +282,7 @@
     "year": 2005,
     "track": 6,
     "name": "叫我怎麼說",
-    "tempo": 108.2,
+    "tempo": 95,
     "energy": 0.3,
     "valence": 0.79,
     "intensity": 0.25,
@@ -302,6 +317,9 @@
       "people_relationships": 3,
       "cosmos": 0
     },
+    "meter": "4/4",
+    "beats_per_bar": 4,
+    "feel": "straight",
     "love": 12,
     "love_en": 0,
     "palette": [
@@ -319,7 +337,7 @@
     "year": 2005,
     "track": 7,
     "name": "哪怕",
-    "tempo": 133.66,
+    "tempo": 63.5,
     "energy": 0.19,
     "valence": 0.6,
     "intensity": 0.0,
@@ -354,6 +372,9 @@
       "people_relationships": 0,
       "cosmos": 0
     },
+    "meter": "3/4",
+    "beats_per_bar": 3,
+    "feel": "straight",
     "love": 0,
     "love_en": 0,
     "palette": [
@@ -371,7 +392,7 @@
     "year": 2005,
     "track": 8,
     "name": "南音",
-    "tempo": 105.02,
+    "tempo": 72,
     "energy": 0.25,
     "valence": 0.53,
     "intensity": 0.131,
@@ -406,6 +427,9 @@
       "people_relationships": 6,
       "cosmos": 0
     },
+    "meter": "12/8",
+    "beats_per_bar": 12,
+    "feel": "triplet (12/8)",
     "love": 1,
     "love_en": 0,
     "palette": [
@@ -425,7 +449,7 @@
     "year": 2005,
     "track": 9,
     "name": "我們能不能",
-    "tempo": 153.6,
+    "tempo": 90,
     "energy": 0.5,
     "valence": 0.53,
     "intensity": 0.735,
@@ -460,6 +484,9 @@
       "people_relationships": 6,
       "cosmos": 5
     },
+    "meter": "4/4",
+    "beats_per_bar": 4,
+    "feel": "straight",
     "love": 0,
     "love_en": 0,
     "palette": [
@@ -478,7 +505,7 @@
     "year": 2005,
     "track": 10,
     "name": "跳",
-    "tempo": 120.23,
+    "tempo": 101.5,
     "energy": 0.52,
     "valence": 0.72,
     "intensity": 0.786,
@@ -513,6 +540,9 @@
       "people_relationships": 2,
       "cosmos": 2
     },
+    "meter": "4/4",
+    "beats_per_bar": 4,
+    "feel": "straight",
     "love": 0,
     "love_en": 0,
     "palette": [
@@ -531,7 +561,7 @@
     "year": 2005,
     "track": 11,
     "name": "總結",
-    "tempo": 107.24,
+    "tempo": 103,
     "energy": 0.24,
     "valence": 0.74,
     "intensity": 0.121,
@@ -566,6 +596,9 @@
       "people_relationships": 1,
       "cosmos": 0
     },
+    "meter": "4/4",
+    "beats_per_bar": 4,
+    "feel": "straight",
     "love": 3,
     "love_en": 0,
     "palette": [
@@ -585,7 +618,7 @@
     "year": 2005,
     "track": 12,
     "name": "趕場",
-    "tempo": 125.7,
+    "tempo": 133.5,
     "energy": 0.26,
     "valence": 0.57,
     "intensity": 0.174,
@@ -620,6 +653,9 @@
       "people_relationships": 10,
       "cosmos": 0
     },
+    "meter": "4/4",
+    "beats_per_bar": 4,
+    "feel": "straight",
     "love": 0,
     "love_en": 0,
     "palette": [
@@ -637,7 +673,7 @@
     "year": 2005,
     "track": 13,
     "name": "等著你回來",
-    "tempo": 118.63,
+    "tempo": 95,
     "energy": 0.61,
     "valence": 0.77,
     "intensity": 1.0,
@@ -672,6 +708,9 @@
       "people_relationships": 0,
       "cosmos": 0
     },
+    "meter": "4/4",
+    "beats_per_bar": 4,
+    "feel": "straight",
     "love": 1,
     "love_en": 1,
     "palette": [
@@ -690,7 +729,7 @@
     "year": 2005,
     "track": 14,
     "name": "認識你",
-    "tempo": 89.1,
+    "tempo": 79.5,
     "energy": 0.25,
     "valence": 0.61,
     "intensity": 0.136,
@@ -725,6 +764,9 @@
       "people_relationships": 3,
       "cosmos": 0
     },
+    "meter": "4/4",
+    "beats_per_bar": 4,
+    "feel": "straight",
     "love": 0,
     "love_en": 0,
     "palette": [

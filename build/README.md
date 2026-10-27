@@ -26,6 +26,8 @@ python3 fetch_discography.py  # → data/discography.json (10 studio albums, iTu
 
 - `stoplist.txt`: words that match a lexicon group but are not something you can see (time words, verbs, abstract words). `songs.py` drops them from the `imagery` counts; "fall" is kept only on lines that list the seasons. Later albums should be segmented into whole words with jieba before matching, and write `imagery` and `terms` per song into `data/songs.json`.
 
+- `rhythm.json`: measured rhythm per Soulboy track (numpy onset/beat analysis of the 30 s previews). `songs.py` uses its `tempo_measured` as `tempo` (the ReccoBeats tempo was often not a pulse in the clip) and copies `meter`, `beats_per_bar` and `feel`.
+
 ## What is not published
 
 `raw/` holds full lyrics and preview audio and is in `.gitignore`. Only derived data goes in `data/`.

@@ -30,6 +30,9 @@ def main():
             groups[w] = g
     album = read_json(os.path.join(DATA, "soulboy_tracks.json"))
     feats = {f["trackNumber"]: f["reccobeats"] for f in read_json(os.path.join(DATA, "soulboy_features.json"))["tracks"]}
+    # measured rhythm overrides the ReccoBeats tempo (see rhythm.json)
+    rhythm_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rhythm.json")
+    rhythm = {r["track"]: r for r in read_json(rhythm_path)["tracks"]} if os.path.exists(rhythm_path) else {}
     energies = [feats[t["trackNumber"]]["energy"] for t in album["tracks"]]
     lo, hi = min(energies), max(energies)
     songs = []
@@ -56,9 +59,10 @@ def main():
         f = feats[n]
         songs.append({
             "album": "Soulboy", "year": 2005, "track": n, "name": t["trackName"],
-            "tempo": round(f["tempo"], 2), "energy": round(f["energy"], 2), "valence": round(f["valence"], 2),
+            "tempo": round(rhythm[n]["tempo_measured"] if n in rhythm else f["tempo"], 2), "energy": round(f["energy"], 2), "valence": round(f["valence"], 2),
             "intensity": round((f["energy"] - lo) / (hi - lo), 3),
             "weights": weights, "sparse": sparse, "hits": counts, "imagery": imagery,
+            **({k: rhythm[n][k] for k in ("meter", "beats_per_bar", "feel")} if n in rhythm else {}),
             "love": love_zh + love_en,  # 愛 + 爱 + English "love"
             "love_en": love_en,
             "palette": [h for h, _ in EDITORIAL[n]["palette"]],

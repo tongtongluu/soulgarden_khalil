@@ -1,0 +1,229 @@
+{
+ "_about": "Rhythm overrides for Soulboy, measured from the 30 s iTunes previews with a numpy onset/beat analysis (spectral flux, DP beat tracker, accent periodicity at 3 vs 4 beats, off-beat position). songs.py uses tempo_measured as `tempo` and copies meter, beats_per_bar and feel. tempo_reccobeats is kept for reference.",
+ "tracks": [
+  {
+   "track": 1,
+   "name": "Prologue",
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "tempo_reccobeats": 99.05,
+   "tempo_measured": 96.5,
+   "confidence": {
+    "meter": 0.75,
+    "feel": 0.7
+   },
+   "method": "audio",
+   "note": "Spoken intro over a steady groove. Downbeat contrast 4 vs 3 = 1.19 vs 0.29; off-beat energy at the half, none at the thirds."
+  },
+  {
+   "track": 2,
+   "name": "妹妹",
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "tempo_reccobeats": 123.59,
+   "tempo_measured": 100.5,
+   "confidence": {
+    "meter": 0.7,
+    "feel": 0.7
+   },
+   "method": "audio",
+   "note": "Contrast 4 vs 3 = 1.03 vs 0.28. Clear periodicity at 100.5; none at 123.6."
+  },
+  {
+   "track": 3,
+   "name": "春風吹",
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "tempo_reccobeats": 114.59,
+   "tempo_measured": 136,
+   "confidence": {
+    "meter": 0.5,
+    "feel": 0.7
+   },
+   "method": "audio",
+   "note": "Octave ambiguity 67.5/136. At 136 lag-4 accent autocorrelation 0.40 vs -0.39 at lag 3. Could read as a 68 BPM half-time groove."
+  },
+  {
+   "track": 4,
+   "name": "每天每天",
+   "meter": "12/8",
+   "beats_per_bar": 12,
+   "feel": "triplet (12/8)",
+   "swing_ratio": 0.69,
+   "tempo_reccobeats": 129.41,
+   "tempo_measured": 58,
+   "confidence": {
+    "meter": 0.75,
+    "feel": 0.85
+   },
+   "method": "audio",
+   "note": "Strongest triplet signal: autocorrelation T/3 = 0.42, T/2 = -0.02, off-beat at about 2/3. Four dotted-quarter beats at 58 per bar; triplet pulse about 175."
+  },
+  {
+   "track": 5,
+   "name": "女人",
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "tempo_reccobeats": 102.52,
+   "tempo_measured": 93.5,
+   "confidence": {
+    "meter": 0.7,
+    "feel": 0.8
+   },
+   "method": "audio",
+   "note": "Contrast 4 vs 3 = 0.81 vs 0.17. Off-beat clearly at the half."
+  },
+  {
+   "track": 6,
+   "name": "叫我怎麼說",
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "tempo_reccobeats": 108.2,
+   "tempo_measured": 95,
+   "confidence": {
+    "meter": 0.4,
+    "feel": 0.75
+   },
+   "method": "audio+knowledge",
+   "note": "Beat at 95 is clear but no accent periodicity in either grouping; 4/4 is a pop-ballad default, not measured. Feel measured: straight eighths."
+  },
+  {
+   "track": 7,
+   "name": "哪怕",
+   "meter": "3/4",
+   "beats_per_bar": 3,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "tempo_reccobeats": 133.66,
+   "tempo_measured": 63.5,
+   "confidence": {
+    "meter": 0.4,
+    "feel": 0.7
+   },
+   "method": "audio",
+   "note": "Conflicting: downbeat contrast prefers 3 (0.96 vs 0.33) but onset autocorrelation is higher at 4 beats. Straight sixteenths. 4/4 at 127.5 is the alternative."
+  },
+  {
+   "track": 8,
+   "name": "南音",
+   "meter": "12/8",
+   "beats_per_bar": 12,
+   "feel": "triplet (12/8)",
+   "swing_ratio": 0.69,
+   "tempo_reccobeats": 105.02,
+   "tempo_measured": 72,
+   "confidence": {
+    "meter": 0.55,
+    "feel": 0.6
+   },
+   "method": "audio",
+   "note": "Weakest periodicity on the album. At 72: triplet subdivision (T/3 = 0.21, off-beat about 2/3), 4 beats per bar. 105 = 1.5 x 72, a hemiola reading of the same 12/8."
+  },
+  {
+   "track": 9,
+   "name": "我們能不能",
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "tempo_reccobeats": 153.6,
+   "tempo_measured": 90,
+   "confidence": {
+    "meter": 0.6,
+    "feel": 0.75
+   },
+   "method": "audio",
+   "note": "Contrast 4 vs 3 = 0.62 vs 0.19. Strong half-beat subdivision. 153.6 has no periodicity; 90 (or 180) does."
+  },
+  {
+   "track": 10,
+   "name": "跳",
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "tempo_reccobeats": 120.23,
+   "tempo_measured": 101.5,
+   "confidence": {
+    "meter": 0.75,
+    "feel": 0.65
+   },
+   "method": "audio",
+   "note": "Lag-4 accent autocorrelation 0.57 vs -0.28, contrast 1.37, straight sixteenths. Secondary candidate 136 (4:3) from syncopation."
+  },
+  {
+   "track": 11,
+   "name": "總結",
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "tempo_reccobeats": 107.24,
+   "tempo_measured": 103,
+   "confidence": {
+    "meter": 0.85,
+    "feel": 0.7
+   },
+   "method": "audio",
+   "note": "Clearest 4/4 on the album: contrast 1.57 vs 0.31, lag-4 autocorrelation 0.52."
+  },
+  {
+   "track": 12,
+   "name": "趕場",
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "tempo_reccobeats": 125.7,
+   "tempo_measured": 133.5,
+   "confidence": {
+    "meter": 0.65,
+    "feel": 0.75
+   },
+   "method": "audio",
+   "note": "Contrast prefers 4 at both 66 and 133.5 (octave pair). Straight eighths."
+  },
+  {
+   "track": 13,
+   "name": "等著你回來",
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "tempo_reccobeats": 118.63,
+   "tempo_measured": 95,
+   "confidence": {
+    "meter": 0.6,
+    "feel": 0.55
+   },
+   "method": "audio",
+   "note": "At 95: contrast 0.52 vs 0.24, sixteenth syncopation. The 2/3 off-beat seen at 118.6 is a 5:4 artefact, not swing."
+  },
+  {
+   "track": 14,
+   "name": "認識你",
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "tempo_reccobeats": 89.1,
+   "tempo_measured": 79.5,
+   "confidence": {
+    "meter": 0.6,
+    "feel": 0.35
+   },
+   "method": "audio",
+   "note": "Weak periodicity (clip may be mostly the spoken intro). Grouping prefers 4. Subdivision too faint to call; a laid-back swung feel can't be ruled out."
+  }
+ ]
+}
