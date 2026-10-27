@@ -4093,9 +4093,9 @@ const songFor = track => (typeof songs !== "undefined" ? songs.find(s => /soulbo
 
 function card(p) {
   if (p.album) return `
-    <h2>Soulboy<span>2005 · 14 songs</span></h2>
+    <h2 lang="zh">${esc(p.compare ? "三張並排" : p.name || "Soulboy")}<span>${p.compare ? "2005–2007" : { soulboy: "2005", thislove: "2006", wonderland: "2007" }[p.group] || "2005"} · ${p.stations.length} songs</span></h2>
     <p class="about">${esc(style.id === "pixel" ? p.pixAbout : style.id === "flat" ? p.about : p.geoAbout)}</p>
-    <p class="hint">Colour = each song's lyric imagery, in the garden's colour key. The spoken Prologue has none, so it is grey.</p>
+    ${p.group === "soulboy" ? `<p class="hint">Colour = each song's lyric imagery, in the garden's colour key. The spoken Prologue has none, so it is grey.</p>` : ""}
     <p class="hint">Hover a station to hear its song${typeof soundOn !== "undefined" && soundOn ? "" : " (turn sound on first)"}.</p>
     <ol class="stations">${p.stations.map(s => `<li><b>${String(s.track).padStart(2, "0")}</b><span lang="zh">${esc(s.name)}</span><em>${esc(s.note)}</em></li>`).join("")}</ol>`;
   return `
