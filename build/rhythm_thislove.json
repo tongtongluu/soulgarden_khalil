@@ -1,0 +1,200 @@
+{
+ "_about": "Measured rhythm for This Love (愛愛愛, 2006) from the 30 s iTunes previews, via rhythm_candidates.py / rhythm_core.py. tempo_measured is the beat chosen from the onset autocorrelation, not ReccoBeats' tempo.",
+ "tracks": [
+  {
+   "track": 1,
+   "name": "愛愛愛",
+   "tempo_measured": 66,
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "confidence": {
+    "meter": 0.6,
+    "feel": 0.65
+   },
+   "method": "audio",
+   "note": "Half-time groove at 66 (133.5 is the octave). Downbeat contrast 4 vs 3 = 0.99 vs 0.36; off-beat at the half."
+  },
+  {
+   "track": 2,
+   "name": "蘇麗珍",
+   "tempo_measured": 88.5,
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "confidence": {
+    "meter": 0.7,
+    "feel": 0.7
+   },
+   "method": "audio",
+   "note": "Contrast 0.94 vs 0.17, lag-4 autocorrelation 0.30 vs -0.53 at lag 3. ReccoBeats 77.5 is not a pulse here; 178.5 is the octave."
+  },
+  {
+   "track": 3,
+   "name": "歌手與模特兒",
+   "tempo_measured": 73.5,
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.48,
+   "confidence": {
+    "meter": 0.65,
+    "feel": 0.75
+   },
+   "method": "audio",
+   "note": "Strong straight eighths (half 0.71 vs thirds 0.15); contrast 0.88 vs 0.21. Could also be counted at 147."
+  },
+  {
+   "track": 4,
+   "name": "唉!",
+   "tempo_measured": 92,
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.77,
+   "confidence": {
+    "meter": 0.5,
+    "feel": 0.55
+   },
+   "method": "audio",
+   "note": "Grouping close (contrast 4 vs 3 = 0.63 vs 0.52) but onset autocorrelation peaks at 4 beats (0.49). The strongest off-beat is the last sixteenth (about 0.77): straight, syncopated, not swung."
+  },
+  {
+   "track": 5,
+   "name": "四人遊",
+   "tempo_measured": 75.5,
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "confidence": {
+    "meter": 0.7,
+    "feel": 0.75
+   },
+   "method": "audio",
+   "note": "Clearest as 4/4 at the double tempo 152.5 (contrast 1.30, lag-4 0.54); the beat itself is 75.5. Straight eighths."
+  },
+  {
+   "track": 6,
+   "name": "手拖手",
+   "tempo_measured": 68.5,
+   "meter": "12/8",
+   "beats_per_bar": 12,
+   "feel": "triplet (12/8)",
+   "swing_ratio": 0.65,
+   "confidence": {
+    "meter": 0.4,
+    "feel": 0.55
+   },
+   "method": "audio",
+   "note": "Off-beat energy sits nearer the thirds (0.37) than the half (0.24), peak at about 0.65: a triplet / shuffle feel at 68.5. Bar grouping is weak (contrast 0.30 vs 0.23), so 12/8 vs 4/4 shuffle is uncertain."
+  },
+  {
+   "track": 7,
+   "name": "偷笑",
+   "tempo_measured": 131,
+   "meter": "3/4",
+   "beats_per_bar": 3,
+   "feel": "straight",
+   "swing_ratio": 0.56,
+   "confidence": {
+    "meter": 0.6,
+    "feel": 0.45
+   },
+   "method": "audio",
+   "note": "Accents group in 3: contrast 1.32 vs 0.39, lag-3 autocorrelation 0.33 vs -0.16 at lag 4; at the half tempo 65.5 it also groups in 3. Read as 3/4 at 131 (or 6/8 with the eighth at 131). Subdivision faint."
+  },
+  {
+   "track": 8,
+   "name": "Goodbye Melody Rose",
+   "tempo_measured": 78,
+   "meter": "12/8",
+   "beats_per_bar": 12,
+   "feel": "triplet (12/8)",
+   "swing_ratio": 0.69,
+   "confidence": {
+    "meter": 0.7,
+    "feel": 0.75
+   },
+   "method": "audio",
+   "note": "Triplet subdivision (autocorrelation T/3 = 0.17, T/2 = -0.02; off-beat at about 2/3) with 4 dotted beats per bar (contrast 1.22). ReccoBeats 113.5 is not a pulse."
+  },
+  {
+   "track": 9,
+   "name": "詩人的情人",
+   "tempo_measured": 67,
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "confidence": {
+    "meter": 0.5,
+    "feel": 0.4
+   },
+   "method": "audio",
+   "note": "Weak periodicity. At 67: contrast 0.86 vs 0.23, straight. The second candidate 89.5 (4:3 against 67) shows off-beats at about 2/3, so a triplet feel is possible."
+  },
+  {
+   "track": 10,
+   "name": "拖男帶女",
+   "tempo_measured": 97.5,
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "confidence": {
+    "meter": 0.8,
+    "feel": 0.75
+   },
+   "method": "audio",
+   "note": "Clear 4/4: contrast 1.32, lag-4 autocorrelation 0.60 vs -0.19 at lag 3. Straight eighths. ReccoBeats 144.8 is 3:2 against it."
+  },
+  {
+   "track": 11,
+   "name": "Love Outrolude (Instrumental)",
+   "tempo_measured": 63,
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.77,
+   "confidence": {
+    "meter": 0.55,
+    "feel": 0.45
+   },
+   "method": "audio",
+   "note": "Instrumental. Periodicity at 2 and 4 beats (0.39, 0.40) of 63, i.e. a clear 126 pulse counted half-time. Contrast 0.87 vs 0.44. Off-beat at the last sixteenth."
+  },
+  {
+   "track": 12,
+   "name": "If You Leave Me Now",
+   "tempo_measured": 96.5,
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": 0.52,
+   "confidence": {
+    "meter": 0.85,
+    "feel": 0.8
+   },
+   "method": "audio",
+   "note": "Strongest pulse on the album (autocorrelation 0.67). Contrast 1.44 vs 0.41, straight. Chicago cover."
+  },
+  {
+   "track": 13,
+   "name": "春風吹之吹吹風Mix",
+   "tempo_measured": null,
+   "meter": "4/4",
+   "beats_per_bar": 4,
+   "feel": "straight",
+   "swing_ratio": null,
+   "confidence": {
+    "meter": 0.3,
+    "feel": 0.3
+   },
+   "method": "audio+knowledge",
+   "note": "No usable pulse in this preview (onset autocorrelation under 0.1 at every candidate), probably an ambient or free intro. Meter and feel are not measured: 4/4 straight is taken from the original 春風吹 (Soulboy, measured 136 / 68 half-time). Leave the tempo empty or reuse the original's."
+  }
+ ]
+}

@@ -1,0 +1,369 @@
+{
+  "method": "Longest-match over the 10-group lexicon, with stoplist.txt and an idiom stoplist consumed first (no jieba). Simplified lyrics are converted to traditional for matching only.",
+  "cat_ids": [
+    "body_gesture",
+    "time_memory",
+    "people_relationships",
+    "city_street",
+    "cosmos",
+    "sky_weather",
+    "nature_plants",
+    "light_fire",
+    "night_moon",
+    "water"
+  ],
+  "tracks": [
+    {
+      "track": 1,
+      "name": "愛愛愛",
+      "has_lyrics": true,
+      "simplified_source": false,
+      "line_count": 18,
+      "imagery": {
+        "body_gesture": 0,
+        "time_memory": 0,
+        "people_relationships": 4,
+        "city_street": 2,
+        "cosmos": 0,
+        "sky_weather": 0,
+        "nature_plants": 7,
+        "light_fire": 0,
+        "night_moon": 0,
+        "water": 5
+      },
+      "terms": [
+        "海:9:5",
+        "家:2:4",
+        "樹:6:3",
+        "花:6:3",
+        "桃花:6:1",
+        "街:3:1",
+        "電影:3:1"
+      ],
+      "love": 25
+    },
+    {
+      "track": 2,
+      "name": "蘇麗珍",
+      "has_lyrics": true,
+      "simplified_source": false,
+      "line_count": 30,
+      "imagery": {
+        "body_gesture": 1,
+        "time_memory": 0,
+        "people_relationships": 0,
+        "city_street": 0,
+        "cosmos": 0,
+        "sky_weather": 0,
+        "nature_plants": 3,
+        "light_fire": 0,
+        "night_moon": 0,
+        "water": 0
+      },
+      "terms": [
+        "花:6:3",
+        "頭:0:1"
+      ],
+      "love": 3
+    },
+    {
+      "track": 3,
+      "name": "歌手與模特兒",
+      "has_lyrics": true,
+      "simplified_source": false,
+      "line_count": 46,
+      "imagery": {
+        "body_gesture": 9,
+        "time_memory": 0,
+        "people_relationships": 1,
+        "city_street": 0,
+        "cosmos": 0,
+        "sky_weather": 3,
+        "nature_plants": 0,
+        "light_fire": 3,
+        "night_moon": 0,
+        "water": 0
+      },
+      "terms": [
+        "臉:0:5",
+        "光:7:3",
+        "風:5:3",
+        "眼:0:2",
+        "家:2:1",
+        "心:0:1",
+        "手:0:1"
+      ],
+      "love": 2
+    },
+    {
+      "track": 4,
+      "name": "唉!",
+      "has_lyrics": true,
+      "simplified_source": false,
+      "line_count": 34,
+      "imagery": {
+        "body_gesture": 2,
+        "time_memory": 0,
+        "people_relationships": 10,
+        "city_street": 0,
+        "cosmos": 0,
+        "sky_weather": 0,
+        "nature_plants": 0,
+        "light_fire": 0,
+        "night_moon": 0,
+        "water": 0
+      },
+      "terms": [
+        "妹妹:2:4",
+        "墨鏡:0:2",
+        "媽媽:2:2",
+        "家:2:2",
+        "朋友:2:2"
+      ],
+      "love": 2
+    },
+    {
+      "track": 5,
+      "name": "四人遊",
+      "has_lyrics": true,
+      "simplified_source": false,
+      "line_count": 45,
+      "imagery": {
+        "body_gesture": 10,
+        "time_memory": 0,
+        "people_relationships": 5,
+        "city_street": 0,
+        "cosmos": 0,
+        "sky_weather": 0,
+        "nature_plants": 0,
+        "light_fire": 0,
+        "night_moon": 1,
+        "water": 0
+      },
+      "terms": [
+        "頭:0:6",
+        "朋友:2:5",
+        "手:0:3",
+        "夜:8:1",
+        "眼淚:0:1"
+      ],
+      "love": 3
+    },
+    {
+      "track": 6,
+      "name": "手拖手",
+      "has_lyrics": true,
+      "simplified_source": false,
+      "line_count": 13,
+      "imagery": {
+        "body_gesture": 6,
+        "time_memory": 0,
+        "people_relationships": 0,
+        "city_street": 1,
+        "cosmos": 0,
+        "sky_weather": 0,
+        "nature_plants": 0,
+        "light_fire": 0,
+        "night_moon": 1,
+        "water": 0
+      },
+      "terms": [
+        "心:0:3",
+        "手:0:2",
+        "月:8:1",
+        "舞:0:1",
+        "路:3:1"
+      ],
+      "love": 8
+    },
+    {
+      "track": 7,
+      "name": "偷笑",
+      "has_lyrics": true,
+      "simplified_source": false,
+      "line_count": 38,
+      "imagery": {
+        "body_gesture": 6,
+        "time_memory": 0,
+        "people_relationships": 0,
+        "city_street": 0,
+        "cosmos": 0,
+        "sky_weather": 0,
+        "nature_plants": 0,
+        "light_fire": 0,
+        "night_moon": 0,
+        "water": 2
+      },
+      "terms": [
+        "心:0:4",
+        "手:0:2",
+        "水:9:2"
+      ],
+      "love": 2
+    },
+    {
+      "track": 8,
+      "name": "Goodbye Melody Rose",
+      "has_lyrics": true,
+      "simplified_source": false,
+      "line_count": 17,
+      "imagery": {
+        "body_gesture": 3,
+        "time_memory": 0,
+        "people_relationships": 0,
+        "city_street": 1,
+        "cosmos": 0,
+        "sky_weather": 1,
+        "nature_plants": 0,
+        "light_fire": 0,
+        "night_moon": 0,
+        "water": 1
+      },
+      "terms": [
+        "頭:0:2",
+        "城:3:1",
+        "水:9:1",
+        "眼淚:0:1",
+        "雨:5:1"
+      ],
+      "love": 0
+    },
+    {
+      "track": 9,
+      "name": "詩人的情人",
+      "has_lyrics": true,
+      "simplified_source": false,
+      "line_count": 24,
+      "imagery": {
+        "body_gesture": 5,
+        "time_memory": 0,
+        "people_relationships": 0,
+        "city_street": 1,
+        "cosmos": 0,
+        "sky_weather": 1,
+        "nature_plants": 0,
+        "light_fire": 0,
+        "night_moon": 0,
+        "water": 0
+      },
+      "terms": [
+        "手:0:4",
+        "北風:5:1",
+        "城:3:1",
+        "心:0:1"
+      ],
+      "love": 2
+    },
+    {
+      "track": 10,
+      "name": "拖男帶女",
+      "has_lyrics": true,
+      "simplified_source": false,
+      "line_count": 54,
+      "imagery": {
+        "body_gesture": 4,
+        "time_memory": 1,
+        "people_relationships": 1,
+        "city_street": 0,
+        "cosmos": 2,
+        "sky_weather": 1,
+        "nature_plants": 0,
+        "light_fire": 0,
+        "night_moon": 1,
+        "water": 1
+      },
+      "terms": [
+        "心:0:4",
+        "friend:2:1",
+        "sun:4:1",
+        "夏天:1:1",
+        "太陽:4:1",
+        "春風:5:1",
+        "月:8:1",
+        "海:9:1"
+      ],
+      "love": 22
+    },
+    {
+      "track": 11,
+      "name": "Love Outrolude (Instrumental)",
+      "has_lyrics": false,
+      "simplified_source": false,
+      "line_count": 0,
+      "imagery": {
+        "body_gesture": 0,
+        "time_memory": 0,
+        "people_relationships": 0,
+        "city_street": 0,
+        "cosmos": 0,
+        "sky_weather": 0,
+        "nature_plants": 0,
+        "light_fire": 0,
+        "night_moon": 0,
+        "water": 0
+      },
+      "terms": [],
+      "love": 0
+    },
+    {
+      "track": 12,
+      "name": "If You Leave Me Now",
+      "has_lyrics": true,
+      "simplified_source": false,
+      "line_count": 33,
+      "imagery": {
+        "body_gesture": 0,
+        "time_memory": 0,
+        "people_relationships": 0,
+        "city_street": 0,
+        "cosmos": 0,
+        "sky_weather": 0,
+        "nature_plants": 0,
+        "light_fire": 0,
+        "night_moon": 0,
+        "water": 0
+      },
+      "terms": [],
+      "love": 4
+    },
+    {
+      "track": 13,
+      "name": "春風吹之吹吹風Mix",
+      "has_lyrics": true,
+      "simplified_source": true,
+      "line_count": 32,
+      "imagery": {
+        "body_gesture": 2,
+        "time_memory": 5,
+        "people_relationships": 0,
+        "city_street": 2,
+        "cosmos": 0,
+        "sky_weather": 8,
+        "nature_plants": 9,
+        "light_fire": 0,
+        "night_moon": 0,
+        "water": 1
+      },
+      "terms": [
+        "春風:5:6",
+        "冬日:1:2",
+        "原上草:6:2",
+        "夏天:1:2",
+        "流淚:0:2",
+        "蛇:6:2",
+        "三月:1:1",
+        "城裡:3:1",
+        "悶雷:5:1",
+        "柳樹:6:1",
+        "桃花:6:1",
+        "河水:9:1",
+        "燕子:6:1",
+        "玫瑰:6:1",
+        "路上:3:1",
+        "雲堆:5:1",
+        "青蛙:6:1"
+      ],
+      "love": 0
+    }
+  ]
+}
