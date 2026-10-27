@@ -2123,12 +2123,8 @@ function posterType(c, w, h, p, ink, sub, opts = {}) {
   // the song's name: under the line when there is room, otherwise above it
   const nameY = y + w * 0.055 < h - w * 0.02 ? y + w * 0.055 : top - w * 0.025;
   c.font = `500 ${Math.max(10, w * 0.03)}px "Noto Sans SC", "Manrope", sans-serif`; c.fillStyle = sub;
-  const label = p.track ? `${p.name}` : `${p.name}`;
-  c.fillText(label, x, nameY);
-  const lw = c.measureText(label).width; rule(c, x + lw + w * 0.02, nameY - w * 0.01, x + lw + w * 0.09, nameY - w * 0.01, Math.max(1, w * 0.002), sub);
-  c.font = `500 ${Math.max(8, w * 0.017)}px "IBM Plex Mono", monospace`; if (opts.metaInk) c.fillStyle = opts.metaInk;
-  const meta = opts.meta || `KHALIL FONG 方大同 · ${p.albumMeta || "SOULBOY 2005"} · ${p.track ? "TRACK " + String(p.track).padStart(2, "0") + " · " + Math.round(p.bpm) + " BPM" : "14 SONGS"}`;
-  c.fillText(meta, x, opts.metaY ?? h * 0.055);
+  // the song's name stays as the small caption beside its line, without a rule; nothing else is printed on the poster
+  c.fillText(p.name, x, nameY);
   c.restore();
 }
 
@@ -3048,9 +3044,7 @@ function sentenceType(c, w, h, card, key, o = {}) {
     });
   });
   const yEnd = y0 + (rows.length - 1) * size * 1.28 + w * 0.055;
-  c.font = `500 ${Math.max(10, w * 0.03)}px "Noto Sans SC", "Manrope", sans-serif`; c.fillStyle = "rgba(255,246,238,.78)"; c.fillText(o.title, x, yEnd);
-  const lw = c.measureText(o.title).width; rule(c, x + lw + w * 0.02, yEnd - w * 0.01, x + lw + w * 0.09, yEnd - w * 0.01, Math.max(1, w * 0.002), "rgba(255,246,238,.78)");
-  c.font = `500 ${Math.max(8, w * 0.017)}px "IBM Plex Mono", monospace`; c.fillStyle = "rgba(255,246,238,.6)"; c.fillText(o.meta, x, h * 0.055);
+  // no title caption under the sentence: the album speaks in its sentence alone; the selector already names it
   // an image word under the pointer: say which songs sing it, and light them
   if (card._word) {
     const named = k => { const rows = albumRows(k); return wordSongsIn(k, card._word).map(tr => (rows.find(r => r.track === tr) || {}).name).filter(Boolean); };
