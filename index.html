@@ -3621,7 +3621,8 @@ function step(d) {
   show(vis[(k + d + vis.length) % vis.length]);
 }
 // where each preview reaches the poster's key line (seconds into the 30 s clip); the album covers open on the first 愛 of the song that sings it most
-const LINE_AT = {};
+// found by transcribing each preview with whisper and aligning it to the synced lyrics; when the key line falls outside the 30 s clip, the clip's first sung line
+const LINE_AT = {"sb:1":13.4,"sb:3":0.1,"sb:4":17.7,"sb:5":1.6,"sb:6":0.6,"sb:7":13.7,"sb:9":0.4,"sb:11":15.6,"tl:1":6.1,"tl:2":1.6,"tl:3":15.6,"tl:4":0.1,"tl:7":10.5,"tl:8":0.1,"tl:10":11.7,"tl:12":0.2,"tl:13":0.4,"sb-album:6":2.4,"tl-album:1":7.2};
 const ALBUM_SONG = { soulboy: ["sb-album", 6], thislove: ["tl-album", 1] };
 const keyOf = (album, track) => (album === "This Love" || album === "tl" ? "tl:" : "sb:") + track;
 const tlSong = track => TL_CARDS.find(c => c.track === track);
