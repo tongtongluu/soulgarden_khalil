@@ -109,6 +109,7 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 .posters .plate { order: -1; }
 .posters .plate { min-width: 0; display: flex; justify-content: center; }
 .posters canvas { max-width: 100%; border-radius: 4px; box-shadow: 0 1px 0 var(--shelf), 0 24px 50px -28px rgba(0, 0, 0, .5); cursor: pointer; }
+.posters:not([hidden]) .plate canvas { border-radius: 0; box-shadow: none; position: relative; z-index: 1; opacity: 0; }
 /* the text is a small caption under the poster, in columns */
 .posters .plate-text { display: block; columns: 3 240px; column-gap: 28px; min-width: 0; font-size: 11px; color: var(--muted); }
 .posters .plate-text > * { break-inside: avoid; margin: 0 0 8px; }
@@ -140,7 +141,6 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 .posters .plate-nav button:hover, .posters .plate-nav button[aria-pressed="true"] { color: var(--fg); }
 .posters .plate-nav button[aria-pressed="true"] { box-shadow: inset 0 -1px 0 var(--fg); border-radius: 0; }
 .posters .plate-nav button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
-@media (max-width: 860px) { .posters .prints { display: grid; gap: 18px; } .posters .viewer { display: contents; } .posters .plate { order: -2; } .posters .album-nav, .posters .plate-nav, .posters .style-bar { order: -1; } }
 .posters .plate-text { display: none; }
 .posters .viewer { margin-bottom: 8px; }
 .style-bar { display: flex; flex-wrap: nowrap; gap: 2px; align-items: center; min-width: 0; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
@@ -149,12 +149,105 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 .style-bar[hidden] { display: none; }
 .style-btn { flex: none; border: 0; background: transparent; color: var(--muted); font: 500 11px var(--body); padding: 5px 8px; cursor: pointer; white-space: nowrap; }
 /* on a big screen the words grow with it, so the navigation reads from across a room */
+/* the posters view is one screen: a thin bar on top (title, styles, sound, more), the poster in all the room left, and the
+   albums and the songs in two rows at the bottom, each row scrolling sideways rather than wrapping. Wherever the poster
+   does not reach, a blurred, enlarged copy of it fills the screen, so the page reads as one image rather than a card */
+body:has(.posters:not([hidden])) { margin: 0; padding-inline: 0; box-sizing: border-box; height: 100dvh; min-height: 0; overflow: hidden; padding-block: max(8px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-inset-bottom, 0px)); }
+.wrap:has(> .posters:not([hidden])) { height: 100%; max-width: none; grid-template-rows: auto minmax(0, 1fr); gap: clamp(6px, 1.2vh, 14px); }
+.wrap:has(> .posters:not([hidden])) header { flex-wrap: nowrap; gap: 8px 18px; }
+.wrap:has(> .posters:not([hidden])) header > div:first-child { flex: 1 1 auto; min-width: 0; gap: 2px; }
+.wrap:has(> .posters:not([hidden])) h1 { font-size: clamp(13px, 1.1vw, 20px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wrap:has(> .posters:not([hidden])) .journey { font-size: 10px; gap: 2px 8px; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
+.wrap:has(> .posters:not([hidden])) .controls { flex: 0 1 auto; flex-wrap: nowrap; min-width: 0; gap: 6px 10px; }
+.posters:not([hidden]) { min-height: 0; height: 100%; display: grid; }
+.posters .prints { display: grid; grid-template-rows: minmax(0, 1fr) auto auto; gap: 4px; min-height: 0; height: 100%; }
+.posters .viewer { min-height: 0; margin: 0; }
+.posters .plate { position: relative; min-height: 0; height: 100%; align-items: center; overflow: hidden; }
+.posters .album-nav, .posters .plate-nav { flex-direction: row; flex-wrap: nowrap; justify-content: safe center; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+.posters .album-nav::-webkit-scrollbar, .posters .plate-nav::-webkit-scrollbar { display: none; }
+.posters .album-group { flex-wrap: nowrap; flex: none; gap: 2px 14px; }
+.posters .album-group.is-live { margin-left: 22px; padding-left: 22px; box-shadow: inset 1px 0 0 var(--shelf); }
+.posters .album-nav button, .posters .plate-nav button { white-space: nowrap; flex: none; }
+.posters .plate-nav #plate-prev, .posters .plate-nav #plate-next { position: sticky; z-index: 1; background: color-mix(in srgb, var(--bg) 94%, transparent); box-shadow: 0 0 10px 6px color-mix(in srgb, var(--bg) 94%, transparent); }
+.posters .plate-nav #plate-prev { left: 0; } .posters .plate-nav #plate-next { right: 0; }
+.ambient { position: fixed; inset: 0; width: 100vw; height: 100dvh; z-index: 0; pointer-events: none; }
+/* the bars sit on the image: a soft shade under each keeps their words readable */
+.wrap:has(> .posters:not([hidden])) header, .posters .album-nav, .posters .plate-nav { position: relative; z-index: 2; padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); }
+.ambient-shade { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to bottom, rgba(10,8,14,.55), rgba(10,8,14,0) 90px, rgba(10,8,14,0) calc(100% - 110px), rgba(10,8,14,.6)); }
+.ambient-shade[hidden] { display: none; }
+.ambient[hidden] { display: none; }
+@media (max-width: 600px) {
+  .wrap:has(> .posters:not([hidden])) .journey { display: none; }
+  .wrap:has(> .posters:not([hidden])) header { flex-wrap: wrap; row-gap: 4px; }
+  .wrap:has(> .posters:not([hidden])) .controls { display: contents; }
+  .wrap:has(> .posters:not([hidden])) .style-bar { order: 3; flex: 1 0 100%; }
+  .posters .album-group { gap: 2px 10px; } .posters .album-nav button { font-size: 14px; padding: 4px 3px; } .posters .plate-nav button { padding: 4px 8px; }
+}
+@media (max-height: 480px) { .wrap:has(> .posters:not([hidden])) .journey { display: none; } .posters .album-nav button { padding: 2px 3px; font-size: 13px; } .posters .plate-nav button { padding: 2px 8px; } }
+/* ---- layout B (?layout=b): light and quiet. A near-white page with a faint cool edge, the poster large with soft corners
+   and a soft shadow, the whitespace around it part of the design; small muted type, the current album and song in black ---- */
+:root[data-layout="b"] { --bg: #F6F6F4; --fg: #161616; --muted: #9B9B98; --shelf: #E2E2DE; color-scheme: light; }
+:root[data-layout="b"] body { background: radial-gradient(130% 100% at 50% 42%, #FCFCFB 0%, #F4F4F2 58%, #E8E9EC 100%) fixed; color: var(--fg); }
+:root[data-layout="b"] .atmos, :root[data-layout="b"] .ambient, :root[data-layout="b"] .ambient-shade { display: none !important; }
+:root[data-layout="b"] body:has(.posters:not([hidden])) { padding-inline: clamp(16px, 4vw, 72px); padding-block: clamp(10px, 2.4vh, 36px) clamp(8px, 2vh, 28px); }
+:root[data-layout="b"] .wrap:has(> .posters:not([hidden])) header, :root[data-layout="b"] .posters .album-nav, :root[data-layout="b"] .posters .plate-nav { padding-inline: 0; }
+:root[data-layout="b"] .posters:not([hidden]) .plate { padding: clamp(10px, 3.2vh, 52px) 0; box-sizing: border-box; }
+:root[data-layout="b"] .posters:not([hidden]) .plate canvas { opacity: 1; border-radius: clamp(8px, 1.1vmin, 18px); box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 30px 70px -36px rgba(30,30,40,.38); }
+:root[data-layout="b"] h1 { font: 400 clamp(12px, 0.9vw, 22px) var(--display); color: var(--fg); letter-spacing: .01em; }
+:root[data-layout="b"] .journey { display: none !important; }
+:root[data-layout="b"] .style-btn { color: var(--muted); font-weight: 400; } :root[data-layout="b"] .style-btn[aria-pressed="true"] { color: var(--fg); box-shadow: none; }
+:root[data-layout="b"] .posters .album-nav button { font-size: clamp(12px, 0.78vw, 20px); font-weight: 400; color: var(--muted); }
+:root[data-layout="b"] .posters .album-group.is-live button { font-size: clamp(11px, 0.7vw, 18px); }
+:root[data-layout="b"] .posters .plate-nav button { font-size: clamp(11px, 0.66vw, 17px); font-weight: 400; color: var(--muted); }
+:root[data-layout="b"] .posters .album-nav button[aria-pressed="true"], :root[data-layout="b"] .posters .plate-nav button[aria-pressed="true"] { color: var(--fg); box-shadow: none; }
+:root[data-layout="b"] .posters .album-group.is-live { box-shadow: inset 1px 0 0 var(--shelf); }
+:root[data-layout="b"] .posters .plate-nav #plate-prev, :root[data-layout="b"] .posters .plate-nav #plate-next { background: transparent; box-shadow: none; }
+:root[data-layout="b"] .sound { background: #161616; color: #FFF; border-color: #161616; padding: 5px 14px; }
+:root[data-layout="b"] .more { color: var(--muted); }
+/* the reference's frame: a soft grey gradient around the screen, and the page as one big white panel inset in it */
+:root[data-layout="b"] body { background: linear-gradient(135deg, #EEF1EF 0%, #E9EAEC 45%, #E3E4E8 100%) fixed; }
+:root[data-layout="b"] body:has(.posters:not([hidden])) { padding: clamp(8px, 1.6vw, 26px); }
+:root[data-layout="b"] .wrap:has(> .posters:not([hidden])) { background: #FFF; border-radius: clamp(10px, 1.2vw, 22px); box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 30px 80px -50px rgba(40,40,60,.35); padding: clamp(12px, 2vw, 36px) clamp(14px, 3.2vw, 64px) clamp(8px, 1.4vw, 24px); box-sizing: border-box; }
+:root[data-layout="b"] .posters:not([hidden]) .plate canvas { box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 24px 60px -34px rgba(30,30,40,.42); }
+:root[data-layout="b"] .sound { border-radius: 8px; font: 500 12px var(--body); letter-spacing: .04em; }
+@media (max-width: 600px) { .paint-status { display: none; } :root[data-gallery="1"][data-zoom="1"] .posters:not([hidden]) .plate { padding-bottom: 150px; } :root[data-layout="b"] body:has(.posters:not([hidden])) { padding: 8px; } :root[data-layout="b"] .posters:not([hidden]) .plate { padding: 8px 0; } }
+/* ---- the gallery (the default): layout B's shell, and in its panel a wall of framed pictures. Before it is heard a picture
+   is only its title on blank paper; Listen walks into it, and it is painted while the song plays ---- */
+:root[data-gallery="1"] .posters .plate { perspective: 1600px; }
+/* room under the poster for the one button, so it never sits on the picture */
+:root[data-gallery="1"][data-zoom="1"] .posters:not([hidden]) .plate { padding-bottom: calc(clamp(10px, 3.2vh, 52px) + 66px); }
+:root[data-gallery="1"]:not([data-zoom="1"]) #plate-canvas { visibility: hidden; }
+.wall { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-origin: 0 0; transition: opacity .5s; will-change: transform; }
+:root[data-gallery="1"] .posters:not([hidden]) .plate { overflow: hidden; cursor: grab; touch-action: none; }
+:root[data-gallery="1"][data-zoom="1"] .posters:not([hidden]) .plate { cursor: default; }
+:root[data-zoom="1"] .wall { opacity: 0; pointer-events: none; }
+.gframe { position: absolute; border-radius: 6px; overflow: hidden; transition: box-shadow .4s, opacity .4s; }
+:root[data-gallery="1"] .posters:not([hidden]) .plate .gframe canvas { display: block; width: 100%; height: 100%; max-width: none; border-radius: 0; box-shadow: none; background: #EDEBE6; }
+.gframe.is-rel { box-shadow: 0 0 0 2px #FFF, 0 0 28px 8px rgba(255, 196, 120, .55); }
+.gframe.is-cur { box-shadow: 0 0 0 2px #161616; }
+.threads { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+:root[data-zoom="1"] .threads { opacity: 0; }
+.pills .wander { background: transparent; color: var(--muted); box-shadow: inset 0 0 0 1px var(--shelf); }
+.pills .wander[aria-pressed="true"] { color: #FFF; background: #161616; box-shadow: none; }
+.gframe.is-next { box-shadow: 0 0 0 3px #FFF, 0 0 50px 14px rgba(255, 196, 120, .8); }
+.pills { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); z-index: 4; display: flex; gap: 6px; }
+.pills button { background: #161616; color: #FFF; border: 0; border-radius: 8px; padding: 7px 14px; font: 500 clamp(11px, 0.66vw, 16px) var(--body); letter-spacing: .04em; cursor: pointer; }
+:root:not([data-zoom="1"]) .pills [data-a="prev"], :root:not([data-zoom="1"]) .pills [data-a="next"], :root:not([data-zoom="1"]) .pills [data-a="back"] { display: none; }
+.img-links { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.rec { position: absolute; border: 0; padding: 0; background: none; cursor: pointer; pointer-events: auto; text-align: left; opacity: 0; transform: translateZ(0) scale(.55); transition: opacity .6s, transform .8s cubic-bezier(.2,.8,.2,1); }
+.rec.in { opacity: 1; transform: none; }
+.rec canvas { display: block; border-radius: 4px; box-shadow: 0 12px 30px -16px rgba(0,0,0,.45); }
+.rec span { display: block; margin-top: 6px; font: 400 clamp(10px, 0.62vw, 14px) var(--display); color: var(--muted); }
+.rec:hover span { color: var(--fg); }
+.listen-pill { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); z-index: 4; background: #161616; color: #FFF; border: 0; border-radius: 8px; padding: 8px 18px; font: 500 clamp(11px, 0.66vw, 16px) var(--body); letter-spacing: .05em; cursor: pointer; }
+.listen-pill:focus-visible { outline: 2px solid #161616; outline-offset: 3px; }
+.paint-status { position: absolute; left: calc(50% + 150px); bottom: 14px; white-space: nowrap; z-index: 4; font: 400 11px var(--body); color: var(--muted); pointer-events: none; }
 @media (min-width: 1800px) {
-  h1 { font-size: clamp(20px, 1.1vw, 30px); }
-  .posters .album-nav button { font-size: clamp(15px, 0.82vw, 22px); }
-  .posters .album-group.is-live button { font-size: clamp(13px, 0.7vw, 19px); }
-  .posters .plate-nav button { font-size: clamp(12px, 0.64vw, 17px); }
-  .style-btn { font-size: clamp(11px, 0.58vw, 15px); }
+  h1 { font-size: clamp(20px, 1.1vw, 42px); }
+  .posters .album-nav button { font-size: clamp(15px, 0.82vw, 32px); }
+  .posters .album-group.is-live button { font-size: clamp(13px, 0.7vw, 27px); }
+  .posters .plate-nav button { font-size: clamp(12px, 0.64vw, 25px); }
+  .style-btn { font-size: clamp(11px, 0.58vw, 22px); }
 }
 .style-btn:hover { color: var(--fg); }
 .style-btn[aria-pressed="true"] { color: var(--fg); box-shadow: inset 0 -1px 0 var(--fg); }
@@ -234,6 +327,9 @@ canvas { display: block; width: 100%; touch-action: manipulation; }
 </div>
 
 <script>
+// which presentation: a (edge to edge, the default), b (light, quiet) or c (the gallery); ?layout= picks one
+{ const L = (new URLSearchParams(location.search).get("layout") || "g").toLowerCase();
+  document.documentElement.dataset.layout = L === "g" ? "b" : L; if (L === "g") document.documentElement.dataset.gallery = "1"; }
 // imagery groups from the hand-built lexicon matched against the full lyrics; terms are the most frequent hits on Soulboy
 const CATS = [
   { id: "body_gesture",         zh: "心 Heart",     color: "#DD7FF2", terms: "心 22 · 手 6 · 臉 6 · 眼 5" },
@@ -2183,7 +2279,7 @@ function posterType(c, w, h, p, ink, sub, opts = {}) {
   const nameY = y + w * 0.055 < h - w * 0.02 ? y + w * 0.055 : top - w * 0.025;
   c.font = `500 ${Math.max(10, w * 0.03)}px "Noto Sans SC", "Manrope", sans-serif`; c.fillStyle = sub;
   // the song's name stays as the small caption beside its line, without a rule; nothing else is printed on the poster
-  c.fillText(p.name, x, nameY);
+  if (!opts.noName) c.fillText(p.name, x, nameY);
   c.restore();
 }
 
@@ -3188,6 +3284,7 @@ function wordColour(key, word) {
   return "#FFE2B8";
 }
 function sentenceType(c, w, h, card, key, o = {}) {
+  if (sentenceType.off) return;
   if (posterType.off) return;
   if (sentenceType.defer) { sentenceType.defer.push([c, w, h, card, key, o]); return; }
   const IM = ALBUM_IMAGE[key], rows = IM.sentence.split(/(?<=，)/), shown = wd => IM.sentence.includes(wd) ? wd : wd[0];
@@ -6266,6 +6363,7 @@ function plateSong(p) {
 // opening a poster plays its song; a tab, an arrow or a tap is the gesture the browser needs before sound
 let opened = false;
 function playPlate() {
+  if (GALLERY && !zoomed) { if (typeof listen === "function") listen(null); return; }
   if (typeof listen !== "function" || prints.closest("[hidden]")) return;
   if (!soundOn) setSound(true);
   const r = plateSong(PLATES[cur]);
@@ -6280,20 +6378,24 @@ function show(i) {
   prints.querySelector(".plate-nav").hidden = g === "all";
   prints.querySelectorAll(".plate-tab").forEach(b => { b.setAttribute("aria-pressed", String(+b.dataset.i === cur)); b.hidden = b.dataset.group !== g; });
   hoverStation = -1;
-  size();
+  size(); requestAnimationFrame(size);
+  // (the gallery is set up further down; until then show() leaves the wall alone)
+
+  // the rows scroll sideways, so keep the open album and song in view
+  [prints.querySelector('.album-tab[aria-pressed="true"]'), prints.querySelector('.plate-tab[aria-pressed="true"]')].forEach(b => b && b.scrollIntoView({ block: "nearest", inline: "center" }));
   if (opened) playPlate();
 }
 function size() {
-  const p = PLATES[cur], boxW = plateBox.clientWidth;
+  const p = PLATES[cur], cs = getComputedStyle(plateBox), boxW = plateBox.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
   if (!boxW) return;
-  const top = plateBox.getBoundingClientRect().top + window.scrollY;
-  // leave room for the two rows of toggles under the poster, so nothing needs scrolling
-  const below = [".album-nav", ".plate-nav"].reduce((a, q) => a + ((document.querySelector(".posters " + q) || {}).offsetHeight || 0), 0) + 28;
-  const availH = Math.max(320, window.innerHeight - top - below);
+  // the plate is the room the grid leaves between the top bar and the two rows of buttons; the poster fills it
+  const availH = Math.max(120, plateBox.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 4);
   // the blend album is a poster like the songs; the other styles keep the wide plate
-  if (p.album && style.id !== "flat" && !p.portrait) { pw = boxW; ph = Math.min(availH, boxW * 0.62); if (boxW < 700) ph = boxW * 1.05; }
-  else { ph = Math.min(availH, boxW * 4 / 3); pw = ph * 3 / 4; }
-  dpr = Math.max(1, Math.min(2, devicePixelRatio || 1));
+  if (p.album && style.id !== "flat" && !p.portrait) { pw = Math.min(boxW, availH / 0.62); ph = Math.min(availH, pw * 0.62); }
+  // a poster is 3:4; on a screen taller than that (a phone held upright) it grows taller, up to 1:2, to fill the room
+  else { pw = Math.min(boxW, availH * 3 / 4); ph = Math.min(availH, Math.max(pw * 4 / 3, Math.min(boxW * 2, availH))); if (ph > pw * 4 / 3 + 1) pw = boxW; }
+  // sharp on retina, but never more than 2600 pixels tall, so a 4K screen still draws every frame in time
+  dpr = Math.max(1, Math.min(2, devicePixelRatio || 1, 2600 / ph));
   cv.width = off.width = Math.round(pw * dpr); cv.height = off.height = Math.round(ph * dpr); cv.style.width = pw + "px"; cv.style.height = ph + "px";
   dirty = true;
 }
@@ -6306,15 +6408,291 @@ styleBar.addEventListener("click", e => {
 prints.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   opened = true;
+  if (window.__gallery && (b.id === "plate-prev" || b.id === "plate-next")) { galleryKey({ key: b.id === "plate-prev" ? "ArrowLeft" : "ArrowRight" }); return; }
+  if (window.__gallery && b.closest(".album-nav, .plate-nav") && galleryJump(b)) return;
   if (b.id === "plate-prev") step(-1); else if (b.id === "plate-next") step(1); else if (b.dataset.album) showAlbum(b.dataset.album); else if (b.dataset.i) show(+b.dataset.i);
 });
 addEventListener("keydown", e => {
   if (prints.closest("[hidden]") || e.target.closest?.("input, select, textarea")) return;
+  if (window.__gallery && galleryKey(e)) { e.preventDefault(); return; }
   if (e.key === "ArrowRight" || e.key === "ArrowLeft") opened = true;
   if (e.key === "ArrowRight") step(1); if (e.key === "ArrowLeft") step(-1);
 });
+// ---- the gallery: one salon wall ----
+// Every picture hangs on one wall, 十張合一 at its centre and the album posters around it. Where a song hangs comes from its
+// images: each kind of image (body, time, people, city, cosmos, sky, plants, light, night, water) has a direction from the
+// centre, a song is pulled toward the kinds it sings most, and songs that sing several kinds sit further out, so pictures
+// sharing images end up near each other. Clicking a picture glides in and it paints itself while its song plays; inside,
+// ‹ › walk to the nearest picture sharing an image and back, Shuffle jumps anywhere, and Esc steps back to the wall.
+const GALLERY = document.documentElement.dataset.gallery === "1";
+let zoomed = false, paintAt = 0, strokes = [], cam = { x: 0, y: 0, D: 1000 }, camTo = null, vel = { x: 0, y: 0 }, history = [], layout = null, enteredAt = 0;
+// the camera: at distance D from the wall's plane; a picture standing z in front of it shows at scale F / (D - z)
+const F = 1000, fOf = z => F / Math.max(1, cam.D - z);
+const painted = new Map(), thumbs = new Map(), rendered = new Set(), wall = Object.assign(document.createElement("div"), { className: "wall" });
+const pills = Object.assign(document.createElement("div"), { className: "pills" }), status = Object.assign(document.createElement("div"), { className: "paint-status" }), links = Object.assign(document.createElement("div"), { className: "img-links" });
+pills.innerHTML = '<button type="button" data-a="prev" aria-label="Previous picture">‹</button><button type="button" data-a="shuffle">Shuffle</button><button type="button" data-a="next" aria-label="Next picture sharing an image">›</button><button type="button" data-a="back">Wall</button>';
+if (GALLERY) plateBox.append(wall, pills, status, links);
+const threads = document.createElementNS("http://www.w3.org/2000/svg", "svg"), trail = [];
+threads.setAttribute("class", "threads"); threads.setAttribute("aria-hidden", "true");
+function drawThreads(now) {
+  if (!layout) return; const W = plateBox.clientWidth, H = plateBox.clientHeight; threads.setAttribute("viewBox", `0 0 ${W} ${H}`); let s = "";
+  const seg = (a, b, alpha, word, wdt) => { if (!a || !b || !a.vis || !b.vis) return; const mx = (a.sx + b.sx) / 2, my = (a.sy + b.sy) / 2 - Math.hypot(b.sx - a.sx, b.sy - a.sy) * 0.22;
+    s += `<path d="M${a.sx.toFixed(1)},${a.sy.toFixed(1)} Q${mx.toFixed(1)},${my.toFixed(1)} ${b.sx.toFixed(1)},${b.sy.toFixed(1)}" stroke="rgba(255,190,110,${alpha})" stroke-width="${wdt}" fill="none" stroke-linecap="round"/>`;
+    if (word) s += `<text x="${((a.sx + b.sx) / 2 + mx) / 2}" y="${((a.sy + b.sy) / 2 + my) / 2 - 6}" fill="rgba(120,90,60,${Math.min(1, alpha * 1.6)})" font-size="12" text-anchor="middle" font-family="Noto Serif SC, serif">${esc(word)}</text>`; };
+  trail.forEach((tr, k) => { const age = (now - tr.t) / 1000, a = Math.max(0.12, 0.9 - age * 0.25) * (0.5 + 0.5 * (k + 1) / trail.length); seg(layout.by.get(tr.a), layout.by.get(tr.b), a, tr.word, 1.6); });
+  const me = layout.by.get(cur); if (me && !zoomed && !flying) sharedLinks(cur).slice(0, 5).forEach(([wd, j]) => seg(me, layout.by.get(j), 0.28 + 0.12 * Math.sin(now / 500), wd, 1));
+  threads.innerHTML = s;
+}
+// wander: the camera follows the connections on its own, painting each picture while its song plays, never repeating
+let wandering = false; const toured = new Set();
+const wanderBtn = Object.assign(document.createElement("button"), { type: "button", className: "wander", textContent: "Wander" });
+function setWander(on) { wandering = on; wanderBtn.setAttribute("aria-pressed", String(on)); if (on) { toured.add(cur); if (!zoomed) enter(cur); } }
+function wanderTick(now) {
+  if (!wandering || !zoomed || flying || reveal() < 1 || now - paintAt < 13000) return;
+  toured.add(cur); let j = sharedLinks(cur).map(([, k]) => k).find(k => !toured.has(k));
+  if (j == null) { const left = layout.items.filter(it => !toured.has(it.i)); if (!left.length) { toured.clear(); return; } const me = layout.by.get(cur); j = left.sort((a, b) => Math.hypot(a.x - me.x, a.y - me.y) - Math.hypot(b.x - me.x, b.y - me.y))[0].i; }
+  toured.add(j); switchTo(j);
+}
+const PKEY = p => p.merge ? "all" : p.group + ":" + (p.album ? "album" : p.track);
+let seen = new Set(); try { seen = new Set(JSON.parse(localStorage.getItem("sg-painted") || "[]")); } catch (e) {}
+const remember = () => { try { localStorage.setItem("sg-painted", JSON.stringify([...seen])); } catch (e) {} };
+// what each picture sings: a weight per kind of image, and its image words
+const CODE_GROUP = Object.fromEntries(Object.entries(ALBUM_CODE).map(([g, c]) => [c, g]));
+function featOf(p) {
+  const v = new Array(10).fill(0), words = new Set();
+  const take = (g, tr) => {
+    const code = ALBUM_CODE[g] || "sb", row = (ALBUM_ROWS[g] || []).find(r => r.track === tr);
+    if (row && row.src) { const [c2, t2] = row.src.split(":"); return take(CODE_GROUP[c2] || "soulboy", +t2); }
+    (row && row.terms || []).forEach(x => { const [wd, ci, n] = x.split(":"); v[+ci] += +n || 1; words.add(wd); });
+    const im = g === "thislove" ? (THIS_LOVE.find(r => r.track === tr) || {}).imagery : g === "soulboy" && typeof songs !== "undefined" ? (songs.find(s => /soulboy/i.test(s.album) && s.track === tr) || {}).imagery : null;
+    if (im && !(row && row.terms && row.terms.length)) Object.entries(im).forEach(([k, n]) => { const i = CAT_IDS.indexOf(k); if (i >= 0) v[i] += n; });
+    ((LYRIC_COLOURS[code + ":" + tr] || {}).things || []).forEach(([wd]) => words.add(wd));
+  };
+  if (p.merge) return { v, words };
+  if (p.album) { PLATES.filter(q => !q.album && q.group === p.group).forEach(q => { const f = featOf(q); f.v.forEach((x, i) => v[i] += x); }); return { v, words }; }
+  take(p.group || "soulboy", p.track); return { v, words };
+}
+function buildLayout() {
+  const idx = PLATES.map((p, i) => i), items = [], placed = [];
+  const hash = i => ((i * 2654435761) >>> 0) / 4294967296;
+  idx.forEach(i => { const p = PLATES[i], f = featOf(p), tot = f.v.reduce((a, x) => a + x, 0) || 1;
+    let ax = 0, ay = 0; f.v.forEach((x, k) => { const a = k / 10 * Math.PI * 2 - Math.PI / 2; ax += Math.cos(a) * x / tot; ay += Math.sin(a) * x / tot; });
+    const conc = Math.hypot(ax, ay), ang = conc > 0.02 ? Math.atan2(ay, ax) : hash(i) * Math.PI * 2;
+    const w = p.merge ? 2.6 : p.album ? 1.55 : [1, 0.82, 1.18, 0.92][Math.floor(hash(i + 3) * 4)];
+    const r = p.merge ? 0 : p.album ? 2.2 : 3 + (1 - conc) * 5 + hash(i + 7) * 3 + (LIVE_KEYS.includes(p.group) ? 1.5 : 0);
+    // how far from the wall each picture hangs: the centre and the album posters near the front, songs at four depths
+    const z = p.merge ? 260 : p.album ? 120 : [-900, -480, -120, 220][Math.floor(hash(i + 11) * 4)] - (LIVE_KEYS.includes(p.group) ? 120 : 0);
+    items.push({ i, w, h: w * 4 / 3, z, tx: Math.cos(ang) * r, ty: Math.sin(ang) * r * 0.8, words: f.words, v: f.v, pr: p.merge ? 0 : p.album ? 1 : LIVE_KEYS.includes(p.group) ? 3 : 2 }); });
+  items.sort((a, b) => a.pr - b.pr);
+  const gap = 0.08, hit = (x, y, it) => placed.some(q => Math.abs(q.x - x) < (q.w + it.w) / 2 + gap && Math.abs(q.y - y) < (q.h + it.h) / 2 + gap);
+  items.forEach(it => { let x = it.tx, y = it.ty;
+    for (let k = 0; hit(x, y, it) && k < 4000; k++) { const a = k * 0.55, r = 0.12 * Math.sqrt(k); x = it.tx + Math.cos(a) * r; y = it.ty + Math.sin(a) * r; }
+    it.x = x; it.y = y; placed.push(it); });
+  return { items, by: new Map(items.map(it => [it.i, it])) };
+}
+// a picture not yet heard: its own colours as a soft field (the poster drawn tiny and blurred up), the title set over it;
+// a picture already painted: the poster itself, small
+const sketch = document.createElement("canvas");
+function drawTiny(s, p, W, H, type) { const keep = [posterType.off, sentenceType.off]; posterType.off = sentenceType.off = !type;
+  try { if (p.album) p.draw(s, W, H, 7, p, -1); else drawTinted(p.draw, s, W, H, 7, p, -1); } catch (e) { s.fillStyle = "#9A98A8"; s.fillRect(0, 0, W, H); } finally { [posterType.off, sentenceType.off] = keep; } }
+function titleCard(c, W, H, p) {
+  if (seen.has(PKEY(p))) { drawTiny(c, p, W, H, true); return; }
+  sketch.width = 90; sketch.height = 120; const s = sketch.getContext("2d"); s.setTransform(1, 0, 0, 1, 0, 0); drawTiny(s, p, 90, 120, false);
+  c.save(); c.filter = `blur(${Math.round(W * 0.05)}px) saturate(1.25)`; c.drawImage(sketch, -W * 0.1, -H * 0.1, W * 1.2, H * 1.2); c.restore();
+  finish(c, W, H);
+  // the words are the poster's own: a song's key line where and how its poster sets it, an album's sentence; never the title
+  const ink = inkFor(c, W, H, p); delete p._ink;
+  if (p.album) { const keep = [p._hit, p._words]; sentenceType(c, W, H, p, p.merge ? "all" : p.group, { light: ink.light }); [p._hit, p._words] = keep; }
+  else posterType(c, W, H, p, ink.ink, ink.sub, { y: H * 0.93, noName: true });
+}
+const UNIT = 150;
+function buildWall() {
+  layout = buildLayout(); wall.innerHTML = ""; thumbs.clear(); rendered.clear();
+  layout.items.forEach(it => { const p = PLATES[it.i], el = document.createElement("div"); el.className = "gframe"; el.dataset.i = it.i;
+    el.style.cssText = `left:0;top:0;width:${it.w * UNIT}px;height:${it.h * UNIT}px;z-index:${Math.round(it.z + 1000)}`; it.el = el;
+    el.setAttribute("aria-label", p.merge ? MERGE_LABEL() : p.album ? (ALBUM_LABEL[p.group] || p.name) : p.name);
+    // the far layers sit in a light haze, as if the room's air were between them and you
+    if (it.z <= -900) el.style.filter = "blur(1.6px) saturate(.65) brightness(1.12)"; else if (it.z <= -480) el.style.filter = "blur(.6px) saturate(.8) brightness(1.06)";
+    const c = document.createElement("canvas"); el.appendChild(c); thumbs.set(it.i, c); wall.appendChild(el); });
+}
+// only pictures in or near the view are drawn, a few per frame
+function renderVisible() {
+  if (!layout) return; const W = plateBox.clientWidth, H = plateBox.clientHeight, d = Math.min(2, devicePixelRatio || 1); let n = 0;
+  for (const it of layout.items) { if (rendered.has(it.i) || !it.vis) continue;
+    const c = thumbs.get(it.i), cw = Math.round(it.w * UNIT * Math.min(2, Math.max(0.6, it.f)) * d * 0.9); c.width = cw; c.height = Math.round(cw * 4 / 3);
+    titleCard(c.getContext("2d"), c.width, c.height, PLATES[it.i]); rendered.add(it.i); if (++n >= 12) break; }
+}
+// every picture placed by the camera: nearer ones move and grow faster, so panning and walking forward read as depth;
+// one the camera is about to pass fades out, far ones are a little dimmer
+function applyCam() {
+  if (!layout) return; const W = plateBox.clientWidth, H = plateBox.clientHeight;
+  for (const it of layout.items) { const dz = cam.D - it.z, f = F / Math.max(1, dz), sx = W / 2 + (it.x * UNIT - cam.x) * f, sy = H / 2 + (it.y * UNIT - cam.y) * f, hw = it.w * UNIT * f / 2, hh = it.h * UNIT * f / 2;
+    it.f = f; it.vis = dz > 60 && sx + hw > -W * 0.3 && sx - hw < W * 1.3 && sy + hh > -H * 0.3 && sy - hh < H * 1.3;
+    if (!it.vis) { if (it.el.style.display !== "none") it.el.style.display = "none"; continue; }
+    it.sx = sx; it.sy = sy; it.el.style.display = ""; it.el.style.transform = `translate3d(${sx - hw * 2 / f / 2}px, ${sy - hh * 2 / f / 2}px, 0) scale(${f})`;
+    it.el.style.opacity = Math.min(1, (dz - 60) / 260) * (0.55 + 0.45 * Math.min(1, Math.max(0, (it.z + 1020) / 1240))); }
+}
+const overviewS = () => Math.max(0.35, (plateBox.clientHeight * 0.2) / (UNIT * 4 / 3)), overviewD = () => F / overviewS();
+function glide(x, y, D, ms = 900, arc = 0, bend = 0) { if (reduce) { cam = { x, y, D }; camTo = null; applyCam(); return; } camTo = { from: { ...cam }, to: { x, y, D }, t0: performance.now(), ms, arc, bend }; }
+function camLoop(now) {
+  requestAnimationFrame(camLoop); if (!GALLERY || !layout) return;
+  if (camTo) { const f = Math.min(1, (now - camTo.t0) / camTo.ms), e = f < 0.5 ? 4 * f * f * f : 1 - Math.pow(-2 * f + 2, 3) / 2;
+    const dx = camTo.to.x - camTo.from.x, dy = camTo.to.y - camTo.from.y, sb = (camTo.bend || 0) * Math.sin(Math.PI * e);
+    cam = { x: camTo.from.x + dx * e - dy * sb, y: camTo.from.y + dy * e + dx * sb, D: camTo.from.D * Math.pow(camTo.to.D / camTo.from.D, e) * (1 + (camTo.arc || 0) * Math.sin(Math.PI * e)) };
+    wall.style.transform = camTo.bend ? `rotate(${(camTo.bend > 0 ? 1 : -1) * 3 * Math.sin(Math.PI * e)}deg)` : ""; if (f >= 1) { camTo = null; wall.style.transform = ""; } }
+  else if (!dragging && (Math.abs(vel.x) > 0.05 || Math.abs(vel.y) > 0.05)) { cam.x -= vel.x / fOf(0); cam.y -= vel.y / fOf(0); vel.x *= 0.92; vel.y *= 0.92; }
+  applyCam(); renderVisible(); drawThreads(now); wanderTick(now);
+}
+// the picture's place on the wall, and the scale at which it fills most of the panel
+const frameCam = i => { const it = layout.by.get(i); return { x: it.x * UNIT, y: it.y * UNIT, D: it.z + F * it.h * UNIT / (plateBox.clientHeight * 0.62) }; };
+function markRelated() {
+  const me = layout && layout.by.get(cur); [...wall.children].forEach(el => { const it = layout.by.get(+el.dataset.i);
+    el.classList.toggle("is-cur", +el.dataset.i === cur); el.classList.toggle("is-rel", !!me && it !== me && [...me.words].some(w => it.words.has(w))); });
+}
+// pictures sharing an image with this one, nearest first; one per shared word
+function sharedLinks(i) {
+  const me = layout.by.get(i), out = [];
+  [...me.words].forEach(wd => { let best = null, bd = 1e9; layout.items.forEach(it => { if (it.i === i || !it.words.has(wd)) return; const d = Math.hypot(it.x - me.x, it.y - me.y); if (d < bd) { bd = d; best = it; } }); if (best) out.push([wd, best.i, bd]); });
+  return out.sort((a, b) => a[2] - b[2]);
+}
+function nextFrom(i) { const l = sharedLinks(i).filter(([, j]) => !history.includes(j)); if (l.length) return l[0][1];
+  const me = layout.by.get(i); let best = null, bd = 1e9; layout.items.forEach(it => { if (it.i === i || history.includes(it.i)) return; const d = Math.hypot(it.x - me.x, it.y - me.y); if (d < bd) { bd = d; best = it; } }); return best ? best.i : i; }
+// brush strokes in the poster's unit square: broad washes first, then smaller strokes at every angle
+function makeStrokes(seed) {
+  let s = (seed * 9301 + 49297) % 233280; const r = () => (s = (s * 9301 + 49297) % 233280) / 233280, out = [];
+  for (let i = 0; i < 16; i++) { const y = (i + r()) / 16, a = (r() - 0.5) * 0.5; out.push({ x0: -0.1, y0: y - a * 0.2, x1: 1.1, y1: y + a * 0.2, bend: (r() - 0.5) * 0.08, wd: 0.11 + r() * 0.06, at: i / 16 * 0.4 }); }
+  for (let i = 0; i < 70; i++) { const x = r(), y = r(), a = r() * Math.PI, L = 0.12 + r() * 0.25; out.push({ x0: x - Math.cos(a) * L / 2, y0: y - Math.sin(a) * L / 2, x1: x + Math.cos(a) * L / 2, y1: y + Math.sin(a) * L / 2, bend: (r() - 0.5) * 0.06, wd: 0.025 + r() * 0.05, at: 0.35 + i / 70 * 0.6 }); }
+  return out;
+}
+const mask = document.createElement("canvas"), paintField = document.createElement("canvas");
+function colourField() { const p = PLATES[cur]; paintField.width = cv.width || 300; paintField.height = cv.height || 400; const f = paintField.getContext("2d");
+  sketch.width = 90; sketch.height = 120; const s = sketch.getContext("2d"); s.setTransform(1, 0, 0, 1, 0, 0); drawTiny(s, p, 90, 120, false);
+  f.filter = `blur(${Math.round(paintField.width * 0.05)}px) saturate(1.25)`; f.drawImage(sketch, -paintField.width * 0.1, -paintField.height * 0.1, paintField.width * 1.2, paintField.height * 1.2); f.filter = "none"; }
+function reveal() { return reduce || seen.has(PKEY(PLATES[cur])) && !paintAt ? 1 : Math.min(1, (performance.now() - paintAt) / 9000); }
+function lettered() { const r = plateSong(PLATES[cur]), at = (r && r.at) || 0, now = typeof audio !== "undefined" && !audio.paused ? audio.currentTime : (performance.now() - paintAt) / 1000; return reveal() >= 1 && now >= at; }
+function applyPaint(c) {
+  if (!GALLERY || !zoomed) return;
+  const v = reveal(); status.textContent = v < 1 ? "Mixing paints…" : lettered() ? "" : "Listening for the line…";
+  if (v >= 1) { if (!seen.has(PKEY(PLATES[cur]))) { seen.add(PKEY(PLATES[cur])); remember(); rendered.delete(cur); } return; }
+  const W = cv.width, H = cv.height; mask.width = W; mask.height = H; const m = mask.getContext("2d"); m.lineCap = "round"; m.strokeStyle = "#000";
+  strokes.forEach(st => { const f = Math.max(0, Math.min(1, (v - st.at) / 0.1)); if (f <= 0) return; m.lineWidth = st.wd * W; m.beginPath(); m.moveTo(st.x0 * W, st.y0 * H);
+    m.quadraticCurveTo((st.x0 + st.x1) / 2 * W, (st.y0 + st.y1) / 2 * H + st.bend * H, st.x0 * W + (st.x1 - st.x0) * W * f, st.y0 * H + (st.y1 - st.y0) * H * f); m.stroke(); });
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = "destination-in"; c.drawImage(mask, 0, 0); c.globalCompositeOperation = "destination-over"; c.drawImage(paintField, 0, 0, W, H); c.restore();
+  dirty = true;
+}
+function flip(from, to) {
+  if (reduce) return;
+  cv.style.transition = "none"; cv.style.transformOrigin = "0 0"; cv.style.transform = `translate(${from.left - to.left}px, ${from.top - to.top}px) scale(${from.width / to.width})`;
+  requestAnimationFrame(() => requestAnimationFrame(() => { cv.style.transition = "transform .8s cubic-bezier(.3,.1,.2,1)"; cv.style.transform = "none"; }));
+}
+function startPaint() { paintAt = seen.has(PKEY(PLATES[cur])) ? 0 : performance.now(); if (!paintAt && !reduce) paintAt = performance.now() - 9000; strokes = makeStrokes(cur + 7); colourField(); posterType.off = sentenceType.off = !reduce; opened = true; playPlate(); links.innerHTML = ""; setTimeout(showLinks, reduce ? 0 : 450); }
+// what to look at next: pictures sharing an image (named by it), the same song live or in the studio, the next song on its album
+function recsFor(i) {
+  const out = [], have = new Set([i]), add = (j, label) => { if (j == null || have.has(j) || out.length >= 5) return; have.add(j); out.push([j, label]); };
+  sharedLinks(i).forEach(([wd, j]) => add(j, wd));
+  const p = PLATES[i];
+  if (!p.album) { const twin = PLATES.findIndex((q, j) => j !== i && !q.album && (q.src && q.src === glyphKey(p) || p.src && (glyphKey(q) === p.src || q.src === p.src))); if (twin >= 0) add(twin, LIVE_KEYS.includes(PLATES[twin].group) ? "live" : "studio");
+    const sib = PLATES.findIndex((q, j) => j > i && q.group === p.group && !q.album); if (sib >= 0) add(sib, ALBUM_LABEL[p.group] || "album"); }
+  // an album: the songs its sentence's images come from, each named by its image
+  else { const key = p.merge ? "all" : p.group, st = (ALBUM_IMAGE[key] || {}).stations || [];
+    if (p.merge) STUDIO_KEYS.forEach(g => add(PLATES.findIndex(q => q.album && q.group === g), ALBUM_LABEL[g]));
+    else st.forEach(([tr, wd]) => add(PLATES.findIndex(q => !q.album && q.group === p.group && q.track === tr), wd)); }
+  return out;
+}
+// they float in from the depth around the poster: small, live thumbnails, each named by what it shares
+function showLinks() {
+  links.innerHTML = ""; if (!zoomed) return;
+  // where the poster rests (its layout box, not mid-flight), in the plate's own coordinates
+  const r = { left: cv.offsetLeft, top: cv.offsetTop, width: cv.offsetWidth, height: cv.offsetHeight }; r.right = r.left + r.width; r.bottom = r.top + r.height;
+  const b = { left: 0, top: 0, width: plateBox.clientWidth, height: plateBox.clientHeight }, recs = recsFor(cur), side = (b.width - r.width) / 2 > 150;
+  const tw = side ? Math.min(130, (b.width - r.width) / 2 - 40) : Math.min(46, (b.width - 40) / recs.length - 10);
+  recs.forEach(([j, label], k) => {
+    const el = document.createElement("button"); el.type = "button"; el.className = "rec"; el.dataset.j = j; el.setAttribute("aria-label", label + ": " + PLATES[j].name);
+    const c = document.createElement("canvas"), d = Math.min(2, devicePixelRatio || 1); c.width = Math.round(tw * d); c.height = Math.round(tw * 4 / 3 * d);
+    const src = thumbs.get(j); if (src && rendered.has(j)) c.getContext("2d").drawImage(src, 0, 0, c.width, c.height); else titleCard(c.getContext("2d"), c.width, c.height, PLATES[j]);
+    c.style.width = tw + "px"; c.style.height = tw * 4 / 3 + "px";
+    el.append(c, Object.assign(document.createElement("span"), { textContent: label })); links.appendChild(el);
+    let x, y;
+    if (side) { const left = k % 2 === 0, row = Math.floor(k / 2), n = Math.ceil(recs.length / 2); x = (left ? r.left - b.left - tw - 34 - (row % 2) * 18 : r.right - b.left + 34 + (row % 2) * 18); y = r.top - b.top + (r.height - tw * 4 / 3) * (n > 1 ? row / (n - 1) : 0.5) * 0.9 + r.height * 0.05; }
+    else { x = (b.width - recs.length * (tw + 10)) / 2 + k * (tw + 10); y = b.height - 146; }
+    el.style.left = x + "px"; el.style.top = y + "px"; el.style.transitionDelay = (0.35 + k * 0.09) + "s";
+  });
+  requestAnimationFrame(() => requestAnimationFrame(() => links.querySelectorAll(".rec").forEach(x => x.classList.add("in"))));
+}
+// into a picture: the camera flies to it on the wall behind, the poster grows out of its frame and paints itself
+function enter(i) {
+  if (i !== cur) { history.push(cur); show(i); }
+  const th = thumbs.get(cur), fc = frameCam(cur); glide(fc.x, fc.y, fc.D, 700); markRelated(); enteredAt = performance.now();
+  zoomed = true; document.documentElement.dataset.zoom = "1"; size(); startPaint();
+  if (th) flip(th.getBoundingClientRect(), cv.getBoundingClientRect());
+}
+// from one picture straight to another, without stepping out
+let flying = false;
+function flyTo(j, keepHistory, word) {
+  if (j === cur || j == null || flying) return;
+  if (reduce) { if (!keepHistory) history.push(cur); show(j); const fc = frameCam(cur); glide(fc.x, fc.y, fc.D); markRelated(); size(); startPaint(); return; }
+  // the painting goes back into its frame on the wall
+  const th = thumbs.get(cur);
+  if (reveal() >= 1) { const snap = document.createElement("canvas"); snap.width = cv.width; snap.height = cv.height; snap.getContext("2d").drawImage(cv, 0, 0); painted.set(cur, snap); }
+  if (th) { rendered.delete(cur); const a = cv.getBoundingClientRect(), b = th.getBoundingClientRect(); cv.style.transition = "transform .45s ease-in, opacity .45s"; cv.style.transformOrigin = "0 0"; cv.style.transform = `translate(${b.left - a.left}px, ${b.top - a.top}px) scale(${b.width / a.width})`; }
+  zoomed = false; flying = true; links.innerHTML = ""; status.textContent = ""; posterType.off = sentenceType.off = false; if (typeof listen === "function") listen(null);
+  setTimeout(() => { delete document.documentElement.dataset.zoom; cv.style.transform = ""; }, 450);
+  // the target glows while the camera swoops across to it
+  const from = layout.by.get(cur), to = layout.by.get(j), dist = Math.hypot(to.x - from.x, to.y - from.y) * UNIT, fc = frameCam(j);
+  [...wall.children].forEach(el => el.classList.toggle("is-next", +el.dataset.i === j));
+  const ms = 1100 + Math.min(1400, dist * 0.45), arc = 0.5 + Math.min(1.6, dist / 900);
+  setTimeout(() => glide(fc.x, fc.y, fc.D, ms, arc, (Math.random() < 0.5 ? -1 : 1) * (0.18 + Math.random() * 0.12)), 380);
+  trail.push({ a: from.i, b: j, word: word || "", t: performance.now() }); if (trail.length > 6) trail.shift();
+  setTimeout(() => { flying = false; wall.querySelectorAll(".is-next").forEach(x => x.classList.remove("is-next")); if (!keepHistory) history.push(cur); show(j); markRelated();
+    const t2 = thumbs.get(cur); zoomed = true; document.documentElement.dataset.zoom = "1"; enteredAt = performance.now(); size(); startPaint(); if (t2) flip(t2.getBoundingClientRect(), cv.getBoundingClientRect()); }, 380 + ms + 60);
+}
+function switchTo(j) { const l = sharedLinks(cur).find(([, k]) => k === j); flyTo(j, false, l ? l[0] : (recsFor(cur).find(([k]) => k === j) || [])[1]); }
+function back() { const j = history.pop(); if (j != null) flyTo(j, true); }
+function shuffle() { const j = layout.items[Math.floor(Math.random() * layout.items.length)].i; zoomed ? switchTo(j) : enter(j); }
+// back to the wall, standing where the picture hangs; it keeps its painting
+function leave() {
+  if (!zoomed) return; const th = thumbs.get(cur);
+  zoomed = false; posterType.off = sentenceType.off = false; status.textContent = ""; links.innerHTML = ""; if (typeof listen === "function") listen(null);
+  rendered.delete(cur); const it = layout.by.get(cur); glide(it.x * UNIT, it.y * UNIT, Math.min(overviewD() / 1.4, cam.D * 2.4), 800);
+  if (th && !reduce) { const a = cv.getBoundingClientRect(), b = th.getBoundingClientRect(); cv.style.transition = "transform .7s cubic-bezier(.3,.1,.2,1)"; cv.style.transformOrigin = "0 0"; cv.style.transform = `translate(${b.left - a.left}px, ${b.top - a.top}px) scale(${b.width / a.width})`; setTimeout(() => { if (!zoomed) { delete document.documentElement.dataset.zoom; cv.style.transform = ""; } }, 700); }
+  else delete document.documentElement.dataset.zoom;
+}
+pills.addEventListener("click", e => { const a = e.target.closest("button")?.dataset.a; if (!a) return; if (a === "shuffle") shuffle(); else if (!zoomed) return; else if (a === "next") switchTo(nextFrom(cur)); else if (a === "prev") back(); else if (a === "back") leave(); });
+links.addEventListener("click", e => { const j = e.target.closest("button")?.dataset.j; if (j != null) switchTo(+j); });
+addEventListener("resize", () => zoomed && setTimeout(showLinks, 60));
+// the wall: drag or scroll to wander, pinch or ⌘-scroll to step closer or back, click a picture to go into it
+let dragging = false, down = null;
+plateBox.addEventListener("pointerdown", e => { if (wandering && !e.target.closest(".wander")) setWander(false); if (!GALLERY || zoomed) return; down = { x: e.clientX, y: e.clientY, t: performance.now(), moved: 0 }; dragging = true; vel = { x: 0, y: 0 }; camTo = null; plateBox.setPointerCapture?.(e.pointerId); });
+plateBox.addEventListener("pointermove", e => { if (!dragging || !down) return; const dx = e.clientX - down.x, dy = e.clientY - down.y; down.moved += Math.abs(dx) + Math.abs(dy); cam.x -= dx / fOf(0); cam.y -= dy / fOf(0); vel = { x: dx, y: dy }; down.x = e.clientX; down.y = e.clientY; });
+plateBox.addEventListener("pointerup", e => { if (!dragging) return; dragging = false; if (down && down.moved < 6) { const el = document.elementsFromPoint(e.clientX, e.clientY).find(x => x.classList && x.classList.contains("gframe")); if (el) enter(+el.dataset.i); } down = null; });
+plateBox.addEventListener("wheel", e => { if (wandering) setWander(false); if (!GALLERY || zoomed) return; e.preventDefault(); camTo = null;
+  if (e.ctrlKey || e.metaKey) cam.D = Math.max(260, Math.min(overviewD() * 2, cam.D * Math.exp(e.deltaY * 0.01))); else { cam.x += e.deltaX / fOf(0); cam.y += e.deltaY / fOf(0); } }, { passive: false });
+// inside a picture: a click outside it, or a swipe, steps out or along
+cv.addEventListener("click", e => { if (GALLERY && zoomed) e.stopPropagation(); });
+plateBox.addEventListener("click", e => { if (GALLERY && zoomed && e.target === plateBox && performance.now() - enteredAt > 600) leave(); });
+let tx0 = null; plateBox.addEventListener("touchstart", e => { if (zoomed) tx0 = e.touches[0].clientX; }, { passive: true });
+plateBox.addEventListener("touchend", e => { if (!zoomed || tx0 == null) return; const d = e.changedTouches[0].clientX - tx0; if (Math.abs(d) > 50) d < 0 ? switchTo(nextFrom(cur)) : back(); tx0 = null; });
+function galleryKey(e) {
+  if (!GALLERY) return false;
+  if (e.key === "w" || e.key === "W") { setWander(!wandering); return true; }
+  if (wandering) setWander(false);
+  if (zoomed) { if (e.key === "Escape") leave(); else if (e.key === "ArrowRight") switchTo(nextFrom(cur)); else if (e.key === "ArrowLeft") back(); else if (e.key === "s" || e.key === "S") shuffle(); else return false; return true; }
+  const k = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowDown: [0, 1], ArrowUp: [0, -1] }[e.key]; if (k) { const W = plateBox.clientWidth / fOf(0) * 0.5; glide(cam.x + k[0] * W, cam.y + k[1] * W, cam.D, 500); return true; }
+  if (e.key === "s" || e.key === "S") { shuffle(); return true; } return false;
+}
+// the album and song text at the bottom: an album flies to its poster on the wall, a song flies in and paints
+function galleryJump(b) {
+  if (!GALLERY || !layout) return false;
+  if (b.dataset.album) { const i = PLATES.findIndex(p => p.album && p.group === b.dataset.album); if (i < 0) return true; if (zoomed) leave(); show(i); const it = layout.by.get(i); glide(it.x * UNIT, it.y * UNIT, overviewD() / 2.2); markRelated(); return true; }
+  if (b.dataset.i) { zoomed ? switchTo(+b.dataset.i) : enter(+b.dataset.i); return true; }
+  return false;
+}
+if (GALLERY) { wall.after(threads); pills.prepend(wanderBtn); wanderBtn.addEventListener("click", () => setWander(!wandering)); if (/[?&]wander\b/.test(location.search)) setTimeout(() => setWander(true), 1500);
+  buildWall(); cam = { x: 0, y: 0, D: overviewD() }; window.__gallery = true; showAlbum("all"); markRelated(); requestAnimationFrame(camLoop);
+  addEventListener("resize", () => { applyCam(); rendered.clear(); }); }
 // hover to listen: the whole song poster plays its song; on the album poster each station plays its own
 function hoverAt(e) {
+  if (window.__gallery) return;
   const r = cv.getBoundingClientRect(), x = e.clientX - r.left, p = PLATES[cur];
   let s = null, at;
   const was = hoverStation;
@@ -6345,23 +6723,29 @@ document.querySelectorAll('.seg button[data-view="posters"], #sound').forEach(b 
 
 // the review page (raw/review.html, outside the repository) draws any poster at any moment; it only exists with ?review in the address
 if (/[?&]review\b/.test(location.search)) window.__soul = { plates: PLATES, studio: STUDIO_KEYS, live: LIVE_KEYS, label: ALBUM_LABEL, rows: ALBUM_ROWS, lineAt: LINE_AT, glyphKey,
+  typeOff(b) { posterType.off = !!b; }, song(i) { const r = plateSong(PLATES[i]); return r && r.s && r.s.preview_url ? { url: r.s.preview_url, at: r.at || 0 } : null; },
   styles: STYLES.map(s => s.id), go(i, st) { style = STYLES.find(s => s.id === st) || STYLES[0]; show(i); dirty = true; }, canvas: cv,
   render(i, c, w, h, t) { const p = PLATES[i]; c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, w, h); if (!p.album) drawTinted(p.draw, c, w, h, t, p, -1); else p.draw(c, w, h, t, p, -1); finish(c, w, h); } };
 function frame(ms) {
   requestAnimationFrame(frame);
-  if (prints.closest("[hidden]") || !pw) return;
+  if (prints.closest("[hidden]") || !pw) { if (typeof extend === "function") extend(); return; }
+  try { frameBody(ms); } finally { if (typeof extend === "function") extend(); }
+}
+function frameBody(ms) {
+  if (GALLERY && !zoomed) return;
+  if (GALLERY) posterType.off = sentenceType.off = !lettered();
   const t = ms / 1000, c = cv.getContext("2d"), p = PLATES[cur];
   // every style draws the same poster: the blend scene with its sentence or key line; the styles only change the drawing language
   if (style.id === "flat") {
     c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, pw, ph);
     if (!p.album) drawTinted(p.draw, c, pw, ph, t, p, hoverStation);
     else p.draw(c, pw, ph, t, p, hoverStation);
-    finish(c, pw, ph);
+    finish(c, pw, ph); applyPaint(c);
     return;
   }
   if (style.id === "bauhaus" && p.merge) {
     c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, pw, ph);
-    bauhausMerge(c, pw, ph, t, p); paperGrain(c, pw, ph, 0.12);
+    bauhausMerge(c, pw, ph, t, p); paperGrain(c, pw, ph, 0.12); applyPaint(c);
     return;
   }
   // the reprinted styles rework every pixel, so they redraw a few times a second rather than every frame
@@ -6387,9 +6771,40 @@ function frame(ms) {
       c.save(); c.fillStyle = lin(c, 0, y, 0, y + h * 0.34, `rgba(${v},.7)`, `rgba(${v},0)`); c.fillRect(0, y, w, h * 0.34); c.restore(); }
     sentenceType(c, w, h, card, key, { ...o, light });
   });
+  applyPaint(c);
 }
 new ResizeObserver(size).observe(plateBox);
 addEventListener("resize", size);
+addEventListener("orientationchange", () => setTimeout(size, 200));
+// the ambient fill: a small copy of the poster, enlarged and blurred behind the whole page, refreshed a few times a second
+// the poster carried to every edge of the screen: a full-screen canvas behind the page copies the poster where it stands
+// and, around it, stretches the poster's own outermost columns and rows out to the screen's edges (softened a little, so
+// a dot on the edge becomes a soft band, not a streak). Sky, horizon and ground run on; there is no card and no margin.
+const ambient = Object.assign(document.createElement("canvas"), { className: "ambient" }), ambShade = Object.assign(document.createElement("div"), { className: "ambient-shade" });
+ambient.setAttribute("aria-hidden", "true"); ambShade.setAttribute("aria-hidden", "true");
+(document.querySelector(".atmos") || document.body.firstChild).after(ambient, ambShade);
+const actx = ambient.getContext("2d");
+const feather = document.createElement("canvas");
+function extend() {
+  const on = !prints.closest("[hidden]") && cv.width > 0 && document.documentElement.dataset.layout === "a"; ambient.hidden = ambShade.hidden = !on; if (!on) return;
+  const d = Math.min(2, devicePixelRatio || 1), W = Math.round(innerWidth * d), H = Math.round(innerHeight * d);
+  if (ambient.width !== W || ambient.height !== H) { ambient.width = W; ambient.height = H; }
+  const r = cv.getBoundingClientRect(), x = r.left * d, y = r.top * d, w = r.width * d, h = r.height * d, sw = cv.width, sh = cv.height, k = Math.max(1, Math.round(sw * 0.004));
+  // behind: the poster itself, enlarged to cover the screen and blurred, so its sky and ground carry on to every edge
+  const sc = Math.max(W / w, H / h) * 1.08, cw = w * sc, ch = h * sc;
+  actx.save(); actx.filter = "blur(" + Math.round(22 * d) + "px)"; actx.drawImage(cv, x + w / 2 - cw / 2, y + h / 2 - ch / 2, cw, ch); actx.filter = "none";
+  actx.globalCompositeOperation = "soft-light"; actx.globalAlpha = 0.22; actx.fillStyle = actx.createPattern(grain, "repeat"); actx.fillRect(0, 0, W, H);
+  actx.globalCompositeOperation = "source-over"; actx.globalAlpha = 1;
+  // in front: the poster crisp, its sides fading into what is behind wherever the screen goes on past them
+  if (feather.width !== sw || feather.height !== sh) { feather.width = sw; feather.height = sh; }
+  const f = feather.getContext("2d"); f.globalCompositeOperation = "source-over"; f.clearRect(0, 0, sw, sh); f.drawImage(cv, 0, 0);
+  const fx = sw * 0.07, fy = sh * 0.05, open = [x > 1, x + w < W - 1, y > 1, y + h < H - 1];
+  f.globalCompositeOperation = "destination-in";
+  if (open[0] || open[1]) { const g = f.createLinearGradient(0, 0, sw, 0); g.addColorStop(0, open[0] ? "rgba(0,0,0,0)" : "#000"); g.addColorStop(fx / sw, "#000"); g.addColorStop(1 - fx / sw, "#000"); g.addColorStop(1, open[1] ? "rgba(0,0,0,0)" : "#000"); f.fillStyle = g; f.fillRect(0, 0, sw, sh); }
+  if (open[2] || open[3]) { const g = f.createLinearGradient(0, 0, 0, sh); g.addColorStop(0, open[2] ? "rgba(0,0,0,0)" : "#000"); g.addColorStop(fy / sh, "#000"); g.addColorStop(1 - fy / sh, "#000"); g.addColorStop(1, open[3] ? "rgba(0,0,0,0)" : "#000"); f.fillStyle = g; f.fillRect(0, 0, sw, sh); }
+  actx.drawImage(feather, x, y, w, h);
+  actx.restore();
+}
 show(PLATES.findIndex(p => p.merge));
 requestAnimationFrame(frame);
 document.fonts && document.fonts.ready.then(size);
